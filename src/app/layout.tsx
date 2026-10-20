@@ -5,6 +5,9 @@ import "./globals.css";
 const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito" });
 const kannada = Noto_Sans_Kannada({ subsets: ["kannada"], weight: ["400", "600", "700"], variable: "--font-kannada" });
 
+// Every page shows a family's own data, so nothing is pre-rendered at build time.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "StudyBuddy Kannada",
   description: "Grade 6 Kannada (3rd language) practice: read, write by hand, get it marked, see progress.",
