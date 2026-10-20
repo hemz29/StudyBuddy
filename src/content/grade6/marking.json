@@ -1,0 +1,21 @@
+{
+  "version": "g5-term1-2024-25",
+  "label": "Marks based on the school's Grade 5 Term 1 pattern (1 mark per item)",
+  "perType": {
+    "meaning_kn": 1,
+    "meaning_en": 1,
+    "en_to_kn": 1,
+    "opposite": 1,
+    "gender": 1,
+    "plural": 1,
+    "split": 1,
+    "rhyme": 1,
+    "number_name": 1,
+    "fill_blank": 1,
+    "who_said": 1,
+    "one_sentence": 1,
+    "own_sentence": 1,
+    "poem_line": 1,
+    "poet_name": 1
+  }
+}
