@@ -1,4 +1,7 @@
-# StudyBuddy Kannada
+# StudyBuddy
+
+Enabling parents to help their children learn Kannada confidently.
+
 
 Grade 6 Kannada (3rd language) practice for the Friday pilot. A child reads a lesson, writes a worksheet **by hand**, and sends a phone photo. The app reads the handwriting, the child confirms what was read, and then the answers are marked. Parents can follow progress without knowing Kannada.
 
