@@ -71,7 +71,7 @@ Import the GitHub repo into Vercel and add these environment variables:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service_role key (server only; never shared) |
 | `ANTHROPIC_API_KEY` | Claude API key |
-| `NEXT_PUBLIC_SITE_URL` | e.g. `https://studybuddy-kannada.vercel.app` (used in QR codes) |
+| `NEXT_PUBLIC_SITE_URL` | `https://study-buddy-kannada.vercel.app` (used in QR codes) |
 
 Reading a page takes about a minute. The upload routes allow up to 300 seconds, which needs a Vercel plan that supports it (Fluid compute is on by default).
 
