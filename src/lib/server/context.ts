@@ -7,11 +7,27 @@ import { localStore } from "@/lib/store/local";
 import { supabaseStore } from "@/lib/store/supabase";
 import type { Child, Store } from "@/lib/store/types";
 
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Older Supabase projects call the keys "anon" and "service_role"; newer ones (and Vercel's integration) use
+// "publishable" and "secret". Either works.
+const URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
+const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
 
 // Without Supabase settings the app runs in demo mode: one built-in parent, data in a local file.
 export const isDemo = !URL || !ANON;
+
+// Demo mode can't work on Vercel (no writable disk), so say exactly what's missing instead of failing later.
+function checkSetup() {
+  if (!process.env.VERCEL) return;
+  const missing = [
+    !URL && "NEXT_PUBLIC_SUPABASE_URL",
+    !ANON && "NEXT_PUBLIC_SUPABASE_ANON_KEY (or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)",
+    !SERVICE && "SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SECRET_KEY)",
+  ].filter(Boolean);
+  if (missing.length)
+    throw new Error(`Supabase isn't set up on Vercel. Missing environment variable(s): ${missing.join(", ")}. Add them in Vercel → Settings → Environment Variables, then redeploy.`);
+}
+
 const DEMO_PARENT = { id: "00000000-0000-4000-8000-000000000001", email: "demo@studybuddy.local" };
 
 export async function supabaseServer() {
@@ -31,6 +47,7 @@ export async function supabaseServer() {
 }
 
 export async function getParent(): Promise<{ id: string; email: string } | null> {
+  checkSetup();
   if (isDemo) return DEMO_PARENT;
   const { data } = await (await supabaseServer()).auth.getUser();
   return data.user ? { id: data.user.id, email: data.user.email ?? "" } : null;
@@ -49,8 +66,9 @@ export async function userStore(): Promise<Store> {
 
 // Store for the phone upload page, which is authorised by a single-use token instead of a login.
 export function serviceStore(): Store {
+  checkSetup();
   if (isDemo) return localStore;
-  return supabaseStore(createClient(URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } }));
+  return supabaseStore(createClient(URL!, SERVICE!, { auth: { persistSession: false } }));
 }
 
 const CHILD_COOKIE = "sb_child";
