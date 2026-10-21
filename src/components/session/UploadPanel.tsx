@@ -22,9 +22,13 @@ export function UploadPanel({ state, onOpen, refresh }: { state: SessionState; o
   const [error, setError] = useState("");
   const open = qr !== null || pages.length > 0;
 
+  // Pressing either upload button means writing is over: stop the timer.
+  const finishWriting = () => fetch(`/api/sessions/${session.id}/done`, { method: "POST" }).then(refresh, () => undefined);
+
   async function showQr() {
     setError("");
     onOpen();
+    finishWriting();
     const res = await fetch(`/api/sessions/${session.id}/token`, { method: "POST" });
     const data = await res.json();
     if (!res.ok) return setError(data.error ?? "Couldn't make the QR code.");
@@ -36,6 +40,7 @@ export function UploadPanel({ state, onOpen, refresh }: { state: SessionState; o
     setBusy(true);
     setError("");
     onOpen();
+    finishWriting();
     for (const f of Array.from(files)) {
       try {
         const small = await compressPage(f);

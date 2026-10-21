@@ -9,7 +9,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ token: 
   const pages = await r.store.listPages(r.session.parentId, r.session.id);
   return NextResponse.json({
     nickname: r.child.nickname,
-    theme: r.child.theme,
+    avatar: r.child.theme,
     worksheet: getWorksheet(r.session.worksheetId)?.title,
     pages: pages.map((p) => ({ id: p.id, status: p.status, error: p.error })),
     graded: r.session.status === "graded",

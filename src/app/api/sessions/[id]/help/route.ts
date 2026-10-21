@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { fail, ownedSession } from "@/lib/server/api";
 
-const Body = z.object({ questionId: z.string(), level: z.number().int().min(1).max(4) });
+const Body = z.object({ questionId: z.string(), level: z.number().int().min(1).max(2) });
 
-// Records the highest "I'm stuck" step opened for a question. Help never changes marks.
+// Records the highest hint opened for a question. Hint 1 is free; Hint 2 halves the marks for that answer (see lib/help).
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const r = await ownedSession((await params).id);
   if ("error" in r) return r.error;

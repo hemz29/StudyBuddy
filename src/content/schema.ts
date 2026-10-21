@@ -29,6 +29,8 @@ export const GlossarySchema = z.object({
   word: z.string(),
   meaningKn: z.string(),
   meaningEn: z.string(),
+  // The English word printed for "English word → Kannada" questions, when it isn't the first meaning.
+  enPrompt: z.string().optional(),
 });
 
 // Question types used in the teacher's notes and the school worksheet.

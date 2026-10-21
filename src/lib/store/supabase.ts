@@ -9,7 +9,7 @@ const camel = (k: string) => k.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
 function toRow(obj: Record<string, unknown>) {
   return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined).map(([k, v]) => [snake(k), v]));
 }
-function fromRow<T>(row: Record<string, unknown> | null): T {
+export function fromRow<T>(row: Record<string, unknown> | null): T {
   return (row && Object.fromEntries(Object.entries(row).map(([k, v]) => [camel(k), typeof v === "string" && /^(awarded|max)$/.test(k) ? Number(v) : v]))) as T;
 }
 function check<T>({ data, error }: { data: T; error: { message: string } | null }) {
@@ -83,6 +83,9 @@ export function supabaseStore(db: SupabaseClient): Store {
 
     logAi: async (parentId, e) => {
       check(await db.from("ai_usage_events").insert({ ...toRow(e), parent_id: parentId }));
+    },
+    logActivity: async (parentId, e) => {
+      check(await db.from("activity_events").insert({ kind: e.kind, path: e.path ?? null, child_id: e.childId ?? null, detail: e.detail ?? {}, parent_id: parentId }));
     },
   };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LESSONS, WORKSHEETS, getQuestion, getWorksheet } from "@/content";
+import { LESSONS, WORKSHEETS, getQuestion, getWorksheet, sectionPart } from "@/content";
 import { KEY_GRADED } from "@/content/schema";
 import { gradeByKey } from "@/lib/grading/answerKey";
 import { transliterate } from "@/lib/transliterate";
@@ -22,15 +22,42 @@ describe("content", () => {
         }
   });
 
-  it("builds the term worksheet in the school's section order", () => {
-    const ws = getWorksheet("term-practice-1")!;
-    expect(ws.sections.map((s) => s.type)).toEqual([
-      "meaning_kn", "meaning_en", "en_to_kn", "opposite", "gender", "plural", "split",
-      "one_sentence", "who_said", "own_sentence", "number_name", "poem_line", "poet_name",
-    ]);
-    expect(ws.totalMarks).toBe(53);
-    expect(WORKSHEETS.length).toBe(7);
-    for (const w of WORKSHEETS) expect(w.sections.length, w.id).toBeGreaterThan(3);
+  it("builds the practice tests on the school's Term 1 pattern: 40 marks, Section A 20 + Section B 20", () => {
+    const tests = WORKSHEETS.filter((w) => w.kind === "test");
+    expect(tests.map((t) => t.id)).toEqual(["test-1", "test-2", "test-3"]);
+    for (const t of tests) {
+      expect(t.totalMarks, t.id).toBe(40);
+      expect(t.minutes).toBe(60);
+      const marks = (part: "A" | "B") => t.sections.filter((s) => sectionPart(s.type) === part).reduce((n, s) => n + s.questions.length, 0);
+      expect([marks("A"), marks("B")], t.id).toEqual([20, 20]);
+      expect(t.sections.map((s) => [s.type, s.questions.length])).toEqual([
+        ["meaning_kn", 3], ["meaning_en", 3], ["en_to_kn", 3], ["opposite", 3], ["gender", 3], ["plural", 2], ["split", 3],
+        ["one_sentence", 6], ["who_said", 2], ["own_sentence", 3], ["number_name", 4], ["poem_line", 5],
+      ]);
+      // No word is tested twice in one paper (e.g. its Kannada meaning and its English meaning).
+      const vocab = t.sections.filter((s) => ["meaning_kn", "meaning_en", "en_to_kn"].includes(s.type)).flatMap((s) => s.questions.map((q) => (q.type === "en_to_kn" ? q.answers[0] : q.prompt)));
+      expect(new Set(vocab).size, t.id).toBe(vocab.length);
+    }
+  });
+
+  it("reproduces the school's Term 1 paper as Test 1", () => {
+    const t = getWorksheet("test-1")!;
+    const prompts = t.sections.map((s) => s.questions.map((q) => q.prompt).join(" | "));
+    expect(prompts[0]).toBe("ಕಳೆ | ಭವಿಷ್ಯ | ಛಾವಣಿ");
+    expect(prompts[2]).toBe("Agriculture | Breath | Noble");
+    expect(prompts[10]).toBe("೪೫ | ೩೩ | ೪೨ | ೩೪");
+    expect(t.sections[11].questions[0].prompt).toBe("ಕೆಂಪು …");
+  });
+
+  it("makes every chapter practice 25 marks in 40 minutes, and keeps old worksheets for past attempts", () => {
+    const practice = WORKSHEETS.filter((w) => w.kind === "practice");
+    expect(practice.length).toBe(6);
+    for (const w of practice) {
+      expect(w.totalMarks, w.id).toBe(25);
+      expect(w.minutes).toBe(40);
+    }
+    expect(getWorksheet("term-practice-1")?.retired).toBe(true);
+    expect(getWorksheet("panchatantra-a")?.retired).toBe(true);
   });
 });
 

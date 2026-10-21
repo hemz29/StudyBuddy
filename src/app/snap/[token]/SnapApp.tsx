@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { compressPage } from "@/components/session/UploadPanel";
-import { ThemeMascot } from "@/components/ThemeArt";
-import type { Theme } from "@/lib/store/types";
+import { AvatarImage } from "@/components/AvatarImage";
 
-type Info = { nickname: string; theme: Theme; worksheet?: { kn: string; en: string }; graded: boolean };
+type Info = { nickname: string; avatar: string; worksheet?: { kn: string; en: string }; graded: boolean };
 type Shot = { file: File; url: string };
 
 // Phone screen: one big action at a time, made for a 10–11-year-old.
@@ -55,12 +54,12 @@ export function SnapApp({ token }: { token: string }) {
 
   if (error && !info) return <Shell><p className="text-center text-xl font-bold">{error}</p></Shell>;
   if (!info) return <Shell><p className="text-center">Loading…</p></Shell>;
-  if (info.graded) return <Shell theme={info.theme}><p className="text-center text-xl font-bold">This worksheet is already marked. Look at the computer!</p></Shell>;
+  if (info.graded) return <Shell><p className="text-center text-xl font-bold">This worksheet is already marked. Look at the computer!</p></Shell>;
 
   return (
-    <Shell theme={info.theme}>
+    <Shell>
       <div className="flex flex-col items-center text-center">
-        <ThemeMascot theme={info.theme} size={64} />
+        <AvatarImage avatar={info.avatar} size={88} />
         <h1 className="mt-2 text-2xl font-extrabold">Hi {info.nickname}!</h1>
         <p className="opacity-80">{info.worksheet?.en}</p>
       </div>
@@ -114,10 +113,10 @@ export function SnapApp({ token }: { token: string }) {
   );
 }
 
-function Shell({ children, theme }: { children: React.ReactNode; theme?: Theme }) {
+function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div data-theme={theme} className="min-h-screen bg-bg">
-      <main className="on-bg mx-auto flex max-w-md flex-col gap-5 px-4 py-8">{children}</main>
+    <div className="app-bg min-h-screen">
+      <main className="mx-auto flex max-w-md flex-col gap-5 px-4 py-8">{children}</main>
     </div>
   );
 }

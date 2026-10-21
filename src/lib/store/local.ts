@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import type { AiUsageEvent, Child, PageUpload, PracticeSession, QuestionAttempt, Store, UploadToken } from "./types";
+import type { ActivityEvent, AiUsageEvent, Child, PageUpload, PracticeSession, QuestionAttempt, Store, UploadToken } from "./types";
 
 // Demo-mode store: one JSON file on this computer. Used when Supabase isn't configured (local development).
 type Db = {
@@ -11,11 +11,12 @@ type Db = {
   attempts: QuestionAttempt[];
   tokens: UploadToken[];
   ai: (AiUsageEvent & { parentId: string; at: string })[];
+  activity: (ActivityEvent & { parentId: string; createdAt: string })[];
 };
 
 const DIR = process.env.LOCAL_DATA_DIR ?? path.join(process.cwd(), ".data");
 const FILE = path.join(DIR, "db.json");
-const empty = (): Db => ({ children: [], sessions: [], pages: [], attempts: [], tokens: [], ai: [] });
+const empty = (): Db => ({ children: [], sessions: [], pages: [], attempts: [], tokens: [], ai: [], activity: [] });
 
 let queue: Promise<unknown> = Promise.resolve();
 
@@ -134,4 +135,11 @@ export const localStore: Store = {
     tx((db) => {
       db.ai.push({ ...e, parentId, at: now() });
     }),
+  logActivity: (parentId, e) =>
+    tx((db) => {
+      db.activity.push({ ...e, parentId, createdAt: now() });
+    }),
 };
+
+// Everything in the demo store, for the admin page.
+export const localDump = () => load();

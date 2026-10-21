@@ -3,6 +3,7 @@ import { after, NextResponse } from "next/server";
 import type { PracticeSession, Store } from "@/lib/store/types";
 import { fail, type ImageType } from "./api";
 import { readPage } from "./pipeline";
+import { noteWritingDone } from "./activity";
 
 const PAGES_PER_DAY = 30;
 const PAGES_PER_SESSION = 8;
@@ -24,6 +25,7 @@ export async function acceptPage(store: Store, session: PracticeSession, image: 
   await store.putImage(imageKey, image.data, image.type);
   const page = await store.addPage(session.parentId, { sessionId: session.id, imageKey, status: "received", error: null });
   await store.updateSession(session.parentId, session.id, { status: "reading" });
+  await noteWritingDone(store, session);
   after(() => readPage(store, session, page, image.data, image.type));
   return NextResponse.json({ pageId: page.id });
 }

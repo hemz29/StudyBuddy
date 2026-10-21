@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getWorksheet, MARKING } from "@/content";
@@ -5,6 +6,11 @@ import { isDemo, requireParent, userStore } from "@/lib/server/context";
 import { recommendation, scoreTrend, skillRows } from "@/lib/dashboard";
 import { ScoreChart } from "@/components/parent/ScoreChart";
 import { DemoBanner } from "@/components/DemoBanner";
+import { AvatarImage } from "@/components/AvatarImage";
+import { Logo } from "@/components/shell/Logo";
+import { logActivity } from "@/lib/server/activity";
+import { isAdmin } from "@/lib/server/admin";
+import { writingTime } from "@/lib/time";
 
 async function deleteChild(formData: FormData) {
   "use server";
@@ -37,20 +43,28 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
   const skills = skillRows(attempts);
   const trend = scoreTrend(sessions, attempts);
   const rec = recommendation(attempts);
+  await logActivity(store, parent.id, { kind: "parent_dashboard", path: "/parent", childId: child.id });
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8">
+    <div className="app-bg min-h-screen">
+    <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6">
       {isDemo && <DemoBanner />}
-      <header className="flex flex-wrap items-center gap-3">
-        <div className="mr-auto">
-          <h1 className="text-3xl font-extrabold">{child.nickname}&apos;s progress</h1>
-          <p className="text-muted">Grade 6 Kannada (3rd language) · {MARKING.label}</p>
-        </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="mr-auto"><Logo href="/parent" /></span>
         {children.length > 1 &&
           children.map((c) => (
-            <Link key={c.id} href={`/parent?child=${c.id}`} className={`chip h-9 px-4 ${c.id === child.id ? "bg-accent text-accent-ink" : "bg-accent-soft"}`}>{c.nickname}</Link>
+            <Link key={c.id} href={`/parent?child=${c.id}`} className={`chip h-9 px-4 ${c.id === child.id ? "bg-accent text-accent-ink" : "bg-white/80"}`}>{c.nickname}</Link>
           ))}
+        {isAdmin(parent.email) && <Link href="/admin" className="btn btn-ghost">Admin</Link>}
         <Link href="/profiles" className="btn btn-ghost">Back to learning</Link>
+      </div>
+      <header className="card relative overflow-hidden bg-white">
+        <Image src="/art/parent.webp" alt="" fill priority sizes="1152px" className="object-cover object-left opacity-90" />
+        <div className="relative ml-auto flex min-h-56 max-w-md flex-col justify-center gap-2 p-6 sm:min-h-64">
+          <AvatarImage avatar={child.theme} size={64} />
+          <h1 className="text-3xl">{child.nickname}&apos;s progress</h1>
+          <p className="text-muted">Grade 6 Kannada (3rd language) · {MARKING.label}</p>
+        </div>
       </header>
 
       {review.length > 0 && (
@@ -63,15 +77,15 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         <Stat label="Latest worksheet" value={latest ? `${fmt(latest.awarded ?? 0)}/${fmt(latest.max ?? 0)}` : "–"} note={latest ? `${Math.round(((latest.awarded ?? 0) / (latest.max || 1)) * 100)}% · ${new Date(latest.completedAt!).toLocaleDateString("en-IN")}` : "No worksheet marked yet"} />
         <Stat label="Practice this week" value={String(week)} note="worksheets and card sets finished" />
         <Stat label="Questions answered" value={String(answered.length)} note={`${fullMarks} got full marks`} />
-        <Stat label="Written without help" value={written.length ? `${Math.round((own / written.length) * 100)}%` : "–"} note={written.length ? `${own} of ${written.length} written answers` : "Shows after the first worksheet"} />
+        <Stat label="Written without hints" value={written.length ? `${Math.round((own / written.length) * 100)}%` : "–"} note={written.length ? `${own} of ${written.length} written answers` : "Shows after the first worksheet"} />
       </section>
 
-      <section className="card p-5">
+      <section className="card bg-white/95 p-5">
         <h2 className="text-lg font-bold">Recommended next practice</h2>
         {rec ? <p className="mt-1">{rec.text}</p> : <p className="mt-1 text-muted">Not enough answers yet to make a fair suggestion. After a few worksheets, this will point to the area that needs most practice.</p>}
       </section>
 
-      <section className="card p-5">
+      <section className="card bg-white/95 p-5">
         <h2 className="text-lg font-bold">Skills</h2>
         <p className="text-sm text-muted">Each percentage only counts questions that test that skill. “Not practised yet” is not a low score.</p>
         <div className="mt-3 overflow-x-auto">
@@ -101,18 +115,18 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         </div>
       </section>
 
-      <section className="card p-5">
+      <section className="card bg-white/95 p-5">
         <h2 className="text-lg font-bold">Score over time</h2>
         <p className="text-sm text-muted">First try of each worksheet, as a percentage (worksheets have different totals). Indicative only: worksheets cover different chapters, and scores here don&apos;t predict school exam marks.</p>
         {trend.length >= 2 ? <ScoreChart points={trend} /> : <p className="mt-4 rounded-xl bg-accent-soft p-4 text-sm">Not enough worksheets yet to show a trend – {trend.length === 1 ? "one more" : "two"} to go.</p>}
       </section>
 
-      <section className="card p-5">
+      <section className="card bg-white/95 p-5">
         <h2 className="text-lg font-bold">History</h2>
         {worksheets.length === 0 ? <p className="mt-2 text-muted">No worksheets yet.</p> : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="text-muted"><tr><th className="py-2">Date</th><th>Worksheet</th><th>Try</th><th>Score</th><th>Help used</th><th /></tr></thead>
+              <thead className="text-muted"><tr><th className="py-2">Date</th><th>Worksheet</th><th>Try</th><th>Score</th><th>Time</th><th>Hints</th><th /></tr></thead>
               <tbody>
                 {worksheets.map((s) => (
                   <tr key={s.id} className="border-t border-line">
@@ -120,7 +134,8 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
                     <td>{getWorksheet(s.worksheetId)?.title.en}</td>
                     <td>{s.retryOf ? "Retry" : "First try"}</td>
                     <td>{s.status === "graded" ? `${fmt(s.awarded ?? 0)}/${fmt(s.max ?? 0)}` : <span className="text-muted">Not finished</span>}</td>
-                    <td>{Object.keys(s.help).length ? `${Object.keys(s.help).length} question(s)` : "None"}</td>
+                    <td>{writingTime(s.startedAt, s.writingDoneAt, getWorksheet(s.worksheetId)?.minutes ?? 60)?.text ?? "–"}</td>
+                    <td>{hintText(s.help)}</td>
                     <td>{s.status === "graded" && <Link href={`/parent/session/${s.id}`} className="font-bold text-accent">Review answers →</Link>}</td>
                   </tr>
                 ))}
@@ -130,7 +145,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         )}
       </section>
 
-      <section className="card p-5 text-sm text-muted">
+      <section className="card bg-white/95 p-5 text-sm text-muted">
         <h2 className="text-base font-bold text-ink">Your data</h2>
         <p className="mt-1">We store {child.nickname}&apos;s nickname, answers, marks and the answer photos (so you can check the marking). Photos are only visible to you. AI is used to read handwriting and mark sentence answers; we log how much it costs, not what was written.</p>
         <form action={deleteChild} className="mt-3">
@@ -139,15 +154,24 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         </form>
       </section>
     </main>
+    </div>
   );
 }
 
 function Stat({ label, value, note }: { label: string; value: string; note: string }) {
   return (
-    <div className="card p-5">
+    <div className="card bg-white/95 p-5">
       <p className="text-sm font-bold text-muted">{label}</p>
       <p className="mt-1 text-3xl font-extrabold">{value}</p>
       <p className="text-sm text-muted">{note}</p>
     </div>
   );
+}
+
+// "2 × Hint 1, 1 × Hint 2" for the history table.
+function hintText(help: Record<string, number>) {
+  const levels = Object.values(help);
+  const h1 = levels.filter((l) => l === 1).length;
+  const h2 = levels.filter((l) => l >= 2).length;
+  return [h1 && `${h1} × Hint 1`, h2 && `${h2} × Hint 2`].filter(Boolean).join(", ") || "None";
 }

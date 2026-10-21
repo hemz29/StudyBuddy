@@ -1,36 +1,62 @@
-import type { Worksheet, WorksheetSection } from "@/content";
+import { sectionPart, type Worksheet, type WorksheetSection } from "@/content";
 import type { Question } from "@/content/schema";
+import { LogoMark } from "@/components/shell/Logo";
 
-// Printable worksheet in the school's format: bilingual instructions, marks per section, answer lines.
+// Printable worksheet in the school's paper format: Section A and B, bilingual instructions, marks per section
+// as "(1X3=3)", answer lines. StudyBuddy's logo sits top right; the school's name and logo are never used.
 const WORD_TYPES = new Set(["meaning_kn", "meaning_en", "en_to_kn", "opposite", "gender", "plural", "split", "rhyme", "number_name"]);
 const LINES: Record<string, number> = { one_sentence: 2, who_said: 1, own_sentence: 1, fill_blank: 0 };
 
 const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 
 export function WorksheetPaper({ ws }: { ws: Worksheet }) {
+  const partMarks = (p: "A" | "B") =>
+    ws.sections.filter((s) => sectionPart(s.type) === p).reduce((t, s) => t + s.marksEach * s.questions.length, 0);
+  let last = "";
   return (
     <article className="worksheet mx-auto bg-white text-black">
-      <header className="text-center">
-        <p className="text-lg font-bold tracking-wide">GRADE VI · KANNADA 3rd LANGUAGE · PRACTICE WORKSHEET</p>
+      <header className="relative text-center">
+        <div className="absolute right-0 top-0 flex items-center gap-1.5">
+          <LogoMark size={30} />
+          <span className="font-serif text-sm font-semibold">StudyBuddy</span>
+        </div>
+        <p className="pt-1 text-lg font-bold tracking-wide">GRADE VI · KANNADA 3rd LANGUAGE</p>
+        <p className="font-bold">{ws.kind === "test" ? "Practice Test" : "Chapter Practice"}</p>
         <p className="kn mt-1 text-xl font-bold">{ws.title.kn}</p>
         <p className="text-sm">{ws.title.en}</p>
         <div className="mt-4 flex justify-between text-sm font-bold">
           <span>NAME: ______________________</span>
           <span>DATE: ____________</span>
-          <span>Max. Marks: {fmt(ws.totalMarks)}</span>
+          <span className="text-right">
+            Duration: {ws.minutes === 60 ? "1 hour" : `${ws.minutes} minutes`}
+            <br />
+            Max. Marks: {fmt(ws.totalMarks)}
+          </span>
         </div>
       </header>
       <hr className="my-4 border-black" />
-      {ws.sections.map((s, i) => (
-        <Section key={s.type} n={i + 1} s={s} poemCues={ws.poemCues} />
-      ))}
+      {ws.sections.map((s, i) => {
+        const part = sectionPart(s.type);
+        const heading = !ws.retired && part !== last;
+        last = part;
+        return (
+          <div key={s.type}>
+            {heading && (
+              <p className="mb-3 mt-1 text-center font-bold underline">
+                Section – {part} ({fmt(partMarks(part))} Marks)
+              </p>
+            )}
+            <Section n={i + 1} s={s} poemCues={ws.poemCues} />
+          </div>
+        );
+      })}
       <p className="mt-6 text-center text-xs text-gray-500">When you finish, take a clear photo of each page in good light.</p>
     </article>
   );
 }
 
 function Section({ n, s, poemCues }: { n: number; s: WorksheetSection; poemCues?: string[] }) {
-  const total = s.marksEach * s.questions.length;
+  const total = s.questions.length * s.marksEach;
   return (
     <section className="ws-section mb-5">
       <div className="flex items-start justify-between gap-4">
@@ -39,7 +65,9 @@ function Section({ n, s, poemCues }: { n: number; s: WorksheetSection; poemCues?
           <br />
           <span className="ml-5 text-sm">({s.en})</span>
         </p>
-        <span className="whitespace-nowrap text-sm font-bold">({fmt(s.marksEach)}×{s.questions.length}={fmt(total)})</span>
+        <span className="whitespace-nowrap text-sm font-bold">
+          {s.type === "poem_line" ? `(${fmt(total)})` : `(${fmt(s.marksEach)}X${s.questions.length}=${fmt(total)})`}
+        </span>
       </div>
       {WORD_TYPES.has(s.type) ? (
         <ol className="mt-2 grid grid-cols-2 gap-x-10 gap-y-4 pl-5">
@@ -54,8 +82,6 @@ function Section({ n, s, poemCues }: { n: number; s: WorksheetSection; poemCues?
         </ol>
       ) : s.type === "poem_line" ? (
         <PoemLines questions={s.questions} cues={poemCues} />
-      ) : s.type === "poet_name" ? (
-        <p className="mt-2 pl-5"><span className="kn">ಕವಿಯ ಹೆಸರು</span>: <span className="inline-block w-72 border-b border-dotted border-black">&nbsp;</span></p>
       ) : (
         <ol className="mt-2 flex flex-col gap-3 pl-5">
           {s.questions.map((q, i) => (
@@ -74,10 +100,13 @@ function Section({ n, s, poemCues }: { n: number; s: WorksheetSection; poemCues?
   );
 }
 
+// As on the school paper: the first word of the verse and the last word of its last line are printed;
+// the child writes the four lines, then the poet's name.
 function PoemLines({ questions, cues }: { questions: Question[]; cues?: string[] }) {
-  // Stanzas of four lines; as on the school worksheet, only the first word of each stanza is printed.
+  const lines = questions.filter((q) => q.type === "poem_line");
+  const poet = questions.find((q) => q.type === "poet_name");
   const stanzas: Question[][] = [];
-  for (let i = 0; i < questions.length; i += 4) stanzas.push(questions.slice(i, i + 4));
+  for (let i = 0; i < lines.length; i += 4) stanzas.push(lines.slice(i, i + 4));
   return (
     <div className="mt-2 flex flex-col gap-4 pl-5">
       {stanzas.map((st, si) => (
@@ -86,10 +115,16 @@ function PoemLines({ questions, cues }: { questions: Question[]; cues?: string[]
             <li key={q.id} className="flex items-end gap-2">
               <span className="kn w-24 text-lg">{li === 0 ? q.prompt.replace(" …", "") : ""}</span>
               <span className="h-9 flex-1 border-b border-black/70" />
+              {li === st.length - 1 && !cues && <span className="kn text-lg">{q.answers[0].split(" ").at(-1)}</span>}
             </li>
           ))}
         </ol>
       ))}
+      {poet && (
+        <p className="mt-2">
+          <span className="kn">ಕವಿಯ ಹೆಸರು</span>: <span className="inline-block w-72 border-b border-dotted border-black">&nbsp;</span>
+        </p>
+      )}
     </div>
   );
 }

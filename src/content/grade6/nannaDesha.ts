@@ -3,9 +3,9 @@ import { exercise, glossaryExercises, ownSentence, pairs, sentences } from "../h
 
 // Source: teacher's notes "Nanna desha Nanna Jana - translation" and "Nanna Desha Nanna Jana - Answer" (3-page version).
 const glossary = [
-  { word: "ಒಕ್ಕಲು", meaningKn: "ಬೇಸಾಯ", meaningEn: "Farming / Agriculture" },
+  { word: "ಒಕ್ಕಲು", meaningKn: "ಬೇಸಾಯ", meaningEn: "Farming / Agriculture", enPrompt: "Agriculture" },
   { word: "ನೆಲೆ", meaningKn: "ವಾಸಸ್ಥಳ, ಆಶ್ರಯ", meaningEn: "Residence / Shelter" },
-  { word: "ಪ್ರಾಣ", meaningKn: "ಉಸಿರು", meaningEn: "Life / Breath" },
+  { word: "ಪ್ರಾಣ", meaningKn: "ಉಸಿರು", meaningEn: "Life / Breath", enPrompt: "Breath" },
   { word: "ವರ್ತಮಾನ", meaningKn: "ಇಂದಿನ, ಪ್ರಸ್ತುತ", meaningEn: "The present / Current" },
   { word: "ಭವಿಷ್ಯ", meaningKn: "ನಾಳಿನ, ಮುಂದಿನ", meaningEn: "Future" },
   { word: "ಋಣ", meaningKn: "ಸಾಲ, ಹಂಗು", meaningEn: "Debt" },
@@ -141,9 +141,9 @@ export const nannaDesha: LessonInput = {
       { prompt: "ಎದ್ದೇಳಿ", answers: ["ಎದ್ದು + ಏಳಿ"] },
     ]),
     exercise("nanna-desha.poem", "poem_line", "poem", "ಪದ್ಯವನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ.", "Complete the poem.", [
-      // Second stanza, as on the school worksheet. The prompt is the line's first word.
-      ...nannaDeshaStanzas[1].map(([line]) => ({ prompt: line.split(" ")[0] + " …", answers: [line] })),
-      ...nannaDeshaStanzas[2].map(([line]) => ({ prompt: line.split(" ")[0] + " …", answers: [line] })),
+      // Every line, stanza by stanza. Stanzas 2 and 3 come first so their ids (.1–.8) stay the same as in earlier versions.
+      // The prompt is the line's first word.
+      ...[1, 2, 0, 3, 4].flatMap((st) => nannaDeshaStanzas[st].map(([line]) => ({ prompt: line.split(" ")[0] + " …", answers: [line] }))),
     ]),
     exercise("nanna-desha.poet", "poet_name", "poem", "ಕವಿಯ ಹೆಸರನ್ನು ಬರೆಯಿರಿ.", "Write the name of the poet.", [
       { prompt: "ಕವಿಯ ಹೆಸರು", answers: ["ಚೆನ್ನವೀರ ಕಣವಿ", "ಕಣವಿ"], model: { kn: "ಚೆನ್ನವೀರ ಕಣವಿ", en: "Chennaveera Kanavi" } },

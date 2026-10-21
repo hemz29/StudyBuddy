@@ -1,75 +1,143 @@
 "use client";
-import { useState } from "react";
-import { getWorksheet } from "@/content";
+import { useEffect, useState } from "react";
+import { getWorksheet, sectionPart } from "@/content";
 import type { Question } from "@/content/schema";
-import { helpSteps } from "@/lib/help";
+import { hint1, hint2 } from "@/lib/help";
 import { transliterate } from "@/lib/transliterate";
 import type { PracticeSession } from "@/lib/store/types";
+import { KnText } from "@/components/Word";
+import { Timer } from "./Timer";
 
-// The worksheet questions in large type while the child writes on paper, each with an "I'm stuck" button.
+// The worksheet questions in large type while the child writes on paper, each with a Hint button.
 export function WorksheetMode({ session, worksheetId }: { session: PracticeSession; worksheetId: string }) {
   const ws = getWorksheet(worksheetId)!;
   const [help, setHelp] = useState<Record<string, number>>(session.help);
 
-  async function openHelp(q: Question) {
-    const level = Math.min(4, (help[q.id] ?? 0) + 1);
-    setHelp((h) => ({ ...h, [q.id]: level }));
+  async function openHint(q: Question, level: 1 | 2) {
+    setHelp((h) => ({ ...h, [q.id]: Math.max(level, h[q.id] ?? 0) }));
     await fetch(`/api/sessions/${session.id}/help`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ questionId: q.id, level }) });
   }
 
+  let lastPart = "";
   return (
     <div className="flex flex-col gap-4">
-      <div className="card flex flex-wrap items-center gap-3 p-5">
+      <div className="card flex flex-wrap items-center gap-3 bg-white/90 p-5">
         <div className="mr-auto">
-          <h1 className="text-2xl font-extrabold">{ws.title.en}</h1>
-          <p className="text-muted">Write your answers on paper. Use the same numbers as below.</p>
+          <h1 className="text-2xl">{ws.title.en}</h1>
+          <p className="text-muted">Write your answers on paper, using the same numbers as below. {ws.totalMarks} marks.</p>
         </div>
         <a href={`/worksheets/${ws.id}.pdf`} target="_blank" rel="noreferrer" className="btn btn-ghost">Worksheet PDF</a>
       </div>
+      <Timer session={session} minutes={ws.minutes} />
+      <HintRules />
 
-      {ws.sections.map((s, si) => (
-        <section key={s.type} className="paper p-5">
-          <div className="flex items-start justify-between gap-3">
-            <h2 className="font-bold">
-              {si + 1}. <span className="kn">{s.kn}</span>
-              <span className="block text-sm font-normal text-gray-500">{s.en}</span>
-            </h2>
-            <span className="chip bg-gray-100 text-gray-700">{s.marksEach * s.questions.length} marks</span>
+      {ws.sections.map((s, si) => {
+        const part = sectionPart(s.type);
+        const heading = part !== lastPart && ws.retired !== true ? part : null;
+        lastPart = part;
+        return (
+          <div key={s.type} className="flex flex-col gap-4">
+            {heading && <h2 className="serif mt-2 text-center text-xl">Section {heading}</h2>}
+            <section className="paper p-5">
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-bold">
+                  {si + 1}. <span className="kn">{s.kn}</span>
+                  <span className="block text-sm font-normal text-gray-500">{s.en}</span>
+                </h3>
+                <span className="chip bg-gray-100 text-gray-700">{s.questions.length * s.marksEach} marks</span>
+              </div>
+              <ol className="mt-3 flex flex-col divide-y divide-gray-100">
+                {s.questions.map((q, qi) => (
+                  <QuestionRow key={q.id} number={`${si + 1}.${qi + 1}`} q={q} level={help[q.id] ?? 0} hidePrompt={q.type === "poem_line" && qi % 4 !== 0} open={(l) => openHint(q, l)} />
+                ))}
+              </ol>
+            </section>
           </div>
-          <ol className="mt-3 flex flex-col divide-y divide-gray-100">
-            {s.questions.map((q, qi) => {
-              const level = help[q.id] ?? 0;
-              const steps = helpSteps(q);
-              const poemHidden = s.type === "poem_line" && qi % 4 !== 0;
-              return (
-                <li key={q.id} className="py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-10 shrink-0 font-bold text-gray-500">{si + 1}.{qi + 1}</span>
-                    <div className="flex-1">
-                      <p className={`${s.type === "en_to_kn" ? "" : "kn"} text-2xl`}>{poemHidden ? "…" : q.prompt.replace(" …", "")}</p>
-                      {!poemHidden && s.type !== "en_to_kn" && <p className="text-sm italic text-gray-500">{transliterate(q.prompt.replace(" …", ""))}</p>}
-                    </div>
-                    <button onClick={() => openHelp(q)} disabled={level >= 4} className="chip h-9 shrink-0 bg-warn-soft px-3 text-warn">
-                      {level === 0 ? "I'm stuck" : level < 4 ? "More help" : "All help shown"}
-                    </button>
-                  </div>
-                  {level > 0 && (
-                    <div className="mt-3 flex flex-col gap-2 pl-13">
-                      {steps.slice(0, level).map((st, i) => (
-                        <div key={i} className="rounded-xl bg-yellow-50 px-4 py-2">
-                          <p className="text-xs font-bold uppercase tracking-wide text-yellow-800">Step {i + 1}: {st.title}</p>
-                          <p className="whitespace-pre-line text-gray-800">{st.body}</p>
-                          {st.kn && <p className="kn mt-1 text-xl">{st.kn}</p>}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        </section>
-      ))}
+        );
+      })}
+    </div>
+  );
+}
+
+function HintRules() {
+  return (
+    <p className="rounded-2xl bg-white/85 px-5 py-3 text-sm text-muted">
+      💡 Stuck? Press <b className="text-ink">Hint</b> next to a question. <b className="text-ink">Hint 1</b> is free.{" "}
+      <b className="text-ink">Hint 2</b> shows choices, and that answer then gets <b className="text-ink">half marks</b>.
+    </p>
+  );
+}
+
+function QuestionRow({ number, q, level, hidePrompt, open }: { number: string; q: Question; level: number; hidePrompt: boolean; open: (l: 1 | 2) => void }) {
+  const prompt = q.type === "poet_name" ? "ಕವಿಯ ಹೆಸರು" : q.prompt.replace(" …", "");
+  const latin = q.type === "en_to_kn";
+  return (
+    <li className="py-3">
+      <div className="flex items-center gap-3">
+        <span className="w-10 shrink-0 font-bold text-gray-500">{number}</span>
+        <div className="flex-1">
+          {hidePrompt ? (
+            <p className="text-2xl text-gray-400">…</p>
+          ) : latin ? (
+            <p className="text-2xl">{prompt}</p>
+          ) : (
+            <>
+              <p className="text-2xl"><KnText text={prompt} /></p>
+              {q.type !== "number_name" && <p className="text-sm italic text-gray-500">{transliterate(prompt)}</p>}
+            </>
+          )}
+        </div>
+        {level === 0 ? (
+          <button onClick={() => open(1)} className="chip h-9 shrink-0 bg-warn-soft px-4 text-warn">💡 Hint</button>
+        ) : level === 1 ? (
+          <button onClick={() => open(2)} className="chip h-9 shrink-0 border border-warn/40 bg-white px-3 text-warn">Hint 2 · half marks</button>
+        ) : (
+          <span className="chip h-9 shrink-0 bg-gray-100 px-3 text-gray-500">Hint 2 used</span>
+        )}
+      </div>
+      {level >= 1 && <Hint1Box q={q} />}
+      {level >= 2 && <Hint2Box q={q} />}
+    </li>
+  );
+}
+
+function Hint1Box({ q }: { q: Question }) {
+  const h = hint1(q);
+  return (
+    <div className="ml-13 mt-3 rounded-2xl bg-yellow-50 px-4 py-3">
+      <p className="text-xs font-bold uppercase tracking-wide text-yellow-800">Hint 1 · free</p>
+      {h.lines.map((l, i) => <p key={i} className="text-gray-800">{l}</p>)}
+      {h.kn && <p className="kn mt-1 whitespace-pre-line text-xl">{h.kn}</p>}
+      {h.knEn && <p className="text-sm italic text-gray-600">{h.knEn}</p>}
+    </div>
+  );
+}
+
+function Hint2Box({ q }: { q: Question }) {
+  const h = hint2(q);
+  const [picked, setPicked] = useState<string | null>(null);
+  useEffect(() => setPicked(null), [q.id]);
+  return (
+    <div className="ml-13 mt-2 rounded-2xl bg-peach/70 px-4 py-3">
+      <p className="text-xs font-bold uppercase tracking-wide text-peach-ink">Hint 2 · half marks for this answer</p>
+      <p className="text-gray-800">{h.question}</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        {h.options.map((o) => {
+          const state = picked === o ? (o === h.correct ? "right" : "wrong") : null;
+          return (
+            <button
+              key={o}
+              onClick={() => setPicked(o)}
+              className={`rounded-xl border-2 bg-white px-3 py-2 text-left ${h.latin ? "" : "kn text-lg"} ${
+                state === "right" ? "border-good bg-good-soft" : state === "wrong" ? "border-bad/60 bg-bad-soft" : "border-transparent"
+              }`}
+            >
+              {o}
+            </button>
+          );
+        })}
+      </div>
+      {picked && <p className="mt-2 text-sm font-bold">{picked === h.correct ? "✓ That's the one. Now write it on your paper." : "Not that one. Try another."}</p>}
     </div>
   );
 }

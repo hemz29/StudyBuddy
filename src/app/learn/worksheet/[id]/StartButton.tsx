@@ -21,7 +21,7 @@ export function StartButton({ worksheetId, retryOf }: { worksheetId: string; ret
 
   return (
     <>
-      <button onClick={start} disabled={busy} className="btn btn-primary">{busy ? "Starting…" : "I'm ready – start writing"}</button>
+      <button onClick={start} disabled={busy} className="btn btn-primary">{busy ? "Starting…" : "I'm ready – start the timer"}</button>
       {error && <p className="w-full text-bad">{error}</p>}
     </>
   );

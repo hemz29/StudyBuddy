@@ -1,9 +1,7 @@
 import type { QuestionType, Skill } from "@/content/schema";
 
-export const THEMES = ["kitten", "space", "floral", "speed", "geometric"] as const;
-export type Theme = (typeof THEMES)[number];
-
-export type Child = { id: string; parentId: string; nickname: string; theme: Theme; createdAt: string };
+// The child's avatar is stored in the "theme" column (themes came first; see lib/avatars).
+export type Child = { id: string; parentId: string; nickname: string; theme: string; createdAt: string };
 
 export type SessionStatus = "writing" | "reading" | "checking" | "graded";
 export type PracticeSession = {
@@ -20,7 +18,9 @@ export type PracticeSession = {
   help: Record<string, number>;
   awarded: number | null;
   max: number | null;
+  // The timer runs from startedAt ("I'm ready") to writingDoneAt ("I've finished writing" or the first photo).
   startedAt: string;
+  writingDoneAt?: string | null;
   completedAt: string | null;
 };
 
@@ -89,11 +89,14 @@ export type AiUsageEvent = {
   error: string | null;
 };
 
+// What parents and children open, for the owner's admin page.
+export type ActivityEvent = { kind: string; path?: string; childId?: string | null; detail?: Record<string, unknown> };
+
 // Every call is scoped to the signed-in parent. The Supabase implementation also enforces this with RLS.
 export interface Store {
   listChildren(parentId: string): Promise<Child[]>;
   getChild(parentId: string, childId: string): Promise<Child | null>;
-  createChild(parentId: string, nickname: string, theme: Theme): Promise<Child>;
+  createChild(parentId: string, nickname: string, avatar: string): Promise<Child>;
   updateChild(parentId: string, childId: string, patch: Partial<Pick<Child, "nickname" | "theme">>): Promise<void>;
   deleteChild(parentId: string, childId: string): Promise<void>;
 
@@ -119,4 +122,5 @@ export interface Store {
   getImage(key: string): Promise<Buffer | null>;
 
   logAi(parentId: string, e: AiUsageEvent): Promise<void>;
+  logActivity(parentId: string, e: ActivityEvent): Promise<void>;
 }

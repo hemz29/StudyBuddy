@@ -2,6 +2,7 @@ import { getQuestion, getWorksheet, marksFor } from "@/content";
 import { KEY_GRADED } from "@/content/schema";
 import type { MarkItem } from "@/lib/ai";
 import type { AttemptFeedback, QuestionAttempt } from "@/lib/store/types";
+import { HINT2_FACTOR } from "@/lib/help";
 import { gradeByKey } from "./answerKey";
 
 type MarkResult = { id: string; pointsMet: boolean[]; feedbackEn: string; spellingNotes: { wrote: string; correct: string }[] };
@@ -10,7 +11,7 @@ export type Marker = (items: MarkItem[]) => Promise<{ results: MarkResult[] }>;
 // Marks are always computed here, in code: the AI only says which rubric points an answer shows.
 const roundHalf = (x: number) => Math.round(x * 2) / 2;
 
-export async function gradeAttempts<A extends Pick<QuestionAttempt, "questionId" | "text" | "max">>(
+export async function gradeAttempts<A extends Pick<QuestionAttempt, "questionId" | "text" | "max"> & { helpLevel?: number }>(
   attempts: A[],
   marker: Marker | null,
 ): Promise<(A & Pick<QuestionAttempt, "awarded" | "status" | "method" | "feedback">)[]> {
@@ -75,7 +76,17 @@ export async function gradeAttempts<A extends Pick<QuestionAttempt, "questionId"
     });
   }
 
-  return attempts.map((a) => ({ ...a, ...out.get(a.questionId)! }));
+  return attempts.map((a) => ({ ...a, ...withHintPenalty(a.helpLevel ?? 0, out.get(a.questionId)!) }));
+}
+
+// An answer written after seeing Hint 2's choices gets half marks (rounded down to the half mark).
+export function withHintPenalty<R extends Pick<QuestionAttempt, "awarded" | "feedback">>(helpLevel: number, r: R): R {
+  if (helpLevel < 2 || !r.awarded) return r;
+  return {
+    ...r,
+    awarded: Math.floor(r.awarded * HINT2_FACTOR * 2) / 2,
+    feedback: r.feedback && { ...r.feedback, en: `${r.feedback.en} Half marks, because Hint 2 (the choices) was used.` },
+  };
 }
 
 export function worksheetQuestionIds(worksheetId: string) {

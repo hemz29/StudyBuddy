@@ -19,14 +19,16 @@ const QUALITY_MESSAGE: Record<string, string> = {
   not_a_worksheet: "This doesn't look like the worksheet page. Please take a photo of your answer sheet.",
 };
 
-// Demo mode without an AI key: the term worksheet "reads" as the real child's answers from the school worksheet,
-// with one deliberately unsure word so the checking step can be tried.
+// Demo mode without an AI key: the first photo "reads" as the real child's answers from the school worksheet
+// (for the questions this worksheet shares with it), with one deliberately unsure word so checking can be tried.
 function demoReading(session: PracticeSession, pageIndex: number): Reading | null {
-  if (session.worksheetId !== "term-practice-1" || pageIndex > 0) return null;
   const ws = getWorksheet(session.worksheetId)!;
+  const ids = new Set(ws.sections.flatMap((s) => s.questions.map((q) => q.id)));
+  const known = Object.entries(SCHOOL_WORKSHEET_ANSWERS).filter(([qid]) => ids.has(qid));
+  if (pageIndex > 0 || known.length === 0) return null;
   return {
     pageQuality: "ok",
-    answers: Object.entries(SCHOOL_WORKSHEET_ANSWERS).map(([qid, text], i, all) => ({
+    answers: known.map(([qid, text], i, all) => ({
       questionNumber: worksheetQuestionNumber(ws, qid),
       text,
       confidence: qid === "nanna-desha.q.1" ? "low" : "high",
@@ -120,7 +122,9 @@ async function settleStatus(store: Store, session: PracticeSession) {
 export async function gradeSession(store: Store, session: PracticeSession) {
   const { parentId } = session;
   const ws = getWorksheet(session.worksheetId)!;
-  const existing = new Map((await store.listSessionAttempts(parentId, session.id)).map((a) => [a.questionId, strip(a)]));
+  const existing = new Map(
+    (await store.listSessionAttempts(parentId, session.id)).map((a) => [a.questionId, { ...strip(a), helpLevel: session.help[a.questionId] ?? a.helpLevel }]),
+  );
   for (const q of ws.sections.flatMap((s) => s.questions)) {
     if (existing.has(q.id)) continue;
     existing.set(q.id, {

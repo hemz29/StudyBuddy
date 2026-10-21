@@ -13,7 +13,8 @@ export async function POST(req: Request) {
   const child = await getActiveChild(parent.id);
   if (!child) return fail(400, "Choose who is practising first.");
   const body = Body.safeParse(await req.json());
-  if (!body.success || !getWorksheet(body.data.worksheetId)) return fail(400, "Unknown worksheet.");
+  const ws = body.success ? getWorksheet(body.data.worksheetId) : undefined;
+  if (!body.success || !ws || ws.retired) return fail(400, "Unknown worksheet.");
 
   const store = await userStore();
   const retryOf = body.data.retryOf && (await store.getSession(parent.id, body.data.retryOf)) ? body.data.retryOf : null;

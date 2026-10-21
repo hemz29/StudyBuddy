@@ -25,7 +25,7 @@ export function exercise(
   };
 }
 
-type Gloss = { word: string; meaningKn: string; meaningEn: string };
+type Gloss = { word: string; meaningKn: string; meaningEn: string; enPrompt?: string };
 
 const splitAlternatives = (s: string) =>
   s
@@ -67,7 +67,7 @@ export function glossaryExercises(lessonId: string, glossary: Gloss[]) {
       "ಕೆಳಗಿನ ಪದಗಳಿಗೆ ಕನ್ನಡದಲ್ಲಿ ಅರ್ಥ ಬರೆಯಿರಿ.",
       "Write the Kannada word for the following English words.",
       glossary.map((g) => ({
-        prompt: splitAlternatives(g.meaningEn)[0],
+        prompt: g.enPrompt ?? splitAlternatives(g.meaningEn)[0],
         answers: [g.word, ...splitAlternatives(g.meaningKn)],
         model: { kn: g.word, en: g.meaningEn },
       })),

@@ -1,7 +1,9 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { getQuestion, getWorksheet, MARKING } from "@/content";
 import type { QuestionAttempt } from "@/lib/store/types";
+import { writingTime } from "@/lib/time";
 import { HandwritingStrip } from "./HandwritingStrip";
 import type { SessionState } from "./SessionView";
 
@@ -19,18 +21,27 @@ export function Results({ state, worksheetId }: { state: SessionState; worksheet
   const answered = attempts.filter((a) => a.text.trim());
   const onOwn = answered.filter((a) => (a.helpLevel ?? 0) === 0).length;
   const review = attempts.filter((a) => a.status === "review").length;
+  const hint2 = attempts.filter((a) => (a.helpLevel ?? 0) >= 2).length;
+  const time = writingTime(session.startedAt, session.writingDoneAt, ws.minutes);
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4">
-      <div className="card p-6 text-center">
-        <p className="text-5xl">{pct >= 80 ? "🌟" : pct >= 50 ? "👏" : "💪"}</p>
-        <h1 className="mt-2 text-4xl font-extrabold">{fmt(awarded)} / {fmt(max)}</h1>
+      <div className="card overflow-hidden bg-white/95 text-center">
+        <div className="relative h-48 sm:h-60">
+          <Image src="/art/celebration.webp" alt="" fill sizes="768px" className="object-cover" />
+        </div>
+        <div className="p-6 pt-4">
+        <p className="text-lg font-bold text-muted">{pct >= 80 ? "Brilliant work! 🌟" : pct >= 50 ? "Well done! 👏" : "Good effort – keep practising! 💪"}</p>
+        <h1 className="mt-1 text-5xl">{fmt(awarded)} / {fmt(max)}</h1>
         <p className="text-lg text-muted">{pct}% · {ws.title.en}</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
-          <span className="chip bg-accent-soft">Answered on your own: {onOwn} of {answered.length}</span>
+          <span className="chip bg-accent-soft">Answered without hints: {onOwn} of {answered.length}</span>
+          {hint2 > 0 && <span className="chip bg-peach text-peach-ink">Hint 2 used: {hint2} (half marks)</span>}
+          {time && <span className={`chip ${time.over ? "bg-peach text-peach-ink" : "bg-good-soft text-good"}`}>⏱️ {time.text}</span>}
           {review > 0 && <span className="chip bg-warn-soft text-warn">{review} answer(s) waiting for a grown-up to check</span>}
         </div>
         <p className="mt-3 text-xs text-muted">{MARKING.label}</p>
+        </div>
       </div>
 
       {ws.sections.map((s, si) => {
@@ -97,8 +108,10 @@ function Row({ n, a, qid, sessionId }: { n: string; a?: QuestionAttempt; qid: st
             </details>
           )}
         </div>
-        {(a?.helpLevel ?? 0) > 0 && <span className="chip bg-warn-soft text-warn">Help used</span>}
+        {(a?.helpLevel ?? 0) === 1 && <span className="chip bg-warn-soft text-warn">Hint 1</span>}
+        {(a?.helpLevel ?? 0) >= 2 && <span className="chip bg-peach text-peach-ink">Hint 2 · ½ marks</span>}
       </div>
     </li>
   );
 }
+

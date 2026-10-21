@@ -63,6 +63,12 @@ export async function userStore(): Promise<Store> {
   return isDemo ? localStore : supabaseStore(await supabaseServer());
 }
 
+// Supabase with the service key: reads every family's rows. Only for the phone token routes and the admin page.
+export function serviceClient() {
+  checkSetup();
+  return isDemo ? null : createClient(URL!, SERVICE!, { auth: { persistSession: false } });
+}
+
 // Store for the phone upload page, which is authorised by a single-use token instead of a login.
 export function serviceStore(): Store {
   checkSetup();

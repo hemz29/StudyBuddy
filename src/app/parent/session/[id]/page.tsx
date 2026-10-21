@@ -3,6 +3,9 @@ import { notFound, redirect } from "next/navigation";
 import { getQuestion, getWorksheet, worksheetQuestionNumber } from "@/content";
 import { requireParent, userStore } from "@/lib/server/context";
 import { sessionTotals } from "@/lib/server/pipeline";
+import { withHintPenalty } from "@/lib/grading/grade";
+import { logActivity } from "@/lib/server/activity";
+import { writingTime } from "@/lib/time";
 import { transliterate } from "@/lib/transliterate";
 import { HandwritingStrip } from "@/components/session/HandwritingStrip";
 
@@ -16,11 +19,13 @@ async function setMark(formData: FormData) {
   const session = await store.getSession(parent.id, sessionId);
   const attempt = (await store.listSessionAttempts(parent.id, sessionId)).find((a) => a.id === attemptId);
   if (!session || !attempt) redirect("/parent");
-  const awarded = Math.min(attempt.max, Math.max(0, Number(formData.get("awarded"))));
+  // The reviewer marks the answer itself; the Hint 2 rule (half marks) is then applied as for any other mark.
+  const worth = Math.min(attempt.max, Math.max(0, Number(formData.get("awarded"))));
+  const { awarded } = withHintPenalty(attempt.helpLevel, { awarded: worth, feedback: null });
   await store.updateAttempt(parent.id, attemptId, {
     awarded,
     method: "reviewer",
-    status: awarded === attempt.max ? "correct" : awarded === 0 ? "incorrect" : "partial",
+    status: worth === attempt.max ? "correct" : worth === 0 ? "incorrect" : "partial",
   });
   await store.updateSession(parent.id, sessionId, sessionTotals(await store.listSessionAttempts(parent.id, sessionId)));
   redirect(`/parent/session/${sessionId}#${attemptId}`);
@@ -36,17 +41,19 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
   const session = await store.getSession(parent.id, (await params).id);
   const ws = session && getWorksheet(session.worksheetId);
   if (!session || !ws) notFound();
+  await logActivity(store, parent.id, { kind: "parent_session_review", path: `/parent/session/${session.id}`, childId: session.childId, detail: { worksheetId: session.worksheetId } });
   const attempts = (await store.listSessionAttempts(parent.id, session.id)).sort((a, b) =>
     worksheetQuestionNumber(ws, a.questionId).localeCompare(worksheetQuestionNumber(ws, b.questionId), undefined, { numeric: true }),
   );
 
   return (
-    <main className="mx-auto flex max-w-4xl flex-col gap-4 px-4 py-8">
+    <div className="app-bg min-h-screen"><main className="mx-auto flex max-w-4xl flex-col gap-4 px-4 py-8">
       <Link href="/parent" className="text-sm font-bold text-accent">← Dashboard</Link>
-      <div className="card p-5">
-        <h1 className="text-2xl font-extrabold">{ws.title.en}</h1>
+      <div className="card bg-white/95 p-5">
+        <h1 className="text-2xl">{ws.title.en}</h1>
         <p className="text-muted">
           {new Date(session.startedAt).toLocaleDateString("en-IN")} · {session.retryOf ? "Retry" : "First try"} · Score {fmt(session.awarded ?? 0)}/{fmt(session.max ?? 0)}
+          {writingTime(session.startedAt, session.writingDoneAt, ws.minutes) && ` · ${writingTime(session.startedAt, session.writingDoneAt, ws.minutes)!.text}`}
         </p>
         <p className="mt-2 text-sm text-muted">Each answer shows the child&apos;s handwriting, what was read, the teacher&apos;s model answer in English, and how it was marked. You can change any mark.</p>
       </div>
@@ -69,7 +76,8 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
                 <HandwritingStrip sessionId={session.id} pageId={a.pageId} region={a.region} />
                 <p className="kn mt-1 text-xl">{a.text || "(no answer)"}</p>
                 {a.text && <p className="text-sm italic text-gray-500">{transliterate(a.text)}</p>}
-                {a.helpLevel > 0 && <p className="mt-1 text-sm text-warn">Used “I’m stuck” help (step {a.helpLevel} of 4)</p>}
+                {a.helpLevel === 1 && <p className="mt-1 text-sm text-warn">Used Hint 1 (free)</p>}
+                {a.helpLevel >= 2 && <p className="mt-1 text-sm text-warn">Used Hint 2 (choices): half marks</p>}
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Teacher&apos;s answer</p>
@@ -95,6 +103,6 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
           </article>
         );
       })}
-    </main>
+    </main></div>
   );
 }

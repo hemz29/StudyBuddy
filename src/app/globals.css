@@ -1,63 +1,32 @@
 @import "tailwindcss";
 
 /* Design tokens. The child's theme swaps these on <body data-theme>. Reading areas (.paper) always stay white. */
+/* Design tokens: soft cream, sage, peach, lavender and sky, matching the watercolour artwork.
+   Reading areas (.paper) always stay white with high-contrast text. */
 :root {
-  --bg: #f6f7fb;
-  --surface: #ffffff;
-  --ink: #1d2433;
-  --muted: #5d6679;
-  --line: #e3e6ee;
-  --accent: #4f5bd5;
+  --bg: #fbf7f0;
+  --surface: #fffdf9;
+  --ink: #2e3a34;
+  --muted: #6b746e;
+  --line: #ece4d8;
+  --accent: #5e8b76;
   --accent-ink: #ffffff;
-  --accent-soft: #eceefe;
-  --good: #1f8a4c;
-  --good-soft: #e5f5ec;
-  --warn: #b26b00;
-  --warn-soft: #fff4dc;
-  --bad: #c0392b;
-  --bad-soft: #fdecea;
-  --radius: 18px;
+  --accent-soft: #e6efe8;
+  --peach: #f8e6d8;
+  --peach-ink: #a85a2e;
+  --lavender: #ece7f6;
+  --lavender-ink: #6a5a9c;
+  --sky: #e2eef3;
+  --sky-ink: #3f6f86;
+  --good: #3e8a5f;
+  --good-soft: #e3f1e7;
+  --warn: #a8641f;
+  --warn-soft: #fbeedc;
+  --bad: #b5463a;
+  --bad-soft: #f9e5e1;
+  --radius: 22px;
   --btn-radius: 999px;
   --header-ink: var(--ink);
-}
-
-[data-theme="kitten"] {
-  --bg: #fff5f0;
-  --accent: #e46a8c;
-  --accent-soft: #fde6ee;
-  --line: #f6dcd3;
-  --radius: 24px;
-}
-[data-theme="space"] {
-  --bg: #141a3a;
-  --accent: #6c7bff;
-  --accent-soft: #e7e9ff;
-  --line: #d9dcf4;
-  --header-ink: #ffffff;
-  --radius: 20px;
-}
-[data-theme="floral"] {
-  --bg: #f3f8f1;
-  --accent: #3f8f5a;
-  --accent-soft: #e2f1e5;
-  --line: #d8e8d6;
-  --radius: 22px;
-}
-[data-theme="speed"] {
-  --bg: #f2f2f2;
-  --accent: #e0362c;
-  --accent-soft: #fde5e3;
-  --line: #dddddd;
-  --radius: 8px;
-  --btn-radius: 8px;
-}
-[data-theme="geometric"] {
-  --bg: #f4f6f6;
-  --accent: #0f8b8d;
-  --accent-soft: #dff2f2;
-  --line: #d6e2e2;
-  --radius: 4px;
-  --btn-radius: 4px;
 }
 
 @theme inline {
@@ -75,6 +44,13 @@
   --color-warn-soft: var(--warn-soft);
   --color-bad: var(--bad);
   --color-bad-soft: var(--bad-soft);
+  --color-peach: var(--peach);
+  --color-peach-ink: var(--peach-ink);
+  --color-lavender: var(--lavender);
+  --color-lavender-ink: var(--lavender-ink);
+  --color-sky: var(--sky);
+  --color-sky-ink: var(--sky-ink);
+  --font-serif: var(--font-lora), Georgia, serif;
   --font-sans: var(--font-nunito), var(--font-kannada), system-ui, sans-serif;
   --font-kn: var(--font-kannada), var(--font-nunito), sans-serif;
 }
@@ -95,7 +71,33 @@ body {
   color: var(--ink);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  box-shadow: 0 1px 2px rgb(20 30 60 / 0.04), 0 6px 24px rgb(20 30 60 / 0.05);
+  box-shadow: 0 1px 2px rgb(60 50 30 / 0.04), 0 10px 30px rgb(60 50 30 / 0.06);
+}
+
+/* Headings in a soft serif, as in the artwork. */
+h1,
+h2,
+.serif {
+  font-family: var(--font-lora), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* The watercolour background behind the child's pages. */
+.app-bg {
+  background: var(--bg) url("/art/app-background.webp") center / cover fixed no-repeat;
+}
+
+/* Tappable Kannada word with a meaning on hover (desktop) or tap (touch). */
+.word {
+  border-radius: 6px;
+  cursor: help;
+  text-decoration: underline dotted rgb(94 139 118 / 0.45);
+  text-underline-offset: 6px;
+}
+.word:hover,
+.word:focus-visible {
+  background: var(--accent-soft);
 }
 
 /* Text placed straight on the page background (dark in the Space theme). */

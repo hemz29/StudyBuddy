@@ -76,3 +76,10 @@ export function recommendation(attempts: QuestionAttempt[]): { text: string; typ
     text: `Practise "${SECTION_TEXT[best.type].en.replace(/\.$/, "")}": ${best.missed} of the last ${best.total} answers of this kind lost marks.`,
   };
 }
+
+// Finished attempts per worksheet, for the "Done ×2" badges.
+export function doneCounts(sessions: PracticeSession[]) {
+  const done = new Map<string, number>();
+  for (const s of sessions) if (s.status === "graded" && s.kind === "worksheet") done.set(s.worksheetId, (done.get(s.worksheetId) ?? 0) + 1);
+  return done;
+}
