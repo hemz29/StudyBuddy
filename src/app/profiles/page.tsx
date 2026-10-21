@@ -12,8 +12,15 @@ async function addChild(formData: FormData) {
   const nickname = String(formData.get("nickname") ?? "").trim().slice(0, 40);
   const theme = String(formData.get("theme")) as Theme;
   if (!nickname || !THEMES.includes(theme)) redirect("/profiles?error=1");
-  const child = await (await userStore()).createChild(parent.id, nickname, theme);
-  await setActiveChild(child.id);
+  let childId: string;
+  try {
+    childId = (await (await userStore()).createChild(parent.id, nickname, theme)).id;
+  } catch (e) {
+    // Production hides server errors behind a digest, so show the database's message to the parent instead.
+    console.error("addChild failed", e);
+    redirect(`/profiles?error=${encodeURIComponent(e instanceof Error ? e.message : String(e)).slice(0, 300)}`);
+  }
+  await setActiveChild(childId);
   redirect("/learn");
 }
 
@@ -61,7 +68,8 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
             <input name="nickname" required maxLength={40} className="h-12 rounded-xl border border-line px-4 text-lg" />
           </label>
           <ThemePicker />
-          {error && <p className="text-bad">Please enter a nickname and choose a theme.</p>}
+          {error === "1" && <p className="text-bad">Please enter a nickname and choose a theme.</p>}
+          {error && error !== "1" && <p className="text-bad">Couldn&apos;t save the child. Please send this message to the StudyBuddy team: <b>{error}</b></p>}
           <button className="btn btn-primary self-start">Start learning</button>
         </form>
       </details>
