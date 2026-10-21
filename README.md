@@ -7,13 +7,15 @@ Grade 6 Kannada (3rd language) practice for the Friday pilot. A child reads a le
 
 ## What's in the pilot
 
-- **Lessons:** Panchatantra, Nanna Desha Nanna Jana and Kugutide Pakshi, from the teacher's notes. Each is shown in Kannada with a pronunciation aid in English letters and the English meaning, and words can be tapped.
+- **Lessons:** Panchatantra, Nanna Desha Nanna Jana and Kugutide Pakshi, from the teacher's notes. Each is shown in Kannada with a pronunciation aid in English letters and the English meaning.
+- **Word meanings:** hovering over (or tapping) any Kannada word shows how to say it and what it means, labelled "From teacher's notes" or "AI-suggested" with a confidence level. See *Word meanings* below.
 - **Practice cards:** quick tap drills for opposites, plurals, gender, meanings, word-splitting and rhymes.
-- **Worksheets:** seven, in the school's format.
-  - Term practice 1 mirrors the school's Grade VI worksheet.
-  - Each chapter has two sets, A and B.
-  - All are PDFs in `public/worksheets/`, with marks shown per section.
-- **"I'm stuck":** four help steps per question. Using help never costs marks; the app records it so the dashboard can show how independently the child worked.
+- **Worksheets:** nine, in the school's Term 1 paper format (Section A and B, marks as "(1X3=3)", StudyBuddy logo top right).
+  - **Practice tests 1–3:** 40 marks, 1 hour, Panchatantra + Nanna Desha Nanna Jana. Test 1 is the school's Term 1 paper (9 Oct 2026).
+  - **Chapter practice A and B** for each chapter: 25 marks, 40 minutes.
+  - All are PDFs in `public/worksheets/`. Older worksheets are kept (marked `retired`) so past attempts still open.
+- **Timer:** starts at "I'm ready". When time is up the child sees a gentle alert and can finish; the time taken (and any extra) is shown to parents.
+- **Hints:** Hint 1 is free and explains the word or points to the right line without giving the answer. Hint 2 shows choices; an answer written after Hint 2 gets half marks. Parents see which hint was used on each question.
 - **Phone upload:** the desktop shows a QR code. The phone page (`/snap/<token>`) takes a camera photo or a gallery photo, compresses it and sends it. Photos can also be uploaded from the computer.
 - **Handwriting check:**
   - Answers the AI reads with confidence go straight to marking.
@@ -30,9 +32,10 @@ Grade 6 Kannada (3rd language) practice for the Friday pilot. A child reads a le
   - Score over time (first tries only).
   - History and a recommendation, made only when there's enough evidence.
   - A review page where any mark can be checked or changed.
-- **Themes:** the child picks one of Kitten, Space, Flowers, Speed & gadgets or Shapes. The reading and checking areas always stay white.
+- **Look and avatars:** one watercolour design (artwork in `artwork/`, web versions in `public/art/`). The child picks an avatar: Cricket star, Astronaut, Gamer & coder, Footballer or Cat buddy.
+- **Admin page (`/admin`):** only for the owner's email (`ADMIN_EMAILS`). Families, children, every worksheet session with score, time and hints, and which pages parents opened.
 
-Marks follow `src/content/grade6/marking.json`, currently the school's Grade 5 Term 1 pattern of 1 mark per item. To change marks, edit that file and run `npm run worksheets` to rebuild the PDFs.
+Marks follow `src/content/grade6/marking.json`: the school's Grade 6 Term 1 pattern, 1 mark per item. To change marks, edit that file and run `npm run worksheets` to rebuild the PDFs.
 
 ## Run it on your computer (demo mode)
 
@@ -49,7 +52,7 @@ Without any settings, the app runs in **demo mode**:
 
 ### 1. Supabase (database and sign-in)
 1. Create a project at supabase.com. The free tier is fine.
-2. In the **SQL editor**, run `supabase/migrations/0001_init.sql`. This creates the tables, the row-level security rules and the private `answer-pages` photo bucket.
+2. In the **SQL editor**, run `supabase/migrations/0001_init.sql`, then `0002_timer_activity.sql`. These create the tables, the row-level security rules, the private `answer-pages` photo bucket, the timer column and the admin page's activity log.
 3. Under **Authentication → URL configuration**, set the Site URL to your Vercel URL and add `https://<your-app>/auth/callback` to the redirect URLs.
 4. Copy the project URL, the `anon` key and the `service_role` key from **Project settings → API**.
 
@@ -94,3 +97,9 @@ npm run test:handwriting
   - The fill-in-the-blank position for "ಹಸಿರೇ ನಮ್ಮ ಉಸಿರು".
   - Divya's decision (Kugutide Pakshi Q6).
 - **What the child wrote** on the school worksheet, read by eye, is in `src/content/grade6/sampleAnswers.ts`. It is used for tests and demo mode.
+
+## Word meanings
+
+- Every word in the lessons has a meaning. The teacher's word list comes first; the rest were suggested by AI (written, then checked by a second independent pass; anything the two passes disagreed on is marked medium or low confidence).
+- `review/word-meanings.json` is the master list. `review/word-meanings-review.xlsx` is the sheet for the Kannada teacher, least certain words first.
+- When the teacher returns the sheet: `python3 scripts/word_meanings.py import <file.xlsx>`. Checked words then show as "From teacher's notes".
