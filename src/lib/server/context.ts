@@ -6,12 +6,11 @@ import { createClient } from "@supabase/supabase-js";
 import { localStore } from "@/lib/store/local";
 import { supabaseStore } from "@/lib/store/supabase";
 import type { Child, Store } from "@/lib/store/types";
+import { SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY, SUPABASE_URL } from "@/lib/supabaseEnv";
 
-// Older Supabase projects call the keys "anon" and "service_role"; newer ones (and Vercel's integration) use
-// "publishable" and "secret". Either works.
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
-const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
+const URL = SUPABASE_URL;
+const ANON = SUPABASE_ANON_KEY;
+const SERVICE = SUPABASE_SERVICE_KEY;
 
 // Without Supabase settings the app runs in demo mode: one built-in parent, data in a local file.
 export const isDemo = !URL || !ANON;
