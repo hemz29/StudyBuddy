@@ -101,5 +101,5 @@ npm run test:handwriting
 ## Word meanings
 
 - Every word in the lessons has a meaning. The teacher's word list comes first; the rest were suggested by AI (written, then checked by a second independent pass; anything the two passes disagreed on is marked medium or low confidence).
-- `review/word-meanings.json` is the master list. `review/word-meanings-review.xlsx` is the sheet for the Kannada teacher, least certain words first.
+- `review/word-meanings.json` is the master list. `review/teacher-review.xlsx` is the sheet for the Kannada teacher: answer-key questions, marking rules, and word meanings (test words first).
 - When the teacher returns the sheet: `python3 scripts/word_meanings.py import <file.xlsx>`. Checked words then show as "From teacher's notes".

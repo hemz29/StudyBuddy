@@ -11,7 +11,8 @@
     "test:e2e": "node tests/e2e/journey.mjs",
     "test:rls": "bash supabase/tests/run.sh",
     "test:handwriting": "tsx --conditions=react-server scripts/handwriting-test.ts",
-    "worksheets": "node scripts/build-worksheets.mjs"
+    "worksheets": "node scripts/build-worksheets.mjs",
+    "test:handwriting:compare": "ANTHROPIC_MODEL=claude-sonnet-5-5 npm run test:handwriting && ANTHROPIC_MODEL=claude-haiku-5-5 npm run test:handwriting"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",

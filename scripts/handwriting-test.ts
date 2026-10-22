@@ -2,7 +2,7 @@
 // Uses the three photographed pages of the school's Grade VI worksheet and compares each reading
 // with what the child actually wrote (read by eye, in src/content/grade6/sampleAnswers.ts).
 //
-// Run (needs ANTHROPIC_API_KEY):  npm run test:handwriting
+// Run (needs ANTHROPIC_API_KEY):  npm run test:handwriting   (or test:handwriting:compare for Sonnet vs Haiku)
 import { readFile } from "node:fs/promises";
 import { getWorksheet, worksheetQuestionNumber } from "../src/content";
 import { SCHOOL_WORKSHEET_ANSWERS } from "../src/content/grade6/sampleAnswers";
@@ -14,6 +14,9 @@ const questions = ws.sections.flatMap((s) => s.questions.map((q) => ({ number: w
 const byNumber = new Map(questions.map((q) => [q.number, q.id]));
 
 async function main() {
+  console.log(`Model: ${process.env.ANTHROPIC_MODEL ?? "claude-opus-5-5 (default)"}`);
+  let inTokens = 0;
+  let outTokens = 0;
   let letters = 0;
   let letterErrors = 0;
   let exact = 0;
@@ -24,8 +27,11 @@ async function main() {
 
   for (const page of [1, 2, 3]) {
     const data = await readFile(`tests/handwriting/school-worksheet-p${page}.jpg`);
-    const reading = await readAnswerPage({ base64: data.toString("base64"), mediaType: "image/jpeg" }, questions, "handwriting-test", async (e) =>
-      console.log(`page ${page}: ${e.inputTokens} in / ${e.outputTokens} out tokens, ${(e.ms / 1000).toFixed(1)}s`),
+    const reading = await readAnswerPage({ base64: data.toString("base64"), mediaType: "image/jpeg" }, questions, "handwriting-test", async (e) => {
+      inTokens += e.inputTokens;
+      outTokens += e.outputTokens;
+      console.log(`page ${page}: ${e.inputTokens} in / ${e.outputTokens} out tokens, ${(e.ms / 1000).toFixed(1)}s`);
+    },
     );
     console.log(`page ${page}: quality ${reading.pageQuality}, ${reading.answers.length} answers`);
     for (const a of reading.answers) {
@@ -51,6 +57,7 @@ async function main() {
   console.log(`Read exactly right: ${exact} of ${found} (${Math.round((exact / found) * 100)}%)`);
   console.log(`Letter accuracy: ${(100 - (letterErrors / letters) * 100).toFixed(1)}%`);
   console.log(`Marked unsure (child checks these): ${lowConfidence}; of the misreads, ${lowWhenWrong} of ${wrong.length} were marked unsure`);
+  console.log(`Tokens per page (average): ${Math.round(inTokens / 3)} in / ${Math.round(outTokens / 3)} out – multiply by the model's price per token for the cost per page`);
   if (wrong.length) console.log("\nMisreads:\n" + wrong.join("\n"));
 }
 

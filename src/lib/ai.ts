@@ -82,7 +82,7 @@ export async function readAnswerPage(
   return call("read_answers", sessionId, log, ReadingSchema, [
     { type: "image", source: { type: "base64", media_type: image.mediaType, data: image.base64 } },
     { type: "text", text: `Worksheet questions (number, kind, printed prompt):\n${list}\n\nTranscribe the child's answers on this page.` },
-  ], READ_SYSTEM, "high");
+  ], READ_SYSTEM, "medium");
 }
 
 // ---------- Marking descriptive answers ----------
