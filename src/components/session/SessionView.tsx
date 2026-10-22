@@ -1,7 +1,9 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import type { PageUpload, PracticeSession, QuestionAttempt } from "@/lib/store/types";
+import { getWorksheet } from "@/content";
 import { WorksheetMode } from "./WorksheetMode";
+import { Timer } from "./Timer";
 import { UploadPanel } from "./UploadPanel";
 import { CheckingScreen } from "./CheckingScreen";
 import { Results } from "./Results";
@@ -39,12 +41,18 @@ export function SessionView({ sessionId, worksheetId }: { sessionId: string; wor
   if (session.status === "graded") return <Results state={state} worksheetId={worksheetId} />;
   if (session.status === "checking") return <CheckingScreen state={state} worksheetId={worksheetId} onDone={refresh} />;
 
+  // Timer and photo upload in one block, pinned to the top while the child is still writing (not on phones, where it would fill the screen).
+  const writing = !session.writingDoneAt;
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_380px]">
-      <WorksheetMode session={session} worksheetId={worksheetId} />
-      <aside className="lg:sticky lg:top-4 lg:self-start">
-        <UploadPanel state={state} onOpen={() => setUploading(true)} refresh={refresh} />
-      </aside>
-    </div>
+    <WorksheetMode
+      session={session}
+      worksheetId={worksheetId}
+      controls={
+        <div className={`card flex flex-col gap-4 bg-white/95 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 ${writing ? "sm:sticky sm:top-3 sm:z-20" : ""}`}>
+          <Timer session={session} minutes={getWorksheet(worksheetId)!.minutes} />
+          <UploadPanel inline state={state} onOpen={() => setUploading(true)} refresh={refresh} />
+        </div>
+      }
+    />
   );
 }

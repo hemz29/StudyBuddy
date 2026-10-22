@@ -15,7 +15,8 @@ export async function compressPage(file: File) {
   return imageCompression(file, { maxSizeMB: 1.5, maxWidthOrHeight: 2400, useWebWorker: true, fileType: "image/jpeg", initialQuality: 0.85 });
 }
 
-export function UploadPanel({ state, onOpen, refresh }: { state: SessionState; onOpen: () => void; refresh: () => void }) {
+// Standalone it is a card; `inline` lays it out as a row inside the writing block, next to the timer.
+export function UploadPanel({ state, onOpen, refresh, inline = false }: { state: SessionState; onOpen: () => void; refresh: () => void; inline?: boolean }) {
   const { session, pages } = state;
   const [qr, setQr] = useState<{ svg: string; url: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -58,6 +59,59 @@ export function UploadPanel({ state, onOpen, refresh }: { state: SessionState; o
 
   const reading = pages.some((p) => p.status === "received" || p.status === "reading");
 
+  const fromComputer = (
+    <label className="btn btn-ghost cursor-pointer">
+      {busy ? "Uploading…" : inline ? "💻 From this computer" : "Upload photos from this computer"}
+      <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" disabled={busy} onChange={(e) => uploadFiles(e.target.files)} />
+    </label>
+  );
+  const qrBlock = qr && (
+    <div className="flex flex-col items-center gap-2 text-center">
+      <div className="rounded-xl bg-white p-2" dangerouslySetInnerHTML={{ __html: qr.svg }} />
+      <p className="font-bold">Scan with the phone camera</p>
+      <p className="text-sm text-muted">The link works for 30 minutes. Photos appear here as soon as they arrive.</p>
+    </div>
+  );
+  const pageList = pages.length > 0 && (
+    <ul className="flex flex-col gap-2">
+      {pages.map((p, i) => (
+        <li key={p.id} className={`rounded-xl px-3 py-2 text-sm ${p.status === "failed" ? "bg-bad-soft" : p.status === "read" ? "bg-good-soft" : "bg-accent-soft"}`}>
+          <span className="font-bold">Page {i + 1}:</span> {PAGE_STATUS[p.status]}
+          {p.status === "reading" && <span className="ml-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent align-middle" />}
+          {p.error && <p className="mt-1">{p.error}</p>}
+        </li>
+      ))}
+    </ul>
+  );
+  const readingNote = reading && <p className="text-sm text-muted">Reading takes about a minute per page. You can send more pages meanwhile.</p>;
+  const errorNote = error && <p className="text-sm text-bad">{error}</p>;
+
+  if (inline)
+    return (
+      <>
+        <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <p className="min-w-0 leading-tight sm:mr-auto">
+            <span className="block text-lg font-extrabold">Finished writing?</span>
+            <span className="text-sm text-muted">Send a photo of each page to be marked.</span>
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {!qr && <button onClick={showQr} className="btn btn-primary">📷 From a phone</button>}
+            {fromComputer}
+          </div>
+        </div>
+        {(qrBlock || pageList || readingNote || errorNote) && (
+          <div className="flex basis-full flex-col gap-3 border-t border-line pt-4 sm:flex-row sm:items-start sm:gap-6">
+            {qrBlock}
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              {pageList}
+              {readingNote}
+              {errorNote}
+            </div>
+          </div>
+        )}
+      </>
+    );
+
   return (
     <div className="card flex flex-col gap-4 p-5">
       <h2 className="text-xl font-extrabold">Finished writing?</h2>
@@ -68,34 +122,13 @@ export function UploadPanel({ state, onOpen, refresh }: { state: SessionState; o
         </>
       ) : (
         <>
-          {qr ? (
-            <div className="flex flex-col items-center gap-2 text-center">
-              <div className="rounded-xl bg-white p-2" dangerouslySetInnerHTML={{ __html: qr.svg }} />
-              <p className="font-bold">Scan with the phone camera</p>
-              <p className="text-sm text-muted">The link works for 30 minutes. Photos appear here as soon as they arrive.</p>
-            </div>
-          ) : (
-            <button onClick={showQr} className="btn btn-soft">Show QR code for a phone</button>
-          )}
-          {pages.length > 0 && (
-            <ul className="flex flex-col gap-2">
-              {pages.map((p, i) => (
-                <li key={p.id} className={`rounded-xl px-3 py-2 text-sm ${p.status === "failed" ? "bg-bad-soft" : p.status === "read" ? "bg-good-soft" : "bg-accent-soft"}`}>
-                  <span className="font-bold">Page {i + 1}:</span> {PAGE_STATUS[p.status]}
-                  {p.status === "reading" && <span className="ml-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent align-middle" />}
-                  {p.error && <p className="mt-1">{p.error}</p>}
-                </li>
-              ))}
-            </ul>
-          )}
-          {reading && <p className="text-sm text-muted">Reading takes about a minute per page. You can send more pages meanwhile.</p>}
+          {qrBlock || <button onClick={showQr} className="btn btn-soft">Show QR code for a phone</button>}
+          {pageList}
+          {readingNote}
         </>
       )}
-      <label className="btn btn-ghost cursor-pointer">
-        {busy ? "Uploading…" : "Upload photos from this computer"}
-        <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" disabled={busy} onChange={(e) => uploadFiles(e.target.files)} />
-      </label>
-      {error && <p className="text-sm text-bad">{error}</p>}
+      {fromComputer}
+      {errorNote}
     </div>
   );
 }

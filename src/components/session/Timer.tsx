@@ -26,11 +26,11 @@ export function Timer({ session, minutes }: { session: PracticeSession; minutes:
     <div
       role="timer"
       aria-live="off"
-      className={`sticky top-3 z-20 flex flex-wrap items-center gap-3 rounded-2xl px-5 py-3 shadow-sm ${over ? "bg-peach" : "bg-white"}`}
+      className={`flex items-center gap-3 rounded-2xl px-4 py-2 ${over ? "bg-peach" : "bg-accent-soft"}`}
     >
       <span className="text-2xl">{done ? "✅" : over ? "🔔" : "⏱️"}</span>
       <span className="text-3xl font-extrabold tabular-nums">{over ? `+${mmss(left)}` : mmss(left)}</span>
-      <span className="text-sm text-muted">
+      <span className="max-w-48 text-sm leading-tight text-muted">
         {done
           ? over
             ? `Finished writing ${mmss(left)} after the ${minutes} minutes.`

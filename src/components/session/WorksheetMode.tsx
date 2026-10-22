@@ -6,10 +6,9 @@ import { hint1, hint2 } from "@/lib/help";
 import { transliterate } from "@/lib/transliterate";
 import type { PracticeSession } from "@/lib/store/types";
 import { KnText } from "@/components/Word";
-import { Timer } from "./Timer";
 
 // The worksheet questions in large type while the child writes on paper, each with a Hint button.
-export function WorksheetMode({ session, worksheetId }: { session: PracticeSession; worksheetId: string }) {
+export function WorksheetMode({ session, worksheetId, controls }: { session: PracticeSession; worksheetId: string; controls: React.ReactNode }) {
   const ws = getWorksheet(worksheetId)!;
   const [help, setHelp] = useState<Record<string, number>>(session.help);
 
@@ -20,48 +19,59 @@ export function WorksheetMode({ session, worksheetId }: { session: PracticeSessi
 
   let lastPart = "";
   return (
-    <div className="flex flex-col gap-4">
-      <div className="card flex flex-wrap items-center gap-3 bg-white/90 p-5">
-        <div className="mr-auto">
-          <h1 className="text-2xl">{ws.title.en}</h1>
-          <p className="text-muted">Write your answers on paper, using the same numbers as below. {ws.totalMarks} marks.</p>
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
+      <header className="card flex flex-wrap items-center gap-4 bg-white/90 p-5">
+        <div className="mr-auto min-w-0">
+          <h1 className="kn text-2xl">{ws.title.kn}</h1>
+          <p className="text-muted">{ws.title.en}</p>
+          <ul className="mt-3 flex flex-wrap gap-2 text-sm">
+            <li className="chip bg-accent-soft text-ink">✏️ Write your answers on paper, with the same numbers as below</li>
+            <li className="chip bg-accent-soft text-ink">{ws.totalMarks} marks</li>
+            <li className="chip bg-accent-soft text-ink">{ws.minutes} minutes</li>
+          </ul>
         </div>
         <a href={`/worksheets/${ws.id}.pdf`} target="_blank" rel="noreferrer" className="btn btn-ghost">Worksheet PDF</a>
-      </div>
-      <Timer session={session} minutes={ws.minutes} />
-      <HintRules />
+      </header>
 
-      {ws.sections.map((s, si) => {
-        const part = sectionPart(s.type);
-        const heading = part !== lastPart && ws.retired !== true ? part : null;
-        lastPart = part;
-        return (
-          <div key={s.type} className="flex flex-col gap-4">
-            {heading && <h2 className="serif mt-2 text-center text-xl">Section {heading}</h2>}
-            <section className="paper p-5">
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="font-bold">
-                  {si + 1}. <span className="kn">{s.kn}</span>
-                  <span className="block text-sm font-normal text-gray-500">{s.en}</span>
-                </h3>
-                <span className="chip bg-gray-100 text-gray-700">{s.questions.length * s.marksEach} marks</span>
-              </div>
-              <ol className="mt-3 flex flex-col divide-y divide-gray-100">
-                {s.questions.map((q, qi) => (
-                  <QuestionRow key={q.id} number={`${si + 1}.${qi + 1}`} q={q} level={help[q.id] ?? 0} hidePrompt={q.type === "poem_line" && qi % 4 !== 0} open={(l) => openHint(q, l)} />
-                ))}
-              </ol>
-            </section>
-          </div>
-        );
-      })}
+      {controls}
+
+      <section aria-labelledby="questions" className="mt-2 flex flex-col gap-4">
+        <div className="flex flex-col gap-2 border-b border-line pb-3">
+          <h2 id="questions" className="text-2xl">Questions</h2>
+          <HintRules />
+        </div>
+        {ws.sections.map((s, si) => {
+          const part = sectionPart(s.type);
+          const heading = part !== lastPart && ws.retired !== true ? part : null;
+          lastPart = part;
+          return (
+            <div key={s.type} className="flex flex-col gap-4">
+              {heading && <h2 className="serif mt-2 text-center text-xl">Section {heading}</h2>}
+              <section className="paper p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-bold">
+                    {si + 1}. <span className="kn">{s.kn}</span>
+                    <span className="block text-sm font-normal text-gray-500">{s.en}</span>
+                  </h3>
+                  <span className="chip bg-gray-100 text-gray-700">{s.questions.length * s.marksEach} marks</span>
+                </div>
+                <ol className="mt-3 flex flex-col divide-y divide-gray-100">
+                  {s.questions.map((q, qi) => (
+                    <QuestionRow key={q.id} number={`${si + 1}.${qi + 1}`} q={q} level={help[q.id] ?? 0} hidePrompt={q.type === "poem_line" && qi % 4 !== 0} open={(l) => openHint(q, l)} />
+                  ))}
+                </ol>
+              </section>
+            </div>
+          );
+        })}
+      </section>
     </div>
   );
 }
 
 function HintRules() {
   return (
-    <p className="rounded-2xl bg-white/85 px-5 py-3 text-sm text-muted">
+    <p className="text-sm text-muted">
       💡 Stuck? Press <b className="text-ink">Hint</b> next to a question. <b className="text-ink">Hint 1</b> is free.{" "}
       <b className="text-ink">Hint 2</b> shows choices, and that answer then gets <b className="text-ink">half marks</b>.
     </p>
