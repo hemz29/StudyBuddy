@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getLesson } from "@/content";
+import { getLesson, SECTION_TEXT } from "@/content";
 import type { QuestionType } from "@/content/schema";
 import { meaningOf } from "@/content/words";
 import { lookalikes } from "@/lib/lookalikes";
@@ -56,6 +56,8 @@ export default async function CardsPage({ params }: { params: Promise<{ lessonId
         skill: q.skill,
         type: q.type,
         label,
+        // The school's instruction, without "the following words" since a card shows one word.
+        labelKn: SECTION_TEXT[q.type].kn.replace(/^ಕೆಳಗಿನ ಪದಗಳ(?:ಿಗೆ|ನ್ನು) /, ""),
         prompt: q.prompt,
         correct: q.answers[0],
         correctLatin: transliterate(q.answers[0]),

@@ -9,11 +9,22 @@ export type Card = {
   skill: Skill;
   type: QuestionType;
   label: string;
+  labelKn: string;
   prompt: string;
   correct: string;
   correctLatin: string;
   correctEn?: string;
   options: string[];
+};
+
+// Each kind of question has its own colour and symbol, so a change of kind is noticed at a glance.
+const TYPE_STYLE: Partial<Record<QuestionType, { icon: string; className: string }>> = {
+  split: { icon: "✂️", className: "bg-peach text-peach-ink" },
+  plural: { icon: "👥", className: "bg-sky text-sky-ink" },
+  gender: { icon: "👧👦", className: "bg-lavender text-lavender-ink" },
+  opposite: { icon: "↔️", className: "bg-accent-soft text-accent" },
+  meaning_kn: { icon: "📖", className: "bg-warn-soft text-warn" },
+  rhyme: { icon: "🎵", className: "bg-good-soft text-good" },
 };
 
 export function PracticeCards({ lessonId, title, cards }: { lessonId: string; title: { kn: string; en: string }; cards: Card[] }) {
@@ -67,7 +78,7 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
         <div className="h-full bg-accent transition-all" style={{ width: `${(i / cards.length) * 100}%` }} />
       </div>
       <div className="paper p-8 text-center">
-        <p className="text-sm font-bold uppercase tracking-wide text-gray-500">{card.label}</p>
+        <TypeBadge key={i} card={card} changed={i > 0 && cards[i - 1].type !== card.type} />
         <p className="kn mt-3 text-5xl font-bold">{card.prompt}</p>
         <p className="mt-1 italic text-gray-500">{transliterate(card.prompt)}</p>
         <div className="mt-8 grid grid-cols-2 gap-3">
@@ -99,6 +110,19 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function TypeBadge({ card, changed }: { card: Card; changed: boolean }) {
+  const style = TYPE_STYLE[card.type] ?? { icon: "❓", className: "bg-gray-100 text-gray-700" };
+  return (
+    <div className={`mx-auto inline-flex items-center gap-3 rounded-2xl px-5 py-2.5 text-left ${style.className} ${changed ? "badge-pop" : ""}`}>
+      <span className="text-2xl" aria-hidden>{style.icon}</span>
+      <span className="flex flex-col leading-tight">
+        <span className="text-lg font-extrabold">{card.label}</span>
+        <span className="kn text-sm opacity-80">{card.labelKn}</span>
+      </span>
     </div>
   );
 }
