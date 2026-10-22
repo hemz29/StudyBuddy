@@ -35,7 +35,7 @@ export default async function Admin() {
       <main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
         <div className="flex items-center justify-between">
           <Logo href="/admin" />
-          <Link href="/profiles" className="btn btn-ghost">Back to the app</Link>
+          <Link href="/" className="btn btn-ghost">Back to homepage</Link>
         </div>
         <h1 className="text-3xl">Pilot admin</h1>
 
