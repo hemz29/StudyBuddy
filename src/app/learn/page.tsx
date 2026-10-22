@@ -3,6 +3,7 @@ import { getWorksheet } from "@/content";
 import { requireChild, userStore } from "@/lib/server/context";
 import { AvatarImage } from "@/components/AvatarImage";
 import { ChoiceCard } from "@/components/shell/PageHeader";
+import { KnText } from "@/components/Word";
 
 export default async function LearnHome() {
   const { parent, child } = await requireChild();
@@ -20,7 +21,7 @@ export default async function LearnHome() {
           <h1 className="text-3xl">Hello, {child.nickname}!</h1>
           <p className="text-muted">{done ? `You've finished ${done} worksheet${done === 1 ? "" : "s"}. Keep going!` : "Small steps, big progress. Where shall we start?"}</p>
         </div>
-        <span className="kn ml-auto hidden rounded-full bg-accent-soft px-4 py-2 text-accent sm:block">ಕಲಿಯೋಣ!</span>
+        <span className="ml-auto hidden rounded-full bg-accent-soft px-4 py-2 text-accent sm:block"><KnText text="ಕಲಿಯೋಣ!" /></span>
       </section>
 
       {open[0] && (

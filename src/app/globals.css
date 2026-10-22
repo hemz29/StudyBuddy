@@ -99,6 +99,17 @@ h2,
 .word:focus-visible {
   background: var(--accent-soft);
 }
+/* Words inside links and buttons: a lighter underline, and the tap still belongs to the link or button. */
+.word-hover {
+  text-decoration: underline dotted rgb(94 139 118 / 0.3);
+  text-underline-offset: 6px;
+}
+@media print {
+  .word,
+  .word-hover {
+    text-decoration: none;
+  }
+}
 
 /* Text placed straight on the page background (dark in the Space theme). */
 .on-bg {

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { QuestionType, Skill } from "@/content/schema";
 import { transliterate } from "@/lib/transliterate";
+import { KnText } from "@/components/Word";
 
 export type Card = {
   questionId: string;
@@ -71,7 +72,7 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
       <div className="flex items-center justify-between text-sm font-bold" style={{ color: "var(--header-ink)" }}>
-        <span className="kn">{title.kn}</span>
+        <KnText text={title.kn} />
         <span>Card {i + 1} of {cards.length}</span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-white/40">
@@ -79,14 +80,15 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
       </div>
       <div className="paper p-8 text-center">
         <TypeBadge key={i} card={card} changed={i > 0 && cards[i - 1].type !== card.type} />
-        <p className="kn mt-3 text-5xl font-bold">{card.prompt}</p>
+        {/* The word being tested shows no meaning until the child has answered. */}
+        <p className="kn mt-3 text-5xl font-bold">{chosen ? <KnText text={card.prompt} /> : card.prompt}</p>
         <p className="mt-1 italic text-gray-500">{transliterate(card.prompt)}</p>
         <div className="mt-8 grid grid-cols-2 gap-3">
           {card.options.map((o) => {
             const state = !chosen ? "" : o === card.correct ? "border-good bg-good-soft" : o === chosen ? "border-bad bg-bad-soft" : "opacity-50";
             return (
               <button key={o} onClick={() => choose(o)} className={`kn rounded-2xl border-2 border-gray-200 p-4 text-2xl font-bold transition hover:border-accent ${state}`}>
-                {o}
+                {chosen ? <KnText text={o} mode="hover" /> : o}
               </button>
             );
           })}
@@ -95,7 +97,7 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
           <div className="mt-6 flex flex-col items-center gap-1">
             <p className={`text-lg font-bold ${chosen === card.correct ? "text-good" : "text-bad"}`}>{chosen === card.correct ? "Correct!" : "Not quite."}</p>
             <p className="text-lg">
-              <span className="kn font-bold">{card.correct}</span> is the right answer.
+              <KnText text={card.correct} className="font-bold" /> is the right answer.
             </p>
             <p className="text-muted">
               <span className="italic">{card.correctLatin}</span>
@@ -121,7 +123,7 @@ function TypeBadge({ card, changed }: { card: Card; changed: boolean }) {
       <span className="text-2xl" aria-hidden>{style.icon}</span>
       <span className="flex flex-col leading-tight">
         <span className="text-lg font-extrabold">{card.label}</span>
-        <span className="kn text-sm opacity-80">{card.labelKn}</span>
+        <KnText text={card.labelKn} className="text-sm opacity-80" />
       </span>
     </div>
   );

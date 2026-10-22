@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getWorksheet, MARKING } from "@/content";
 import { StartButton } from "./StartButton";
+import { KnText } from "@/components/Word";
 
 export default async function WorksheetIntro({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ retry?: string }> }) {
   const ws = getWorksheet((await params).id);
@@ -14,7 +15,7 @@ export default async function WorksheetIntro({ params, searchParams }: { params:
       <div className="card bg-white/90 p-6">
         <p className="text-sm font-bold text-muted">{ws.kind === "test" ? "Practice test" : "Chapter practice"} · {ws.totalMarks} marks · {ws.minutes === 60 ? "1 hour" : `${ws.minutes} minutes`}</p>
         <h1 className="mt-1 text-3xl">{ws.title.en}</h1>
-        <p className="kn text-xl text-muted">{ws.title.kn}</p>
+        <p className="text-xl text-muted"><KnText text={ws.title.kn} /></p>
         <ol className="mt-5 grid gap-2 sm:grid-cols-2">
           {ws.sections.map((s, i) => (
             <li key={s.type} className="flex items-baseline justify-between gap-3 rounded-xl bg-accent-soft px-3 py-2 text-sm">

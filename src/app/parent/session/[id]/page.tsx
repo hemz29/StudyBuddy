@@ -8,6 +8,7 @@ import { logActivity } from "@/lib/server/activity";
 import { writingTime } from "@/lib/time";
 import { transliterate } from "@/lib/transliterate";
 import { HandwritingStrip } from "@/components/session/HandwritingStrip";
+import { KnText } from "@/components/Word";
 
 // A reviewer (in the pilot: the owner sitting with the family) sets the mark for an answer.
 async function setMark(formData: FormData) {
@@ -67,7 +68,7 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
           <article key={a.id} id={a.id} className={`paper p-5 ${a.status === "review" ? "ring-2 ring-warn" : ""}`}>
             <div className="flex flex-wrap items-start justify-between gap-2">
               <p className="text-sm text-gray-500">
-                {worksheetQuestionNumber(ws, a.questionId)} · <span className="kn text-base text-gray-800">{q.prompt}</span>
+                {worksheetQuestionNumber(ws, a.questionId)} · <KnText text={q.prompt} className="text-base text-gray-800" />
                 {q.promptEn && <span> · {q.promptEn}</span>}
               </p>
               <span className="chip bg-gray-100">{STATUS[a.status ?? "review"]} · {a.awarded != null ? `${fmt(a.awarded)}/${fmt(a.max)}` : `–/${fmt(a.max)}`}</span>
@@ -86,21 +87,21 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Child&apos;s answer</p>
                 <HandwritingStrip sessionId={session.id} pageId={a.pageId} region={a.region} />
-                <p className="kn mt-1 text-xl">{a.text || "(no answer)"}</p>
+                <p className="mt-1 text-xl">{a.text ? <KnText text={a.text} /> : "(no answer)"}</p>
                 {a.text && <p className="text-sm italic text-gray-500">{transliterate(a.text)}</p>}
                 {a.helpLevel === 1 && <p className="mt-1 text-sm text-warn">Used Hint 1 (free)</p>}
                 {a.helpLevel >= 2 && <p className="mt-1 text-sm text-warn">Used Hint 2 (choices): half marks</p>}
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Teacher&apos;s answer</p>
-                <p className="kn text-lg">{q.model?.kn ?? q.answers.join(" / ")}</p>
+                <p className="text-lg"><KnText text={q.model?.kn ?? q.answers.join(" / ")} /></p>
                 {q.model?.en && <p className="text-gray-600">{q.model.en}</p>}
                 {fb?.points && (
                   <ul className="mt-2 text-sm">
                     {fb.points.map((p) => <li key={p.point} className={p.met ? "text-good" : "text-bad"}>{p.met ? "✓" : "✗"} {p.point}</li>)}
                   </ul>
                 )}
-                {fb?.nearMiss && <p className="kn mt-2 text-sm">Spelling: wrote {fb.nearMiss.wrote} → {fb.nearMiss.correct}</p>}
+                {fb?.nearMiss && <p className="mt-2 text-sm">Spelling: wrote <KnText text={fb.nearMiss.wrote} /> → <KnText text={fb.nearMiss.correct} /></p>}
                 {a.method && <p className="mt-2 text-xs text-gray-500">{METHOD[a.method]}</p>}
               </div>
             </div>

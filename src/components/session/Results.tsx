@@ -6,6 +6,7 @@ import type { QuestionAttempt } from "@/lib/store/types";
 import { writingTime } from "@/lib/time";
 import { HandwritingStrip } from "./HandwritingStrip";
 import type { SessionState } from "./SessionView";
+import { KnText } from "@/components/Word";
 
 const ICON: Record<string, string> = { correct: "✓", partial: "½", incorrect: "✗", blank: "–", review: "…" };
 const TONE: Record<string, string> = { correct: "bg-good-soft text-good", partial: "bg-warn-soft text-warn", incorrect: "bg-bad-soft text-bad", blank: "bg-gray-100 text-gray-500", review: "bg-accent-soft" };
@@ -78,8 +79,8 @@ function Row({ n, a, qid, sessionId }: { n: string; a?: QuestionAttempt; qid: st
       <div className="flex items-start gap-3">
         <span className={`chip mt-1 w-12 justify-center ${TONE[status]}`}>{ICON[status]} {a?.awarded != null ? fmt(a.awarded) : ""}</span>
         <div className="flex-1">
-          <p className="text-sm text-gray-500">{n} · <span className="kn">{q.prompt}</span></p>
-          <p className="kn text-xl">{a?.text || <span className="text-base text-gray-400">(no answer)</span>}</p>
+          <p className="text-sm text-gray-500">{n} · <KnText text={q.prompt} /></p>
+          <p className="kn text-xl">{a?.text ? <KnText text={a.text} /> : <span className="text-base text-gray-400">(no answer)</span>}</p>
           {fb?.en && status !== "correct" && <p className="mt-1 text-gray-700">{fb.en}</p>}
           {fb?.points && (
             <ul className="mt-1 text-sm">
@@ -94,16 +95,16 @@ function Row({ n, a, qid, sessionId }: { n: string; a?: QuestionAttempt; qid: st
               <div className="mt-1 grid gap-2 sm:grid-cols-2">
                 <div>
                   <HandwritingStrip sessionId={sessionId} pageId={a?.pageId ?? null} region={a?.region ?? null} />
-                  <p className="kn mt-1 text-lg">You wrote: {fb.nearMiss.wrote}</p>
+                  <p className="mt-1 text-lg">You wrote: <KnText text={fb.nearMiss.wrote} /></p>
                 </div>
-                <p className="kn self-center text-2xl font-bold text-good">✓ {fb.nearMiss.correct}</p>
+                <p className="self-center text-2xl font-bold text-good">✓ <KnText text={fb.nearMiss.correct} /></p>
               </div>
             </div>
           )}
           {fb?.model && status !== "correct" && (
             <details className="mt-1 text-sm">
               <summary className="cursor-pointer font-bold text-accent">See the model answer</summary>
-              <p className="kn mt-1 text-lg">{fb.model.kn}</p>
+              <p className="mt-1 text-lg"><KnText text={fb.model.kn} /></p>
               <p className="text-gray-500">{fb.model.en}</p>
             </details>
           )}

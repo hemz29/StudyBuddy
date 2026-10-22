@@ -1,5 +1,6 @@
 import { LESSONS } from "./index";
 import aiWords from "./grade6/words.json";
+import { NUMBER_NAMES } from "./grade6/numbers";
 
 // Word meanings for hover/tap and for hints. The teacher's word list comes first; every other word has an
 // AI-suggested meaning with a confidence level, waiting for review by a Kannada teacher.
@@ -20,6 +21,10 @@ export const stripPunct = (w: string) => w.replace(/[“”"'‘’.,?!;:()[\]�
 const TEACHER = new Map<string, WordMeaning>();
 for (const l of LESSONS)
   for (const g of l.glossary) TEACHER.set(g.word, { word: g.word, en: g.meaningEn, meaningKn: g.meaningKn, source: "teacher" });
+
+// Number names come from the teacher's notes, so their meaning is exact: ಎರಡು = 2.
+for (const [n, names] of Object.entries(NUMBER_NAMES))
+  for (const w of names) if (!TEACHER.has(w)) TEACHER.set(w, { word: w, en: n, source: "teacher" });
 
 const AI = new Map<string, WordMeaning>();
 for (const w of aiWords as AiWord[])

@@ -6,6 +6,7 @@ import type { QuestionAttempt } from "@/lib/store/types";
 import { HandwritingStrip } from "./HandwritingStrip";
 import { UploadPanel } from "./UploadPanel";
 import type { SessionState } from "./SessionView";
+import { KnText } from "@/components/Word";
 
 // confirmed: the child has decided. flagged: none of the readings is what they wrote, so a grown-up checks it.
 type Choice = { confirmed: boolean; replace: { word: string; with: string }[]; flagged?: boolean };
@@ -98,7 +99,7 @@ function CheckCard({ attempt, number, sessionId, choice, onChange, onRetake }: {
     <div className="mt-1 flex flex-wrap gap-2">
       {attempt.text.split(/\s+/).map((w, i) => (
         <span key={i} className={`flex flex-col items-center rounded-lg px-2 py-1 ${unsureWords.has(w) ? "bg-yellow-100 ring-2 ring-yellow-300" : ""}`}>
-          <span className="kn text-2xl">{shown(w)}</span>
+          <KnText text={shown(w)} className="text-2xl" />
           <span className="text-xs italic text-gray-500">{transliterate(shown(w))}</span>
         </span>
       ))}
@@ -107,7 +108,7 @@ function CheckCard({ attempt, number, sessionId, choice, onChange, onRetake }: {
 
   return (
     <div className={`paper p-5 ${decided ? (choice?.flagged ? "ring-2 ring-warn" : "ring-2 ring-good") : ""}`}>
-      <p className="text-sm font-bold text-gray-500">Question {number}: <span className="kn font-normal">{q.prompt}</span></p>
+      <p className="text-sm font-bold text-gray-500">Question {number}: <KnText text={q.prompt} className="font-normal" /></p>
       <p className="mt-3 text-xs font-bold uppercase tracking-wide text-gray-500">Your writing</p>
       <HandwritingStrip sessionId={sessionId} pageId={attempt.pageId} region={attempt.region} />
       <p className="mt-4 text-xs font-bold uppercase tracking-wide text-gray-500">What we read</p>
@@ -140,7 +141,7 @@ function CheckCard({ attempt, number, sessionId, choice, onChange, onRetake }: {
                     onClick={() => pick(u.word, alt)}
                     className={`kn rounded-xl border-2 bg-white px-4 py-2 text-2xl ${shown(u.word) === alt ? "border-accent bg-accent-soft" : "border-gray-200"}`}
                   >
-                    {alt}
+                    <KnText text={alt} mode="hover" />
                   </button>
                 ))}
               </div>

@@ -22,7 +22,7 @@ export function WorksheetMode({ session, worksheetId, controls }: { session: Pra
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
       <header className="card flex flex-wrap items-center gap-4 bg-white/90 p-5">
         <div className="mr-auto min-w-0">
-          <h1 className="kn text-2xl">{ws.title.kn}</h1>
+          <h1 className="text-2xl"><KnText text={ws.title.kn} /></h1>
           <p className="text-muted">{ws.title.en}</p>
           <ul className="mt-3 flex flex-wrap gap-2 text-sm">
             <li className="chip bg-accent-soft text-ink">✏️ Write your answers on paper, with the same numbers as below</li>
@@ -50,7 +50,7 @@ export function WorksheetMode({ session, worksheetId, controls }: { session: Pra
               <section className="paper p-5">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-bold">
-                    {si + 1}. <span className="kn">{s.kn}</span>
+                    {si + 1}. <KnText text={s.kn} />
                     <span className="block text-sm font-normal text-gray-500">{s.en}</span>
                   </h3>
                   <span className="chip bg-gray-100 text-gray-700">{s.questions.length * s.marksEach} marks</span>
@@ -78,6 +78,10 @@ function HintRules() {
   );
 }
 
+// Questions that are sentences: hovering their words helps the child understand what is asked without giving
+// the answer away. Single-word questions (meanings, opposites, plurals…) test that very word, so it stays plain.
+const SENTENCE_PROMPTS: Question["type"][] = ["one_sentence", "who_said"];
+
 function QuestionRow({ number, q, level, hidePrompt, open }: { number: string; q: Question; level: number; hidePrompt: boolean; open: (l: 1 | 2) => void }) {
   const prompt = q.type === "poet_name" ? "ಕವಿಯ ಹೆಸರು" : q.prompt.replace(" …", "");
   const latin = q.type === "en_to_kn";
@@ -92,7 +96,7 @@ function QuestionRow({ number, q, level, hidePrompt, open }: { number: string; q
             <p className="text-2xl">{prompt}</p>
           ) : (
             <>
-              <p className="text-2xl"><KnText text={prompt} /></p>
+              <p className="kn text-2xl">{SENTENCE_PROMPTS.includes(q.type) ? <KnText text={prompt} /> : prompt}</p>
               {q.type !== "number_name" && <p className="text-sm italic text-gray-500">{transliterate(prompt)}</p>}
             </>
           )}
@@ -116,8 +120,8 @@ function Hint1Box({ q }: { q: Question }) {
   return (
     <div className="ml-13 mt-3 rounded-2xl bg-yellow-50 px-4 py-3">
       <p className="text-xs font-bold uppercase tracking-wide text-yellow-800">Hint 1 · free</p>
-      {h.lines.map((l, i) => <p key={i} className="text-gray-800">{l}</p>)}
-      {h.kn && <p className="kn mt-1 whitespace-pre-line text-xl">{h.kn}</p>}
+      {h.lines.map((l, i) => <p key={i} className="text-gray-800"><KnText text={l} /></p>)}
+      {h.kn && <p className="mt-1 whitespace-pre-line text-xl"><KnText text={h.kn} /></p>}
       {h.knEn && <p className="text-sm italic text-gray-600">{h.knEn}</p>}
     </div>
   );

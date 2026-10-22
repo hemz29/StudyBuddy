@@ -23,7 +23,7 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
       <Link href="/learn/lessons" className="text-sm font-bold text-accent">← Back</Link>
       <div className="card flex flex-wrap items-center gap-4 bg-white/90 p-5">
         <div className="mr-auto">
-          <h1 className="kn text-3xl font-bold">{lesson.title.kn}</h1>
+          <h1 className="text-3xl font-bold"><KnText text={lesson.title.kn} /></h1>
           <p className="text-2xl font-bold">
             {titleCase(transliterate(lesson.title.kn.replace(/\s*\(.*\)\s*$/, "")))}{" "}
             <span className="font-normal text-muted">({lesson.kind})</span>
@@ -78,12 +78,12 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
       )}
 
       <section className="paper p-5">
-        <h2 className="text-lg"><span className="kn">ಪದಗಳ ಅರ್ಥ</span> · Word meanings from your teacher&apos;s notes</h2>
+        <h2 className="text-lg"><KnText text="ಪದಗಳ ಅರ್ಥ" /> · Word meanings from your teacher&apos;s notes</h2>
         <dl className="mt-3 grid gap-x-8 gap-y-3 sm:grid-cols-2">
           {lesson.glossary.map((g) => (
             <div key={g.word}>
-              <dt className="kn text-xl font-bold">{g.word} <span className="text-sm font-normal italic text-gray-500">{transliterate(g.word)}</span></dt>
-              <dd className="kn text-gray-700">{g.meaningKn} <span className="text-gray-500">· {g.meaningEn}</span></dd>
+              <dt className="text-xl font-bold"><KnText text={g.word} /> <span className="text-sm font-normal italic text-gray-500">{transliterate(g.word)}</span></dt>
+              <dd className="text-gray-700"><KnText text={g.meaningKn} /> <span className="text-gray-500">· {g.meaningEn}</span></dd>
             </div>
           ))}
         </dl>

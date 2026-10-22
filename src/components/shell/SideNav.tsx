@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { KnText } from "@/components/Word";
 
 export const CHILD_NAV = [
   { href: "/learn", label: "Home", icon: "🏠", exact: true },
@@ -26,7 +27,7 @@ export function SideNav({ items = CHILD_NAV }: { items?: typeof CHILD_NAV }) {
           }`}
         >
           <span className="kn w-6 text-center text-base" aria-hidden>{i.icon}</span>
-          {i.label}
+          <KnText text={i.label} mode="subtle" />
         </Link>
       ))}
     </nav>

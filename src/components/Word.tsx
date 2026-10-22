@@ -1,22 +1,27 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { meaningOf, stripPunct } from "@/content/words";
+import { aksharas, meaningOf, stripPunct } from "@/content/words";
 import { transliterate } from "@/lib/transliterate";
 
 const KANNADA = /[ಀ-೿]/;
 
-// Kannada text where every word shows how to say it and what it means: on hover with a mouse, on tap on a touch screen.
-export function KnText({ text, className = "" }: { text: string; className?: string }) {
+// How a word responds: "normal" in reading and learning content (dotted underline; hover, or tap on a touch
+// screen); "hover" inside links and buttons, so a tap still opens the link or picks the answer; "subtle" in
+// site navigation, with no underline.
+type Mode = "normal" | "hover" | "subtle";
+
+// Kannada text where every word shows how to say it and what it means. Other text (English, numbers) is left as is.
+export function KnText({ text, className = "", mode = "normal" }: { text: string; className?: string; mode?: Mode }) {
   const parts = text.split(/(\s+)/);
   return (
-    <span className={`kn ${className}`}>
-      {parts.map((p, i) => (KANNADA.test(p) ? <Word key={i} raw={p} /> : p))}
+    <span className={className}>
+      {parts.map((p, i) => (KANNADA.test(p) ? <Word key={i} raw={p} mode={mode} /> : p))}
     </span>
   );
 }
 
-export function Word({ raw, children }: { raw: string; children?: React.ReactNode }) {
+export function Word({ raw, children, mode = "normal" }: { raw: string; children?: React.ReactNode; mode?: Mode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   const word = stripPunct(raw);
@@ -39,13 +44,17 @@ export function Word({ raw, children }: { raw: string; children?: React.ReactNod
   return (
     <span
       ref={ref}
-      className="relative inline-block"
+      className="kn relative inline-block"
       onPointerEnter={(e) => e.pointerType === "mouse" && setOpen(true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && setOpen(false)}
     >
-      <span role="button" tabIndex={0} className="word" onClick={() => setOpen(true)} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
-        {children ?? raw}
-      </span>
+      {mode === "normal" ? (
+        <span role="button" tabIndex={0} className="word" onClick={() => setOpen(true)} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
+          {children ?? raw}
+        </span>
+      ) : (
+        <span className={mode === "hover" ? "word-hover" : "word-subtle"}>{children ?? raw}</span>
+      )}
       {open && ref.current && <MeaningPopover word={word} anchor={ref.current} />}
     </span>
   );
@@ -92,9 +101,9 @@ function MeaningPopover({ word, anchor }: { word: string; anchor: HTMLElement })
             {m.source === "teacher" ? "From teacher's notes" : `AI-suggested · ${m.confidence} confidence`}
           </span>
         </>
-      ) : (
+      ) : aksharas(word).length > 1 ? (
         <span className="mt-1 text-muted">Meaning not added yet.</span>
-      )}
+      ) : null}
     </span>,
     document.body,
   );
