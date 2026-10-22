@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { markDependsOnCheck } from "@/lib/grading/grade";
 import { redirect } from "next/navigation";
 import { getWorksheet, MARKING } from "@/content";
 import { isDemo, requireParent, userStore } from "@/lib/server/context";
@@ -40,6 +41,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
   const written = attempts.filter((a) => a.pageId && a.text.trim());
   const own = written.filter((a) => a.helpLevel === 0).length;
   const review = attempts.filter((a) => a.status === "review");
+  const childChecked = attempts.filter((a) => a.sessionId === latest?.id && markDependsOnCheck(a));
   const skills = skillRows(attempts);
   const trend = scoreTrend(sessions, attempts);
   const rec = recommendation(attempts);
@@ -69,6 +71,12 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       {review.length > 0 && (
         <Link href={`/parent/session/${review[0].sessionId}`} className="rounded-2xl bg-warn-soft p-4 font-bold text-warn">
           {review.length} answer(s) are waiting to be marked by a reviewer → open
+        </Link>
+      )}
+
+      {childChecked.length > 0 && (
+        <Link href={`/parent/session/${latest!.id}#${childChecked[0].id}`} className="rounded-2xl bg-sky p-4 font-bold text-sky-ink">
+          {childChecked.length} mark(s) in the latest worksheet depended on {child.nickname}&apos;s own check of the handwriting → compare with the photos
         </Link>
       )}
 

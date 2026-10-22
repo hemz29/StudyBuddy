@@ -7,7 +7,8 @@ import { HandwritingStrip } from "./HandwritingStrip";
 import { UploadPanel } from "./UploadPanel";
 import type { SessionState } from "./SessionView";
 
-type Choice = { confirmed: boolean; replace: { word: string; with: string }[] };
+// confirmed: the child has decided. flagged: none of the readings is what they wrote, so a grown-up checks it.
+type Choice = { confirmed: boolean; replace: { word: string; with: string }[]; flagged?: boolean };
 
 // The child checks only the answers whose reading was unsure. They confirm what they wrote, mistakes included.
 export function CheckingScreen({ state, worksheetId, onDone }: { state: SessionState; worksheetId: string; onDone: () => void }) {
@@ -27,7 +28,7 @@ export function CheckingScreen({ state, worksheetId, onDone }: { state: SessionS
     const res = await fetch(`/api/sessions/${state.session.id}/confirm`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ confirmations: unsure.map((a) => ({ attemptId: a.id, replace: choices[a.id]?.replace ?? [] })) }),
+      body: JSON.stringify({ confirmations: unsure.map((a) => ({ attemptId: a.id, replace: choices[a.id]?.replace ?? [], flagged: choices[a.id]?.flagged ?? false })) }),
     });
     if (!res.ok) {
       setError((await res.json()).error ?? "Something went wrong. Please try again.");
@@ -59,6 +60,7 @@ export function CheckingScreen({ state, worksheetId, onDone }: { state: SessionS
         </p>
         <p className="mt-3 rounded-xl bg-accent-soft px-4 py-3 text-sm">
           Only check that the words below are <b>what you wrote</b> – even if you think your answer is wrong. Mistakes will be marked fairly.
+          Your parent can see your photo next to these answers.
         </p>
       </div>
 
@@ -82,53 +84,75 @@ export function CheckingScreen({ state, worksheetId, onDone }: { state: SessionS
 
 function CheckCard({ attempt, number, sessionId, choice, onChange, onRetake }: { attempt: QuestionAttempt; number: string; sessionId: string; choice?: Choice; onChange: (c: Choice) => void; onRetake: () => void }) {
   const q = getQuestion(attempt.questionId)!;
-  const [openWord, setOpenWord] = useState<string | null>(null);
-  const replace = choice?.replace ?? [];
-  const shown = (w: string) => replace.find((r) => r.word === w)?.with ?? w;
+  const [saysNo, setSaysNo] = useState(false);
+  const [picked, setPicked] = useState<{ word: string; with: string }[]>(choice?.replace ?? []);
+  const shown = (w: string) => picked.find((r) => r.word === w)?.with ?? w;
   const unsureWords = new Map(attempt.uncertainWords.map((u) => [u.word, u.alternatives]));
+  const decided = choice?.confirmed && !saysNo;
 
-  function pick(word: string, alt: string | null) {
-    const rest = replace.filter((r) => r.word !== word);
-    onChange({ confirmed: false, replace: alt ? [...rest, { word, with: alt }] : rest });
-    setOpenWord(null);
+  function pick(word: string, alt: string) {
+    const rest = picked.filter((r) => r.word !== word);
+    setPicked(alt === word ? rest : [...rest, { word, with: alt }]);
   }
+  const reading = (
+    <div className="mt-1 flex flex-wrap gap-2">
+      {attempt.text.split(/\s+/).map((w, i) => (
+        <span key={i} className={`flex flex-col items-center rounded-lg px-2 py-1 ${unsureWords.has(w) ? "bg-yellow-100 ring-2 ring-yellow-300" : ""}`}>
+          <span className="kn text-2xl">{shown(w)}</span>
+          <span className="text-xs italic text-gray-500">{transliterate(shown(w))}</span>
+        </span>
+      ))}
+    </div>
+  );
 
   return (
-    <div className={`paper p-5 ${choice?.confirmed ? "ring-2 ring-good" : ""}`}>
+    <div className={`paper p-5 ${decided ? (choice?.flagged ? "ring-2 ring-warn" : "ring-2 ring-good") : ""}`}>
       <p className="text-sm font-bold text-gray-500">Question {number}: <span className="kn font-normal">{q.prompt}</span></p>
       <p className="mt-3 text-xs font-bold uppercase tracking-wide text-gray-500">Your writing</p>
       <HandwritingStrip sessionId={sessionId} pageId={attempt.pageId} region={attempt.region} />
       <p className="mt-4 text-xs font-bold uppercase tracking-wide text-gray-500">What we read</p>
-      <div className="mt-1 flex flex-wrap gap-2">
-        {attempt.text.split(/\s+/).map((w, i) =>
-          unsureWords.has(w) ? (
-            <button key={i} onClick={() => setOpenWord(openWord === w ? null : w)} className="flex flex-col items-center rounded-lg bg-yellow-100 px-2 py-1 ring-2 ring-yellow-300">
-              <span className="kn text-2xl">{shown(w)}</span>
-              <span className="text-xs italic text-gray-500">{transliterate(shown(w))}</span>
-            </button>
-          ) : (
-            <span key={i} className="flex flex-col items-center px-1 py-1">
-              <span className="kn text-2xl">{w}</span>
-              <span className="text-xs italic text-gray-500">{transliterate(w)}</span>
-            </span>
-          ),
-        )}
-      </div>
-      {openWord && (
-        <div className="mt-3 rounded-xl bg-yellow-50 p-3">
-          <p className="text-sm font-bold">Did you write one of these instead?</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            <button onClick={() => pick(openWord, null)} className="kn rounded-lg border-2 border-gray-300 bg-white px-3 py-1 text-xl">{openWord}</button>
-            {unsureWords.get(openWord)!.map((alt) => (
-              <button key={alt} onClick={() => pick(openWord, alt)} className="kn rounded-lg border-2 border-gray-300 bg-white px-3 py-1 text-xl">{alt}</button>
-            ))}
-            <button onClick={onRetake} className="rounded-lg px-3 py-1 text-sm font-bold text-bad">None of these → retake photo</button>
+      {reading}
+
+      {decided ? (
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-gray-50 px-4 py-3">
+          <span className="font-bold">
+            {choice.flagged ? "🧑‍🏫 A grown-up will check this one" : picked.length ? "✓ Changed to what you wrote" : "✓ That's what you wrote"}
+          </span>
+          <button onClick={() => { setSaysNo(false); onChange({ confirmed: false, replace: picked }); }} className="text-sm font-bold text-accent">Change</button>
+        </div>
+      ) : !saysNo ? (
+        <>
+          <p className="mt-4 font-bold">Look at your writing. Is this exactly what you wrote?</p>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            <button onClick={() => { setPicked([]); onChange({ confirmed: true, replace: [] }); }} className="btn btn-primary">✓ Yes, that&apos;s what I wrote</button>
+            <button onClick={() => setSaysNo(true)} className="btn border-2 border-bad/40 bg-white text-bad">✗ No, I wrote something else</button>
           </div>
+        </>
+      ) : (
+        <div className="mt-4 flex flex-col gap-3 rounded-xl bg-yellow-50 p-4">
+          {attempt.uncertainWords.map((u) => (
+            <div key={u.word}>
+              <p className="text-sm font-bold">Which one did you write?</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {[u.word, ...u.alternatives].map((alt) => (
+                  <button
+                    key={alt}
+                    onClick={() => pick(u.word, alt)}
+                    className={`kn rounded-xl border-2 bg-white px-4 py-2 text-2xl ${shown(u.word) === alt ? "border-accent bg-accent-soft" : "border-gray-200"}`}
+                  >
+                    {alt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button onClick={() => { setSaysNo(false); onChange({ confirmed: true, replace: picked }); }} className="btn btn-primary">✓ Now it&apos;s what I wrote</button>
+            <button onClick={() => { setSaysNo(false); setPicked([]); onChange({ confirmed: true, replace: [], flagged: true }); }} className="btn btn-ghost">None of these – a grown-up will check it</button>
+          </div>
+          <button onClick={onRetake} className="self-start text-sm font-bold text-muted">Photo too blurry? Send this page again</button>
         </div>
       )}
-      <button onClick={() => onChange({ confirmed: true, replace })} className={`btn mt-4 w-full ${choice?.confirmed ? "btn-soft" : "btn-primary"}`}>
-        {choice?.confirmed ? "✓ Checked" : "✓ Yes, this is what I wrote"}
-      </button>
     </div>
   );
 }

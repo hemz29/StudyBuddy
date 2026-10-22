@@ -8,7 +8,12 @@ export const maxDuration = 300;
 const Body = z.object({
   // For each unsure reading: confirmed as read, or with a word replaced by one of the offered alternatives.
   confirmations: z.array(
-    z.object({ attemptId: z.string(), replace: z.array(z.object({ word: z.string(), with: z.string() })).default([]) }),
+    z.object({
+      attemptId: z.string(),
+      replace: z.array(z.object({ word: z.string(), with: z.string() })).default([]),
+      // None of the readings is what the child wrote: a grown-up marks it from the photo.
+      flagged: z.boolean().default(false),
+    }),
   ),
 });
 
@@ -30,7 +35,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       const allowed = a.uncertainWords.find((u) => u.word === rep.word)?.alternatives.includes(rep.with);
       if (allowed) text = text.replace(rep.word, rep.with);
     }
-    await r.store.updateAttempt(r.parent.id, a.id, { text, readingConfirmed: true });
+    await r.store.updateAttempt(r.parent.id, a.id, { text, readingConfirmed: true, misreadFlagged: c.flagged });
   }
 
   const after = await r.store.listSessionAttempts(r.parent.id, r.session.id);

@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getQuestion, getWorksheet, worksheetQuestionNumber } from "@/content";
 import { requireParent, userStore } from "@/lib/server/context";
 import { sessionTotals } from "@/lib/server/pipeline";
-import { withHintPenalty } from "@/lib/grading/grade";
+import { markDependsOnCheck, withHintPenalty } from "@/lib/grading/grade";
 import { logActivity } from "@/lib/server/activity";
 import { writingTime } from "@/lib/time";
 import { transliterate } from "@/lib/transliterate";
@@ -42,6 +42,7 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
   const ws = session && getWorksheet(session.worksheetId);
   if (!session || !ws) notFound();
   await logActivity(store, parent.id, { kind: "parent_session_review", path: `/parent/session/${session.id}`, childId: session.childId, detail: { worksheetId: session.worksheetId } });
+  const name = (await store.getChild(parent.id, session.childId))?.nickname ?? "your child";
   const attempts = (await store.listSessionAttempts(parent.id, session.id)).sort((a, b) =>
     worksheetQuestionNumber(ws, a.questionId).localeCompare(worksheetQuestionNumber(ws, b.questionId), undefined, { numeric: true }),
   );
@@ -61,6 +62,7 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
       {attempts.map((a) => {
         const q = getQuestion(a.questionId)!;
         const fb = a.feedback;
+        const depends = markDependsOnCheck(a);
         return (
           <article key={a.id} id={a.id} className={`paper p-5 ${a.status === "review" ? "ring-2 ring-warn" : ""}`}>
             <div className="flex flex-wrap items-start justify-between gap-2">
@@ -70,6 +72,16 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
               </p>
               <span className="chip bg-gray-100">{STATUS[a.status ?? "review"]} · {a.awarded != null ? `${fmt(a.awarded)}/${fmt(a.max)}` : `–/${fmt(a.max)}`}</span>
             </div>
+            {a.misreadFlagged && (
+              <p className="mt-2 rounded-xl bg-warn-soft px-3 py-2 text-sm text-warn">
+                {name} said none of StudyBuddy&apos;s readings matched the handwriting. Compare with the photo and set the mark.
+              </p>
+            )}
+            {depends && (
+              <p className="mt-2 rounded-xl bg-sky px-3 py-2 text-sm text-sky-ink">
+                <b>Depends on {name}&apos;s check.</b> StudyBuddy wasn&apos;t sure of a word here, and {name} confirmed the reading this mark is based on. Compare with the photo.
+              </p>
+            )}
             <div className="mt-3 grid gap-4 md:grid-cols-2">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Child&apos;s answer</p>

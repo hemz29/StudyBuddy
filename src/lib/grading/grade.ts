@@ -11,7 +11,7 @@ export type Marker = (items: MarkItem[]) => Promise<{ results: MarkResult[] }>;
 // Marks are always computed here, in code: the AI only says which rubric points an answer shows.
 const roundHalf = (x: number) => Math.round(x * 2) / 2;
 
-export async function gradeAttempts<A extends Pick<QuestionAttempt, "questionId" | "text" | "max"> & { helpLevel?: number }>(
+export async function gradeAttempts<A extends Pick<QuestionAttempt, "questionId" | "text" | "max"> & { helpLevel?: number; misreadFlagged?: boolean }>(
   attempts: A[],
   marker: Marker | null,
 ): Promise<(A & Pick<QuestionAttempt, "awarded" | "status" | "method" | "feedback">)[]> {
@@ -21,6 +21,11 @@ export async function gradeAttempts<A extends Pick<QuestionAttempt, "questionId"
   for (const a of attempts) {
     const q = getQuestion(a.questionId)!;
     const model = q.model;
+    // The child said none of the readings matched their writing: a grown-up marks it from the photo.
+    if (a.misreadFlagged) {
+      out.set(a.questionId, { awarded: null, status: "review", method: null, feedback: { en: "A grown-up will check this one against your photo.", model } });
+      continue;
+    }
     if (!a.text.trim()) {
       out.set(a.questionId, { awarded: 0, status: "blank", method: "key", feedback: { en: "Not answered.", model } });
       continue;
@@ -87,6 +92,22 @@ export function withHintPenalty<R extends Pick<QuestionAttempt, "awarded" | "fee
     awarded: Math.floor(r.awarded * HINT2_FACTOR * 2) / 2,
     feedback: r.feedback && { ...r.feedback, en: `${r.feedback.en} Half marks, because Hint 2 (the choices) was used.` },
   };
+}
+
+// True when the mark hung on the child's own check of an unsure reading: another possible reading of the
+// same handwriting would have scored differently. Parents see these so they can compare with the photo.
+export function markDependsOnCheck(a: Pick<QuestionAttempt, "questionId" | "text" | "uncertainWords" | "misreadFlagged">) {
+  const q = getQuestion(a.questionId);
+  if (!q || a.misreadFlagged || !a.uncertainWords.length || !KEY_GRADED.includes(q.type)) return false;
+  const words = a.text.split(/\s+/);
+  const fractions = new Set<number>();
+  for (const u of a.uncertainWords) {
+    const options = [u.word, ...u.alternatives];
+    const at = words.findIndex((w) => options.includes(w));
+    if (at < 0) continue;
+    for (const o of options) fractions.add(gradeByKey(q, words.map((w, i) => (i === at ? o : w)).join(" ")).fraction);
+  }
+  return fractions.size > 1;
 }
 
 export function worksheetQuestionIds(worksheetId: string) {

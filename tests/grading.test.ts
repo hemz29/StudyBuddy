@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gradeAttempts, type Marker } from "@/lib/grading/grade";
+import { gradeAttempts, markDependsOnCheck, type Marker } from "@/lib/grading/grade";
 import { recommendation, scoreTrend, skillRows } from "@/lib/dashboard";
 import type { PracticeSession, QuestionAttempt } from "@/lib/store/types";
 
@@ -34,6 +34,19 @@ describe("gradeAttempts", () => {
     expect(r1).toMatchObject({ status: "review", awarded: null });
     const [r2] = await gradeAttempts([a("panchatantra.own.1", "ನಾನು ವಿದ್ಯಾಭ್ಯಾಸ ಮಾಡುತ್ತೇನೆ")], null);
     expect(r2).toMatchObject({ status: "review", awarded: null });
+  });
+
+  it("leaves an answer the child flagged as misread for a grown-up, outside the score", async () => {
+    const out = await gradeAttempts([{ ...a("panchatantra.opp.1", "ಸುಖ"), misreadFlagged: true }, a("panchatantra.opp.2", "ಅನರ್ಹ")], null);
+    expect(out[0]).toMatchObject({ status: "review", awarded: null });
+    // Session totals count only answers with a mark (sessionTotals in the pipeline).
+    expect(out.filter((x) => x.awarded !== null).map((x) => x.awarded)).toEqual([1]);
+  });
+
+  it("notices when a mark depends on the child's choice between unsure readings", () => {
+    const unsure = { word: "ಉಳಿ", alternatives: ["ಇಳಿ"], index: 0 };
+    expect(markDependsOnCheck({ questionId: "nanna-desha.opp.4", text: "ಇಳಿ", uncertainWords: [unsure], misreadFlagged: false })).toBe(true);
+    expect(markDependsOnCheck({ questionId: "nanna-desha.opp.4", text: "ಇಳಿ", uncertainWords: [], misreadFlagged: false })).toBe(false);
   });
 
   it("caps AI-derived marks at the question maximum", async () => {
