@@ -50,13 +50,12 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6">
       {isDemo && <DemoBanner />}
       <div className="flex flex-wrap items-center gap-3">
-        <span className="mr-auto"><Logo href="/parent" /></span>
+        <span className="mr-auto"><Logo href="/" /></span>
         {children.length > 1 &&
           children.map((c) => (
             <Link key={c.id} href={`/parent?child=${c.id}`} className={`chip h-9 px-4 ${c.id === child.id ? "bg-accent text-accent-ink" : "bg-white/80"}`}>{c.nickname}</Link>
           ))}
         {isAdmin(parent.email) && <Link href="/admin" className="btn btn-ghost">Admin</Link>}
-        <Link href="/profiles" className="btn btn-ghost">Back to learning</Link>
       </div>
       <header className="card relative overflow-hidden bg-white">
         <Image src="/art/parent.webp" alt="" fill priority sizes="1152px" className="object-cover object-left opacity-90" />

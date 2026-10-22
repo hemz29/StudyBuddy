@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getWorksheet } from "@/content";
 import { requireParent } from "@/lib/server/context";
@@ -33,10 +32,7 @@ export default async function Admin() {
   return (
     <div className="app-bg min-h-screen">
       <main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
-        <div className="flex items-center justify-between">
-          <Logo href="/admin" />
-          <Link href="/" className="btn btn-ghost text-xl" aria-label="Back to homepage" title="Back to homepage">🏠</Link>
-        </div>
+        <Logo href="/" />
         <h1 className="text-3xl">Pilot admin</h1>
 
         <section className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
