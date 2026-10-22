@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { meaningOf, stripPunct } from "@/content/words";
 import { transliterate } from "@/lib/transliterate";
 
@@ -23,8 +24,15 @@ export function Word({ raw, children }: { raw: string; children?: React.ReactNod
   useEffect(() => {
     if (!open) return;
     const close = (e: PointerEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
+    const hide = () => setOpen(false);
     document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
+    window.addEventListener("scroll", hide, true);
+    window.addEventListener("resize", hide);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      window.removeEventListener("scroll", hide, true);
+      window.removeEventListener("resize", hide);
+    };
   }, [open]);
 
   if (!word) return <>{raw}</>;
@@ -38,17 +46,35 @@ export function Word({ raw, children }: { raw: string; children?: React.ReactNod
       <span role="button" tabIndex={0} className="word" onClick={() => setOpen(true)} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
         {children ?? raw}
       </span>
-      {open && <MeaningPopover word={word} />}
+      {open && ref.current && <MeaningPopover word={word} anchor={ref.current} />}
     </span>
   );
 }
 
-function MeaningPopover({ word }: { word: string }) {
+const GAP = 8;
+
+// Rendered on <body> with fixed positioning, so cards with overflow-hidden can't clip it.
+// Centred above the word, flipped below when there's no room, and kept inside the screen.
+function MeaningPopover({ word, anchor }: { word: string; anchor: HTMLElement }) {
   const m = meaningOf(word);
-  return (
+  const box = useRef<HTMLSpanElement>(null);
+  const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const a = anchor.getBoundingClientRect();
+    const b = box.current!.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const left = Math.min(Math.max(a.left + a.width / 2 - b.width / 2, GAP), vw - b.width - GAP);
+    const above = a.top - b.height - GAP;
+    setPos({ left, top: above >= GAP ? above : a.bottom + GAP });
+  }, [anchor, word]);
+
+  return createPortal(
     <span
+      ref={box}
       role="tooltip"
-      className="absolute bottom-full left-1/2 z-40 mb-2 flex w-max max-w-64 -translate-x-1/2 flex-col gap-0.5 rounded-2xl border border-line bg-white px-4 py-3 text-left font-sans text-sm leading-snug text-ink shadow-xl"
+      style={{ left: pos?.left ?? 0, top: pos?.top ?? 0, visibility: pos ? "visible" : "hidden" }}
+      className="pointer-events-none fixed z-50 flex w-max max-w-64 flex-col gap-0.5 rounded-2xl border border-line bg-white px-4 py-3 text-left font-sans text-sm leading-snug text-ink shadow-xl"
     >
       <span className="kn text-lg font-bold leading-tight">{word}</span>
       <span className="italic text-muted">{transliterate(word)}</span>
@@ -69,6 +95,7 @@ function MeaningPopover({ word }: { word: string }) {
       ) : (
         <span className="mt-1 text-muted">Meaning not added yet.</span>
       )}
-    </span>
+    </span>,
+    document.body,
   );
 }

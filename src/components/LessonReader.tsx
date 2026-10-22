@@ -4,9 +4,10 @@ import Link from "next/link";
 import type { Lesson } from "@/content/schema";
 import { transliterate } from "@/lib/transliterate";
 import { KnText } from "@/components/Word";
-import { KindLabel } from "@/components/KindLabel";
 
 type Sentence = { id: string; kn: string; en: string };
+
+const titleCase = (s: string) => s.replace(/(^|\s)(\S)/g, (_, sp, c) => sp + c.toUpperCase());
 
 export function LessonReader({ lesson }: { lesson: Lesson }) {
   const [showTr, setShowTr] = useState(true);
@@ -22,10 +23,11 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
       <Link href="/learn/lessons" className="text-sm font-bold text-accent">← Back</Link>
       <div className="card flex flex-wrap items-center gap-4 bg-white/90 p-5">
         <div className="mr-auto">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="kn text-3xl font-bold">{lesson.title.kn}</h1>
-            <KindLabel kind={lesson.kind} />
-          </div>
+          <h1 className="kn text-3xl font-bold">{lesson.title.kn}</h1>
+          <p className="text-2xl font-bold">
+            {titleCase(transliterate(lesson.title.kn.replace(/\s*\(.*\)\s*$/, "")))}{" "}
+            <span className="font-normal text-muted">({lesson.kind})</span>
+          </p>
           <p className="text-muted">
             {lesson.title.en}
             {lesson.author.en && ` · ${lesson.author.en}`}
