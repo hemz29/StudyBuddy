@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { getLesson } from "@/content";
 import type { QuestionType } from "@/content/schema";
+import { meaningOf } from "@/content/words";
+import { lookalikes } from "@/lib/lookalikes";
+import { transliterate } from "@/lib/transliterate";
 import { PracticeCards, type Card } from "@/components/PracticeCards";
 
 const CARD_TYPES: Partial<Record<QuestionType, string>> = {
@@ -22,18 +25,32 @@ function shuffle<T>(xs: T[], seed: number) {
   return a;
 }
 
+// The right answer's English meaning, for the feedback after a choice: "ಸ್ಪಷ್ಟ = clear".
+function meaningEn(type: QuestionType, prompt: string, answer: string) {
+  const en = (w: string) => meaningOf(w)?.en;
+  if (type === "split") {
+    const parts = answer.split("+").map((p) => p.trim());
+    const ens = parts.map(en);
+    return ens.every(Boolean) ? parts.map((p, i) => `${p} = ${ens[i]}`).join(", ") : en(prompt);
+  }
+  return type === "meaning_kn" ? (en(prompt) ?? en(answer)) : (en(answer) ?? undefined);
+}
+
 export default async function CardsPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const lesson = getLesson((await params).lessonId);
   if (!lesson) notFound();
 
-  // Tap-to-answer drills built from the teacher's key: the wrong options are other answers from the same exercise.
+  // Tap-to-answer drills built from the teacher's key. Wrong options look like the question word where the
+  // answer is formed from it (splits, plurals, ...); otherwise they are other answers from the same exercise.
   const cards: Card[] = [];
   for (const ex of lesson.exercises) {
     const label = CARD_TYPES[ex.type];
     if (!label) continue;
     const pool = [...new Set(ex.questions.map((q) => q.answers[0]))];
     ex.questions.forEach((q, i) => {
-      const wrong = shuffle(pool.filter((a) => a !== q.answers[0]), i + 7).slice(0, 3);
+      const others = shuffle(pool.filter((a) => !q.answers.includes(a)), i + 7);
+      const like = lookalikes(q);
+      const wrong = (like.length >= 3 ? like : [...like, ...others]).slice(0, 3);
       cards.push({
         questionId: q.id,
         skill: q.skill,
@@ -41,6 +58,8 @@ export default async function CardsPage({ params }: { params: Promise<{ lessonId
         label,
         prompt: q.prompt,
         correct: q.answers[0],
+        correctLatin: transliterate(q.answers[0]),
+        correctEn: meaningEn(q.type, q.prompt, q.answers[0]),
         options: shuffle([q.answers[0], ...wrong], i + 3),
       });
     });

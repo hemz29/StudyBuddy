@@ -3,6 +3,7 @@ import { NUMBER_NAMES } from "@/content/grade6/numbers";
 import { nannaDeshaStanzas } from "@/content/grade6/nannaDesha";
 import type { Question, QuestionType } from "@/content/schema";
 import { aksharas, meaningOf, stripPunct } from "@/content/words";
+import { lookalikes } from "./lookalikes";
 import { transliterate } from "./transliterate";
 
 // Two hints per question.
@@ -142,9 +143,10 @@ const sameType = (q: Question) => {
   return [...own, ...others].filter((x) => x.id !== q.id);
 };
 
-function choices(q: Question, correct: string, pool: string[]) {
+// Look-alikes of the question word come first, so the right answer isn't the only one that resembles it.
+function choices(q: Question, correct: string, pool: string[], like: string[] = []) {
   const wrong = [...new Set(pool.filter((p) => p && p !== correct && !q.answers.includes(p)))];
-  return shuffle([correct, ...shuffle(wrong, q.id).slice(0, 3)], q.id + "!");
+  return shuffle([correct, ...[...like, ...shuffle(wrong, q.id)].slice(0, 3)], q.id + "!");
 }
 
 export function hint2(q: Question): Hint2 {
@@ -173,7 +175,7 @@ export function hint2(q: Question): Hint2 {
     case "poet_name":
       return { question: ask, correct: q.answers[0], options: choices(q, q.answers[0], ["ಕುವೆಂಪು", "ದ. ರಾ. ಬೇಂದ್ರೆ", "ಜಿ. ಎಸ್. ಶಿವರುದ್ರಪ್ಪ"]), latin: false };
     default:
-      return { question: ask, correct: q.answers[0], options: choices(q, q.answers[0], sameType(q).map((x) => x.answers[0])), latin: false };
+      return { question: ask, correct: q.answers[0], options: choices(q, q.answers[0], sameType(q).map((x) => x.answers[0]), lookalikes(q)), latin: false };
   }
 }
 

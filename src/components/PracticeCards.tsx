@@ -11,33 +11,35 @@ export type Card = {
   label: string;
   prompt: string;
   correct: string;
+  correctLatin: string;
+  correctEn?: string;
   options: string[];
 };
 
 export function PracticeCards({ lessonId, title, cards }: { lessonId: string; title: { kn: string; en: string }; cards: Card[] }) {
   const [i, setI] = useState(0);
-  const [chosen, setChosen] = useState<string | null>(null);
-  const [results, setResults] = useState<{ questionId: string; correct: boolean }[]>([]);
+  // The choice made on each card; going back shows it again, and it can't be changed.
+  const [picks, setPicks] = useState<(string | null)[]>(() => cards.map(() => null));
   const [saved, setSaved] = useState(false);
   const card = cards[i];
   const done = i >= cards.length;
+  const chosen = done ? null : picks[i];
+  const results = cards.map((c, k) => ({ questionId: c.questionId, correct: picks[k] === c.correct }));
 
-  async function finish(all: typeof results) {
-    await fetch("/api/cards", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ lessonId, results: all }) });
+  async function finish() {
+    await fetch("/api/cards", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ lessonId, results }) });
     setSaved(true);
   }
 
   function choose(opt: string) {
     if (chosen) return;
-    setChosen(opt);
-    setResults((r) => [...r, { questionId: card.questionId, correct: opt === card.correct }]);
+    setPicks((p) => p.map((x, k) => (k === i ? opt : x)));
   }
 
   function next() {
     const nextI = i + 1;
-    setChosen(null);
     setI(nextI);
-    if (nextI >= cards.length) finish(results);
+    if (nextI >= cards.length && !saved) finish();
   }
 
   if (done) {
@@ -48,7 +50,7 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
         <h1 className="mt-3 text-3xl font-extrabold">{right} of {cards.length} correct</h1>
         <p className="mt-2 text-muted">{saved ? "Saved to your progress." : "Saving…"}</p>
         <div className="mt-6 flex justify-center gap-3">
-          <button className="btn btn-soft" onClick={() => { setI(0); setResults([]); setSaved(false); }}>Play again</button>
+          <button className="btn btn-soft" onClick={() => { setI(0); setPicks(cards.map(() => null)); setSaved(false); }}>Play again</button>
           <Link href="/learn" className="btn btn-primary">Back home</Link>
         </div>
       </div>
@@ -79,11 +81,21 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
           })}
         </div>
         {chosen && (
-          <div className="mt-6">
-            <p className={`text-lg font-bold ${chosen === card.correct ? "text-good" : "text-bad"}`}>
-              {chosen === card.correct ? "Correct!" : <>Not quite – it is <span className="kn">{card.correct}</span></>}
+          <div className="mt-6 flex flex-col items-center gap-1">
+            <p className={`text-lg font-bold ${chosen === card.correct ? "text-good" : "text-bad"}`}>{chosen === card.correct ? "Correct!" : "Not quite."}</p>
+            <p className="text-lg">
+              <span className="kn font-bold">{card.correct}</span> is the right answer.
             </p>
-            <button onClick={next} className="btn btn-primary mt-4 w-full">Next</button>
+            <p className="text-muted">
+              <span className="italic">{card.correctLatin}</span>
+              {card.correctEn && <> · “{card.correctEn}”</>}
+            </p>
+          </div>
+        )}
+        {(i > 0 || chosen) && (
+          <div className="mt-6 flex gap-3">
+            {i > 0 && <button onClick={() => setI(i - 1)} className="btn btn-soft">← Back</button>}
+            {chosen && <button onClick={next} className="btn btn-primary flex-1">Next</button>}
           </div>
         )}
       </div>
