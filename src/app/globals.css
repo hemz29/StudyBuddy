@@ -31,8 +31,8 @@
 
 @theme inline {
   /* Montserrat is heavy at 700+; keep bold text lighter so the thin headings set the tone. */
-  --font-weight-bold: 600;
-  --font-weight-extrabold: 700;
+  --font-weight-bold: 500;
+  --font-weight-extrabold: 600;
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
