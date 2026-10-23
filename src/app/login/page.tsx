@@ -100,11 +100,10 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
                     <div className="flex items-center gap-3 text-sm text-muted">
                       <span className="h-px flex-1 bg-line" /> or <span className="h-px flex-1 bg-line" />
                     </div>
-                    <form action={googleSignIn} className="flex flex-col gap-2">
+                    <form action={googleSignIn}>
                       <button className="btn w-full border border-line bg-white text-ink hover:bg-gray-50">
                         <GoogleLogo /> Continue with Google
                       </button>
-                      <p className="text-center text-sm text-muted">We only get your name and email from Google. We never see your Gmail or Drive.</p>
                     </form>
                   </>
                 )}
