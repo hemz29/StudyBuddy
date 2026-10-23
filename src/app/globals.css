@@ -30,6 +30,9 @@
 }
 
 @theme inline {
+  /* Montserrat is heavy at 700+; keep bold text lighter so the thin headings set the tone. */
+  --font-weight-bold: 600;
+  --font-weight-extrabold: 700;
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
@@ -50,9 +53,9 @@
   --color-lavender-ink: var(--lavender-ink);
   --color-sky: var(--sky);
   --color-sky-ink: var(--sky-ink);
-  --font-serif: var(--font-lora), Georgia, serif;
-  --font-sans: var(--font-nunito), var(--font-kannada), system-ui, sans-serif;
-  --font-kn: var(--font-kannada), var(--font-nunito), sans-serif;
+  --font-serif: var(--font-main), var(--font-kannada), sans-serif;
+  --font-sans: var(--font-main), var(--font-kannada), system-ui, sans-serif;
+  --font-kn: var(--font-kannada), var(--font-main), sans-serif;
 }
 
 html,
@@ -62,7 +65,8 @@ body {
 }
 
 body {
-  font-family: var(--font-nunito), var(--font-kannada), system-ui, sans-serif;
+  font-family: var(--font-main), var(--font-kannada), system-ui, sans-serif;
+  font-weight: 300;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -74,12 +78,13 @@ body {
   box-shadow: 0 1px 2px rgb(60 50 30 / 0.04), 0 10px 30px rgb(60 50 30 / 0.06);
 }
 
-/* Headings in a soft serif, as in the artwork. */
+/* Headings: thin Montserrat, as in the Nudi logo. */
 h1,
 h2,
 .serif {
-  font-family: var(--font-lora), Georgia, serif;
-  font-weight: 600;
+  font-family: var(--font-main), var(--font-kannada), sans-serif;
+  font-weight: 200;
+  letter-spacing: 0.01em;
   letter-spacing: -0.01em;
 }
 
@@ -137,7 +142,7 @@ h2,
   min-height: 48px;
   padding: 0 1.4rem;
   border-radius: var(--btn-radius);
-  font-weight: 700;
+  font-weight: 500;
   transition: transform 0.08s ease, filter 0.15s ease;
 }
 .btn:active {
