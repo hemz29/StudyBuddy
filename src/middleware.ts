@@ -6,6 +6,14 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabaseEnv";
 export async function middleware(request: NextRequest) {
   const url = SUPABASE_URL;
   const anon = SUPABASE_ANON_KEY;
+  // A sign-in code that lands on any other page (Supabase falls back to the site address when the callback
+  // isn't in its allowed list) is passed on to the callback, which finishes signing in.
+  const code = request.nextUrl.searchParams.get("code");
+  if (code && request.nextUrl.pathname !== "/auth/callback" && !request.nextUrl.pathname.startsWith("/api/")) {
+    const to = new URL("/auth/callback", request.url);
+    to.searchParams.set("code", code);
+    return NextResponse.redirect(to);
+  }
   let response = NextResponse.next({ request });
   if (!url || !anon) return response;
 
