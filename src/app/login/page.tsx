@@ -2,7 +2,6 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { isDemo, supabaseServer } from "@/lib/server/context";
-import { LogoMark } from "@/components/shell/Logo";
 import { SendButton } from "./SendButton";
 
 export const dynamic = "force-dynamic";
@@ -43,10 +42,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       </div>
       <div className="flex flex-col justify-center px-6 py-10 lg:px-16">
         <div className="mx-auto w-full max-w-md">
-          <div className="flex items-center gap-3">
-            <LogoMark size={44} />
-            <span className="serif text-2xl font-semibold">StudyBuddy</span>
-          </div>
+          <Image src="/brand/nudi-logo.webp" alt="Nudi – Kannada, with confidence" width={900} height={711} priority className="w-56 rounded-3xl shadow-sm" />
           <h1 className="mt-8 text-4xl leading-tight">Learn Kannada.<br />Build confidence.</h1>
           <p className="mt-3 text-lg text-muted">Grade 6 Kannada (3rd language) practice for your child, with progress you can follow.</p>
           <div className="card mt-8 p-6">

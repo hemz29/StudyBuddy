@@ -3,7 +3,7 @@ import type { Question } from "@/content/schema";
 import { LogoMark } from "@/components/shell/Logo";
 
 // Printable worksheet in the school's paper format: Section A and B, bilingual instructions, marks per section
-// as "(1X3=3)", answer lines. StudyBuddy's logo sits top right; the school's name and logo are never used.
+// as "(1X3=3)", answer lines. Nudi's logo sits top right; the school's name and logo are never used.
 const WORD_TYPES = new Set(["meaning_kn", "meaning_en", "en_to_kn", "opposite", "gender", "plural", "split", "rhyme", "number_name"]);
 const LINES: Record<string, number> = { one_sentence: 2, who_said: 1, own_sentence: 1, fill_blank: 0 };
 
@@ -18,7 +18,7 @@ export function WorksheetPaper({ ws }: { ws: Worksheet }) {
       <header className="relative text-center">
         <div className="absolute right-0 top-0 flex items-center gap-1.5">
           <LogoMark size={30} />
-          <span className="font-serif text-sm font-semibold">StudyBuddy</span>
+          <span className="font-serif text-sm font-semibold">Nudi</span>
         </div>
         <p className="pt-1 text-lg font-bold tracking-wide">GRADE VI · KANNADA 3rd LANGUAGE</p>
         <p className="font-bold">{ws.kind === "test" ? "Practice Test" : "Chapter Practice"}</p>

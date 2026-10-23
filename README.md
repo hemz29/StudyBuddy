@@ -1,4 +1,4 @@
-# StudyBuddy
+# Nudi (ನುಡಿ)
 
 Enabling parents to help their children learn Kannada confidently.
 
@@ -10,7 +10,7 @@ Grade 6 Kannada (3rd language) practice for the Friday pilot. A child reads a le
 - **Lessons:** Panchatantra, Nanna Desha Nanna Jana and Kugutide Pakshi, from the teacher's notes. Each is shown in Kannada with a pronunciation aid in English letters and the English meaning.
 - **Word meanings:** hovering over (or tapping) any Kannada word shows how to say it and what it means, labelled "From teacher's notes" or "AI-suggested" with a confidence level. See *Word meanings* below.
 - **Practice cards:** quick tap drills for opposites, plurals, gender, meanings, word-splitting and rhymes.
-- **Worksheets:** nine, in the school's Term 1 paper format (Section A and B, marks as "(1X3=3)", StudyBuddy logo top right).
+- **Worksheets:** nine, in the school's Term 1 paper format (Section A and B, marks as "(1X3=3)", Nudi logo top right).
   - **Practice tests 1–3:** 40 marks, 1 hour, Panchatantra + Nanna Desha Nanna Jana. Test 1 is the school's Term 1 paper (9 Oct 2026).
   - **Chapter practice A and B** for each chapter: 25 marks, 40 minutes.
   - All are PDFs in `public/worksheets/`. Older worksheets are kept (marked `retired`) so past attempts still open.

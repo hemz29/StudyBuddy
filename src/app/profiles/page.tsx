@@ -72,7 +72,7 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
             </label>
             <AvatarPicker />
             {error === "1" && <p className="text-bad">Please enter a nickname and choose an avatar.</p>}
-            {error && error !== "1" && <p className="text-bad">Couldn&apos;t save the child. Please send this message to the StudyBuddy team: <b>{error}</b></p>}
+            {error && error !== "1" && <p className="text-bad">Couldn&apos;t save the child. Please send this message to the Nudi team: <b>{error}</b></p>}
             <button className="btn btn-primary self-start">Start learning</button>
           </form>
         </details>

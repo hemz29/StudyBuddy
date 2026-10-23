@@ -79,7 +79,7 @@ def export():
 
     how = wb.create_sheet("How to review", 0)
     for line in [
-        "StudyBuddy – Grade 6 Kannada: please check these before the pilot",
+        "Nudi – Grade 6 Kannada: please check these before the pilot",
         "",
         "Your lesson notes, translations and model answers are used as they are. Please only check what is in these tabs.",
         "All corrections can be written in English. Where a Kannada answer is needed, pick it from the dropdown.",

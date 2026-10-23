@@ -75,12 +75,12 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
             </div>
             {a.misreadFlagged && (
               <p className="mt-2 rounded-xl bg-warn-soft px-3 py-2 text-sm text-warn">
-                {name} said none of StudyBuddy&apos;s readings matched the handwriting. Compare with the photo and set the mark.
+                {name} said none of Nudi&apos;s readings matched the handwriting. Compare with the photo and set the mark.
               </p>
             )}
             {depends && (
               <p className="mt-2 rounded-xl bg-sky px-3 py-2 text-sm text-sky-ink">
-                <b>Depends on {name}&apos;s check.</b> StudyBuddy wasn&apos;t sure of a word here, and {name} confirmed the reading this mark is based on. Compare with the photo.
+                <b>Depends on {name}&apos;s check.</b> Nudi wasn&apos;t sure of a word here, and {name} confirmed the reading this mark is based on. Compare with the photo.
               </p>
             )}
             <div className="mt-3 grid gap-4 md:grid-cols-2">
