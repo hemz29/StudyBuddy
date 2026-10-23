@@ -51,7 +51,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
                 <p className="text-4xl">📬</p>
                 <h2 className="text-2xl">Check your email</h2>
                 <p className="text-muted">
-                  We sent a sign-in link to <b className="text-ink">{email}</b>. Open it on this device to continue. It can take a minute to arrive; check spam too.
+                  We sent a sign-in link to {email ? <b className="text-ink">{email}</b> : "your email"}. Open it on this device to continue. It can take a minute to arrive; check spam too.
                 </p>
                 <a href="/login" className="mt-2 text-sm font-bold text-accent">Use a different email</a>
               </div>
