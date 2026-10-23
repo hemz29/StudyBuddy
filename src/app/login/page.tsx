@@ -42,8 +42,8 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       </div>
       <div className="flex flex-col justify-center px-6 py-10 lg:px-16">
         <div className="mx-auto w-full max-w-md">
-          <Image src="/brand/nudi-logo.webp" alt="Nudi – Kannada, with confidence" width={900} height={711} priority className="w-56 rounded-3xl shadow-sm" />
-          <p className="mt-6 text-lg text-muted">Grade 6 Kannada (3rd language) practice for your child, with progress you can follow.</p>
+          <Image src="/brand/nudi-logo.webp" alt="Nudi – Kannada, with confidence" width={900} height={711} priority className="mx-auto w-56 rounded-3xl shadow-sm" />
+          <p className="mt-6 text-center text-lg text-muted">Grade 6 Kannada (3rd language) practice for your child, with progress you can follow.</p>
           <div className="card mt-8 p-6">
             {sent ? (
               <div className="flex flex-col gap-2">
