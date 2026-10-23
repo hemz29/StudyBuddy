@@ -3,6 +3,7 @@ import { z } from "zod";
 import { MARKING, getWorksheet } from "@/content";
 import { getActiveChild, getParent, userStore } from "@/lib/server/context";
 import { fail } from "@/lib/server/api";
+import { logActivity } from "@/lib/server/activity";
 
 const Body = z.object({ worksheetId: z.string(), retryOf: z.string().nullable().optional() });
 
@@ -31,5 +32,6 @@ export async function POST(req: Request) {
     max: null,
     completedAt: null,
   });
+  await logActivity(store, parent.id, { kind: "worksheet_start", path: `/learn/worksheet/${ws.id}`, childId: child.id });
   return NextResponse.json({ id: session.id });
 }

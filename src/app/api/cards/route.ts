@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { MARKING, getQuestion } from "@/content";
 import { getActiveChild, getParent, userStore } from "@/lib/server/context";
+import { logActivity } from "@/lib/server/activity";
 
 const Body = z.object({
   lessonId: z.string(),
@@ -62,5 +63,6 @@ export async function POST(req: Request) {
       };
     }),
   );
+  await logActivity(store, parent.id, { kind: "cards_done", path: `/learn/cards/${body.data.lessonId}`, childId: child.id });
   return NextResponse.json({ ok: true });
 }

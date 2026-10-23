@@ -9,7 +9,19 @@ const ACTIVITY: Record<string, string> = {
   parent_dashboard: "Opened the parent dashboard",
   parent_session_review: "Reviewed a worksheet's answers",
   lesson_view: "Child opened a lesson",
+  worksheet_start: "Started a worksheet",
+  cards_done: "Finished a set of practice cards",
+  photo_upload: "Sent an answer photo",
 };
+
+// "💻 75% · 📱 20% · tablet 5% (40 visits)" from the device noted on each visit.
+function deviceSplit(acts: { device: string | null }[]) {
+  const known = acts.filter((a) => a.device);
+  if (!known.length) return "–";
+  const pct = (d: string) => Math.round((known.filter((a) => a.device === d).length / known.length) * 100);
+  const parts = [["computer", "💻"], ["phone", "📱"], ["tablet", "tablet"]].filter(([d]) => pct(d) > 0).map(([d, label]) => `${label} ${pct(d)}%`);
+  return `${parts.join(" · ")} (${known.length} visit${known.length > 1 ? "s" : ""})`;
+}
 const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 const date = (iso?: string | null) => (iso ? new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) : "–");
 
@@ -43,6 +55,7 @@ export default async function Admin() {
           <Stat label="Hint 2 used" value={hint2} note="answers" />
           <Stat label="Waiting for review" value={review} note="answers" />
         </section>
+        <p className="text-sm text-muted">Devices across all families: {deviceSplit(d.activity)}</p>
         <p className="text-sm text-muted">AI use so far: {d.aiCalls.length} calls, {tokens.toLocaleString("en-IN")} tokens.</p>
         {d.activityMissing && (
           <p className="rounded-2xl bg-warn-soft p-4 text-warn">
@@ -51,7 +64,7 @@ export default async function Admin() {
         )}
 
         <Card title="Families">
-          <Table head={["Parent email", "Joined", "Last sign-in", "Children", "Worksheets (finished)", "Dashboard views", "Last activity"]}>
+          <Table head={["Parent email", "Joined", "Last sign-in", "Children", "Worksheets (finished)", "Dashboard views", "Device use", "Last activity"]}>
             {d.families.map((f) => {
               const kids = d.children.filter((c) => c.parentId === f.parentId);
               const ws = worksheets.filter((s) => s.parentId === f.parentId);
@@ -65,6 +78,7 @@ export default async function Admin() {
                   <td>{kids.length ? kids.map((k) => k.nickname).join(", ") : <span className="text-warn">None yet</span>}</td>
                   <td>{ws.length ? `${ws.length} (${ws.filter((s) => s.status === "graded").length})` : <span className="text-warn">Not started</span>}</td>
                   <td>{acts.filter((a) => a.kind === "parent_dashboard").length}</td>
+                  <td>{deviceSplit(acts)}</td>
                   <td>{date(last)}</td>
                 </tr>
               );

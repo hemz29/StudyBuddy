@@ -9,7 +9,8 @@ const ADMINS = (process.env.ADMIN_EMAILS ?? "hemlata.v.29@gmail.com").split(",")
 export const isAdmin = (email: string) => ADMINS.includes(email.toLowerCase());
 
 export type Family = { parentId: string; email: string; joinedAt: string | null; lastSignInAt: string | null };
-export type Activity = { parentId: string; childId: string | null; kind: string; path: string | null; createdAt: string };
+export type Activity = { parentId: string; childId: string | null; kind: string; path: string | null; createdAt: string; device: string | null };
+const deviceIn = (detail: unknown) => ((detail as { device?: string } | null)?.device ?? null);
 export type AdminData = {
   families: Family[];
   children: Child[];
@@ -30,7 +31,7 @@ export async function loadAdminData(): Promise<AdminData> {
       children: d.children,
       sessions: d.sessions,
       attempts: d.attempts,
-      activity: d.activity.map((a) => ({ parentId: a.parentId, childId: a.childId ?? null, kind: a.kind, path: a.path ?? null, createdAt: a.createdAt })),
+      activity: d.activity.map((a) => ({ parentId: a.parentId, childId: a.childId ?? null, kind: a.kind, path: a.path ?? null, createdAt: a.createdAt, device: deviceIn(a.detail) })),
       aiCalls: d.ai.map((a) => ({ parentId: a.parentId, ok: a.ok, inputTokens: a.inputTokens, outputTokens: a.outputTokens })),
       activityMissing: false,
     };
@@ -45,7 +46,7 @@ export async function loadAdminData(): Promise<AdminData> {
     all("children"),
     all("practice_sessions"),
     all("question_attempts", "session_id, help_level, status, awarded, max, method"),
-    all("activity_events", "parent_id, child_id, kind, path, created_at"),
+    all("activity_events", "parent_id, child_id, kind, path, created_at, detail"),
     all("ai_usage_events", "parent_id, ok, input_tokens, output_tokens"),
   ]);
   return {
@@ -53,7 +54,7 @@ export async function loadAdminData(): Promise<AdminData> {
     children: children.rows as unknown as Child[],
     sessions: (sessions.rows as unknown as PracticeSession[]).map((s) => ({ ...s, awarded: s.awarded === null ? null : Number(s.awarded), max: s.max === null ? null : Number(s.max) })),
     attempts: (attempts.rows as unknown as AdminData["attempts"]).map((a) => ({ ...a, awarded: a.awarded === null ? null : Number(a.awarded), max: Number(a.max) })),
-    activity: activity.rows as unknown as Activity[],
+    activity: (activity.rows as unknown as (Activity & { detail?: unknown })[]).map(({ detail, ...a }) => ({ ...a, device: deviceIn(detail) })),
     aiCalls: ai.rows as unknown as AdminData["aiCalls"],
     activityMissing: Boolean(activity.error),
   };

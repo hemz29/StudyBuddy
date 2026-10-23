@@ -32,7 +32,7 @@ export default function Privacy() {
             <li><b>About you, the parent:</b> your email address. If you sign in with Google, also the name and profile photo on your Google account. Nothing else from Google: we never see your Gmail, Drive or contacts.</li>
             <li><b>About your child:</b> only a nickname and the avatar you pick. We don&apos;t ask for a full name, date of birth or school.</li>
             <li><b>Practice work:</b> photos of handwritten answers, the answers read from them, marks, which hints were used, and how long a worksheet took.</li>
-            <li><b>Simple usage records:</b> which pages were opened and when, so we can see what helps and fix what doesn&apos;t.</li>
+            <li><b>Simple usage records:</b> which pages were opened, when, and on what kind of device (phone, tablet or computer), so we can see what helps and fix what doesn&apos;t.</li>
           </ul>
         </Section>
 
