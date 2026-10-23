@@ -143,22 +143,23 @@ h2,
 .btn:active {
   transform: scale(0.98);
 }
+/* Buttons follow the Nudi logo: black for the main action, white with a dark outline for the rest. */
 .btn-primary {
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: #000;
+  color: #fff;
 }
 .btn-primary:hover {
-  filter: brightness(1.06);
+  background: #262626;
 }
-.btn-soft {
-  background: var(--accent-soft);
-  color: var(--ink);
-}
+.btn-soft,
 .btn-ghost {
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--line);
-  background-color: var(--surface);
+  background: #fff;
+  color: #000;
+  border: 1px solid #747775;
+}
+.btn-soft:hover,
+.btn-ghost:hover {
+  background: #f3f3f3;
 }
 .btn:disabled {
   opacity: 0.5;
