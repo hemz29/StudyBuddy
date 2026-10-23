@@ -58,15 +58,19 @@ export const localStore: Store = {
       const c = db.children.find((x) => x.id === childId && x.parentId === parentId);
       if (c) Object.assign(c, patch);
     }),
-  deleteChild: (parentId, childId) =>
-    tx((db) => {
+  deleteChild: async (parentId, childId) => {
+    const keys: string[] = [];
+    await tx((db) => {
       const sessionIds = new Set(db.sessions.filter((s) => s.childId === childId && s.parentId === parentId).map((s) => s.id));
+      keys.push(...db.pages.filter((p) => sessionIds.has(p.sessionId)).map((p) => p.imageKey));
       db.children = db.children.filter((c) => !(c.id === childId && c.parentId === parentId));
       db.sessions = db.sessions.filter((s) => !sessionIds.has(s.id));
       db.pages = db.pages.filter((p) => !sessionIds.has(p.sessionId));
       db.attempts = db.attempts.filter((a) => !sessionIds.has(a.sessionId));
       db.tokens = db.tokens.filter((t) => !sessionIds.has(t.sessionId));
-    }),
+    });
+    await Promise.all(keys.map((k) => fs.rm(path.join(DIR, "images", k), { force: true })));
+  },
 
   createSession: (s) =>
     tx((db) => {

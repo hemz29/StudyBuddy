@@ -111,6 +111,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
               </div>
             )}
           </div>
+          <p className="mt-4 text-center text-sm"><a href="/privacy" className="text-muted underline">Privacy</a></p>
         </div>
       </div>
     </main>

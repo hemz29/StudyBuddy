@@ -36,6 +36,13 @@ export function supabaseStore(db: SupabaseClient): Store {
       check(await db.from("children").update(toRow(patch)).eq("parent_id", parentId).eq("id", id));
     },
     deleteChild: async (parentId, id) => {
+      // Rows go with the child (on delete cascade); the answer photos in storage have to be removed separately.
+      const sessions = rows<{ id: string }>(await db.from("practice_sessions").select("id").eq("parent_id", parentId).eq("child_id", id));
+      if (sessions.length) {
+        const pages = rows<{ imageKey: string }>(await db.from("page_uploads").select("image_key").eq("parent_id", parentId).in("session_id", sessions.map((x) => x.id)));
+        const keys = pages.map((x) => x.imageKey).filter(Boolean);
+        for (let i = 0; i < keys.length; i += 1000) check(await db.storage.from(BUCKET).remove(keys.slice(i, i + 1000)));
+      }
       check(await db.from("children").delete().eq("parent_id", parentId).eq("id", id));
     },
 
