@@ -101,7 +101,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
                       <span className="h-px flex-1 bg-line" /> or <span className="h-px flex-1 bg-line" />
                     </div>
                     <form action={googleSignIn}>
-                      <button className="btn w-full border border-line bg-white text-ink hover:bg-gray-50">
+                      <button className="btn w-full border border-[#747775] bg-white text-ink shadow-sm hover:bg-gray-50">
                         <GoogleLogo /> Continue with Google
                       </button>
                     </form>
