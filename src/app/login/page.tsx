@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { isDemo, supabaseServer } from "@/lib/server/context";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabaseEnv";
 import { SendButton } from "./SendButton";
+import { HashError } from "./HashError";
 
 export const dynamic = "force-dynamic";
 
@@ -88,6 +89,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
               </div>
             ) : (
               <div className="flex flex-col gap-4">
+                <HashError />
                 <form action={sendLink} className="flex flex-col gap-3">
                   <label htmlFor="email" className="font-bold">Parent email</label>
                   <input id="email" name="email" type="email" required defaultValue={email} autoComplete="email" className="h-12 rounded-xl border border-line bg-white px-4 text-lg" placeholder="you@example.com" />
