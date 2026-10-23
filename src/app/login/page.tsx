@@ -88,26 +88,26 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-              {google && (
-                <>
-                  <form action={googleSignIn} className="flex flex-col gap-2">
-                    <button className="btn w-full border border-line bg-white text-ink hover:bg-gray-50">
-                      <GoogleLogo /> Continue with Google
-                    </button>
-                    <p className="text-center text-sm text-muted">We only get your name and email from Google. We never see your Gmail or Drive.</p>
-                  </form>
-                  <div className="flex items-center gap-3 text-sm text-muted">
-                    <span className="h-px flex-1 bg-line" /> or get a link by email <span className="h-px flex-1 bg-line" />
-                  </div>
-                </>
-              )}
-              <form action={sendLink} className="flex flex-col gap-3">
-                <label htmlFor="email" className="font-bold">Parent email</label>
-                <input id="email" name="email" type="email" required defaultValue={email} autoComplete="email" className="h-12 rounded-xl border border-line bg-white px-4 text-lg" placeholder="you@example.com" />
-                {problem && <p className={problem.wait ? "rounded-xl bg-accent-soft p-3 text-ink" : "text-bad"}>{problem.text}</p>}
-                <SendButton waitSeconds={problem?.wait ?? 0} />
-                <p className="text-sm text-muted">No password needed. We only use your email to sign you in.</p>
-              </form>
+                <form action={sendLink} className="flex flex-col gap-3">
+                  <label htmlFor="email" className="font-bold">Parent email</label>
+                  <input id="email" name="email" type="email" required defaultValue={email} autoComplete="email" className="h-12 rounded-xl border border-line bg-white px-4 text-lg" placeholder="you@example.com" />
+                  {problem && <p className={problem.wait ? "rounded-xl bg-accent-soft p-3 text-ink" : "text-bad"}>{problem.text}</p>}
+                  <SendButton waitSeconds={problem?.wait ?? 0} />
+                  <p className="text-sm text-muted">No password needed. We only use your email to sign you in.</p>
+                </form>
+                {google && (
+                  <>
+                    <div className="flex items-center gap-3 text-sm text-muted">
+                      <span className="h-px flex-1 bg-line" /> or <span className="h-px flex-1 bg-line" />
+                    </div>
+                    <form action={googleSignIn} className="flex flex-col gap-2">
+                      <button className="btn w-full border border-line bg-white text-ink hover:bg-gray-50">
+                        <GoogleLogo /> Continue with Google
+                      </button>
+                      <p className="text-center text-sm text-muted">We only get your name and email from Google. We never see your Gmail or Drive.</p>
+                    </form>
+                  </>
+                )}
               </div>
             )}
           </div>
