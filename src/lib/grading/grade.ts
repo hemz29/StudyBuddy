@@ -2,7 +2,7 @@ import { getQuestion, getWorksheet, marksFor } from "@/content";
 import { KEY_GRADED } from "@/content/schema";
 import type { MarkItem } from "@/lib/ai";
 import type { AttemptFeedback, QuestionAttempt } from "@/lib/store/types";
-import { HINT2_FACTOR } from "@/lib/help";
+import { HINT2_FACTOR, HINT2_WRONG } from "@/lib/help";
 import { gradeByKey } from "./answerKey";
 
 type MarkResult = { id: string; pointsMet: boolean[]; feedbackEn: string; spellingNotes: { wrote: string; correct: string }[] };
@@ -84,8 +84,11 @@ export async function gradeAttempts<A extends Pick<QuestionAttempt, "questionId"
   return attempts.map((a) => ({ ...a, ...withHintPenalty(a.helpLevel ?? 0, out.get(a.questionId)!) }));
 }
 
-// An answer written after seeing Hint 2's choices gets half marks (rounded down to the half mark).
+// An answer written after seeing Hint 2's choices gets half marks (rounded down to the half mark), and none at
+// all if the one pick among the choices was wrong.
 export function withHintPenalty<R extends Pick<QuestionAttempt, "awarded" | "feedback">>(helpLevel: number, r: R): R {
+  if (helpLevel === HINT2_WRONG && r.awarded !== null)
+    return { ...r, awarded: 0, feedback: r.feedback && { ...r.feedback, en: `${r.feedback.en} Hint 2's choice was not right, so this answer gets no marks.` } };
   if (helpLevel < 2 || !r.awarded) return r;
   return {
     ...r,

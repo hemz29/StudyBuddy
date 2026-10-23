@@ -9,6 +9,7 @@ import { writingTime } from "@/lib/time";
 import { transliterate } from "@/lib/transliterate";
 import { HandwritingStrip } from "@/components/session/HandwritingStrip";
 import { KnText } from "@/components/Word";
+import { HINT2_WRONG } from "@/lib/help";
 
 // A reviewer (in the pilot: the owner sitting with the family) sets the mark for an answer.
 async function setMark(formData: FormData) {
@@ -20,7 +21,7 @@ async function setMark(formData: FormData) {
   const session = await store.getSession(parent.id, sessionId);
   const attempt = (await store.listSessionAttempts(parent.id, sessionId)).find((a) => a.id === attemptId);
   if (!session || !attempt) redirect("/parent");
-  // The reviewer marks the answer itself; the Hint 2 rule (half marks) is then applied as for any other mark.
+  // The reviewer marks the answer itself; the Hint 2 rule (half marks, or 0 after a wrong pick) is then applied as for any other mark.
   const worth = Math.min(attempt.max, Math.max(0, Number(formData.get("awarded"))));
   const { awarded } = withHintPenalty(attempt.helpLevel, { awarded: worth, feedback: null });
   await store.updateAttempt(parent.id, attemptId, {
@@ -90,7 +91,7 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
                 <p className="mt-1 text-xl">{a.text ? <KnText text={a.text} /> : "(no answer)"}</p>
                 {a.text && <p className="text-sm italic text-gray-500">{transliterate(a.text)}</p>}
                 {a.helpLevel === 1 && <p className="mt-1 text-sm text-warn">Used Hint 1 (free)</p>}
-                {a.helpLevel >= 2 && <p className="mt-1 text-sm text-warn">Used Hint 2 (choices): half marks</p>}
+                {a.helpLevel >= 2 && <p className="mt-1 text-sm text-warn">{a.helpLevel === HINT2_WRONG ? "Used Hint 2 (choices): picked wrong, so 0 marks" : "Used Hint 2 (choices): half marks"}</p>}
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Teacher&apos;s answer</p>

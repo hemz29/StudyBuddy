@@ -7,6 +7,7 @@ import { writingTime } from "@/lib/time";
 import { HandwritingStrip } from "./HandwritingStrip";
 import type { SessionState } from "./SessionView";
 import { KnText } from "@/components/Word";
+import { HINT2_WRONG } from "@/lib/help";
 
 const ICON: Record<string, string> = { correct: "✓", partial: "½", incorrect: "✗", blank: "–", review: "…" };
 const TONE: Record<string, string> = { correct: "bg-good-soft text-good", partial: "bg-warn-soft text-warn", incorrect: "bg-bad-soft text-bad", blank: "bg-gray-100 text-gray-500", review: "bg-accent-soft" };
@@ -37,7 +38,7 @@ export function Results({ state, worksheetId }: { state: SessionState; worksheet
         <p className="text-lg text-muted">{pct}% · {ws.title.en}</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <span className="chip bg-accent-soft">Answered without hints: {onOwn} of {answered.length}</span>
-          {hint2 > 0 && <span className="chip bg-peach text-peach-ink">Hint 2 used: {hint2} (half marks)</span>}
+          {hint2 > 0 && <span className="chip bg-peach text-peach-ink">Hint 2 used: {hint2} (half marks if picked right, 0 if wrong)</span>}
           {time && <span className={`chip ${time.over ? "bg-peach text-peach-ink" : "bg-good-soft text-good"}`}>⏱️ {time.text}</span>}
           {review > 0 && <span className="chip bg-warn-soft text-warn">{review} answer(s) waiting for a grown-up to check</span>}
         </div>
@@ -110,7 +111,7 @@ function Row({ n, a, qid, sessionId }: { n: string; a?: QuestionAttempt; qid: st
           )}
         </div>
         {(a?.helpLevel ?? 0) === 1 && <span className="chip bg-warn-soft text-warn">Hint 1</span>}
-        {(a?.helpLevel ?? 0) >= 2 && <span className="chip bg-peach text-peach-ink">Hint 2 · ½ marks</span>}
+        {(a?.helpLevel ?? 0) >= 2 && <span className="chip bg-peach text-peach-ink">{a?.helpLevel === HINT2_WRONG ? "Hint 2 · wrong pick · 0" : "Hint 2 · ½ marks"}</span>}
       </div>
     </li>
   );

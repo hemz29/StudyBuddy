@@ -11,6 +11,13 @@ import { transliterate } from "./transliterate";
 // Hint 2 shows choices; an answer written after Hint 2 gets half marks if it is right (see HINT2_FACTOR).
 export const HINT2_FACTOR = 0.5;
 
+// Help levels kept per question in session.help: 1 = Hint 1, 2 = Hint 2 opened, 3 = Hint 2 picked right,
+// 4 = Hint 2 picked wrong. The child gets one pick; a wrong pick means no marks for that question.
+export const HINT2_RIGHT = 3;
+export const HINT2_WRONG = 4;
+// A pick also counts as opening Hint 2 (the "opened" save can lose a race with Hint 1's); only a second pick is refused.
+export const levelAfterPick = (current: number, correct: boolean) => (current < HINT2_RIGHT ? (correct ? HINT2_RIGHT : HINT2_WRONG) : null);
+
 export type Hint1 = { lines: string[]; kn?: string; knEn?: string };
 export type Hint2 = { question: string; options: string[]; correct: string; latin: boolean };
 

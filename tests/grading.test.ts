@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { gradeAttempts, markDependsOnCheck, type Marker } from "@/lib/grading/grade";
+import { gradeAttempts, markDependsOnCheck, withHintPenalty, type Marker } from "@/lib/grading/grade";
+import { levelAfterPick } from "@/lib/help";
 import { recommendation, scoreTrend, skillRows } from "@/lib/dashboard";
 import type { PracticeSession, QuestionAttempt } from "@/lib/store/types";
 
@@ -47,6 +48,19 @@ describe("gradeAttempts", () => {
     const unsure = { word: "ಉಳಿ", alternatives: ["ಇಳಿ"], index: 0 };
     expect(markDependsOnCheck({ questionId: "nanna-desha.opp.4", text: "ಇಳಿ", uncertainWords: [unsure], misreadFlagged: false })).toBe(true);
     expect(markDependsOnCheck({ questionId: "nanna-desha.opp.4", text: "ಇಳಿ", uncertainWords: [], misreadFlagged: false })).toBe(false);
+  });
+
+  it("Hint 2 gives one pick: right halves the mark, wrong gives 0, and a second pick is refused", () => {
+    const r = { awarded: 1, feedback: { en: "Correct." } };
+    expect(withHintPenalty(2, r).awarded).toBe(0.5);
+    expect(withHintPenalty(3, r).awarded).toBe(0.5);
+    expect(withHintPenalty(4, r).awarded).toBe(0);
+    expect(withHintPenalty(4, { awarded: 0, feedback: null }).awarded).toBe(0);
+    expect(levelAfterPick(2, true)).toBe(3);
+    expect(levelAfterPick(2, false)).toBe(4);
+    expect(levelAfterPick(3, false)).toBeNull();
+    expect(levelAfterPick(1, true)).toBe(3);
+    expect(levelAfterPick(4, true)).toBeNull();
   });
 
   it("caps AI-derived marks at the question maximum", async () => {

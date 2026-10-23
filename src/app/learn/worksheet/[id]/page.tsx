@@ -33,7 +33,7 @@ export default async function WorksheetIntro({ params, searchParams }: { params:
           {[
             ["🖨️", "Print the worksheet (or copy the questions into your notebook with the same numbers)."],
             ["⏱️", `Press “I'm ready” when you start writing. A ${ws.minutes === 60 ? "1-hour" : `${ws.minutes}-minute`} timer starts. If time runs out, you can still finish.`],
-            ["✍️", "Write your answers by hand. The questions also show on this screen. Hint 1 is free; Hint 2 shows choices and gives half marks for that answer."],
+            ["✍️", "Write your answers by hand. The questions also show on this screen. Hint 1 is free; Hint 2 shows four choices and you get one try: right gives half marks, wrong gives no marks for that question."],
             ["📷", "Take a photo of each page with a phone – scan the QR code that appears here."],
             ["✅", "Check that we read your writing correctly, then see your marks."],
           ].map(([icon, text]) => (
