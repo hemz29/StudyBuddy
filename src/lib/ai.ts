@@ -46,6 +46,9 @@ async function call<T extends z.ZodType>(
 
 // ---------- Reading handwritten answers ----------
 
+// Where something sits on the page photo, as fractions of its width and height (0 = left/top, 1 = right/bottom).
+const Box = z.object({ left: z.number(), top: z.number(), right: z.number(), bottom: z.number() });
+
 export const ReadingSchema = z.object({
   pageQuality: z.enum(["ok", "blurry_or_dark", "not_a_worksheet"]),
   answers: z.array(
@@ -57,10 +60,13 @@ export const ReadingSchema = z.object({
         z.object({
           word: z.string().describe("The word as you read it"),
           alternatives: z.array(z.string()).describe("Up to 3 other readings that the handwriting could also be"),
+          box: Box.describe("Tight box around this handwritten word on the page"),
         }),
       ),
       top: z.number().describe("Top of the handwritten answer as a fraction of page height (0-1)"),
       bottom: z.number().describe("Bottom of the handwritten answer as a fraction of page height (0-1)"),
+      left: z.number().describe("Left edge of the handwritten answer as a fraction of page width (0-1)"),
+      right: z.number().describe("Right edge of the handwritten answer as a fraction of page width (0-1)"),
     }),
   ),
 });
@@ -70,7 +76,7 @@ const READ_SYSTEM = `You read photos of a Grade 6 child's handwritten Kannada (3
 
 Your only job is transcription. Write down exactly what the child wrote, letter for letter, in Unicode Kannada (or English where they wrote English). Never correct spelling, grammar, missing letters or wrong vowel signs, and never fill in what the answer "should" be: a faithful transcription of a mistake is what lets the child see and fix it. You are not told the correct answers, on purpose.
 
-For each answer you can see on the page, give its worksheet number (section.item) from the question list you are given. If the page is numbered differently (a notebook, or another copy of the worksheet), match each answer to the list by its printed word or question instead. Mark confidence "low" when any word could reasonably be read another way (similar-looking letters such as ಮಾ/ಮೊ, ಬ/ಐ, ದ/ಧ, ತ/ಶ, missing or extra ottakshara), and list those words with up to three alternative readings based only on the shapes in the photo. If an answer is crossed out and rewritten, transcribe the final version. If an answer is blank, return empty text with high confidence. Only include questions that appear on this page.`;
+For each answer you can see on the page, give its worksheet number (section.item) from the question list you are given. If the page is numbered differently (a notebook, or another copy of the worksheet), match each answer to the list by its printed word or question instead. Mark confidence "low" when any word could reasonably be read another way (similar-looking letters such as ಮಾ/ಮೊ, ಬ/ಐ, ದ/ಧ, ತ/ಶ, missing or extra ottakshara), and list those words with up to three alternative readings based only on the shapes in the photo, and a tight box around each such word in the photo, so the child can be shown exactly that word. If an answer is crossed out and rewritten, transcribe the final version. If an answer is blank, return empty text with high confidence. Only include questions that appear on this page.`;
 
 export async function readAnswerPage(
   image: { base64: string; mediaType: "image/jpeg" | "image/png" | "image/webp" },

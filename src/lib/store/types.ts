@@ -24,7 +24,9 @@ export type PracticeSession = {
   completedAt: string | null;
 };
 
-export type UncertainWord = { index: number; word: string; alternatives: string[] };
+// Where on the page photo, as fractions of its width and height. Older readings have no box.
+export type PageBox = { left: number; top: number; right: number; bottom: number };
+export type UncertainWord = { index: number; word: string; alternatives: string[]; box?: PageBox };
 
 export type PageUpload = {
   id: string;
@@ -46,7 +48,7 @@ export type QuestionAttempt = {
   skill: Skill;
   pageId: string | null;
   // Vertical position of the answer on the page (0–1), used to show the child's handwriting strip.
-  region: { top: number; bottom: number } | null;
+  region: { top: number; bottom: number; left?: number; right?: number } | null;
   text: string;
   confidence: "high" | "low";
   uncertainWords: UncertainWord[];

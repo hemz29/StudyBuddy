@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { getQuestion, getWorksheet, worksheetQuestionNumber } from "@/content";
 import { transliterate } from "@/lib/transliterate";
 import type { QuestionAttempt } from "@/lib/store/types";
-import { HandwritingStrip } from "./HandwritingStrip";
+import { HandwritingStrip, WordZoom } from "./HandwritingStrip";
 import { UploadPanel } from "./UploadPanel";
 import type { SessionState } from "./SessionView";
 import { KnText } from "@/components/Word";
@@ -90,6 +90,9 @@ function CheckCard({ attempt, number, sessionId, choice, onChange, onRetake }: {
   const shown = (w: string) => picked.find((r) => r.word === w)?.with ?? w;
   const unsureWords = new Map(attempt.uncertainWords.map((u) => [u.word, u.alternatives]));
   const decided = choice?.confirmed && !saysNo;
+  // Readings since word positions were added say where each unsure word is; zoom in on the first.
+  const firstBox = attempt.uncertainWords.find((u) => u.box)?.box;
+  const several = attempt.uncertainWords.filter((u) => u.box).length > 1;
 
   function pick(word: string, alt: string) {
     const rest = picked.filter((r) => r.word !== word);
@@ -110,7 +113,15 @@ function CheckCard({ attempt, number, sessionId, choice, onChange, onRetake }: {
     <div className={`paper p-5 ${decided ? (choice?.flagged ? "ring-2 ring-warn" : "ring-2 ring-good") : ""}`}>
       <p className="text-sm font-bold text-gray-500">Question {number}: <KnText text={q.prompt} className="font-normal" /></p>
       <p className="mt-3 text-xs font-bold uppercase tracking-wide text-gray-500">Your writing</p>
-      <HandwritingStrip sessionId={sessionId} pageId={attempt.pageId} region={attempt.region} />
+      {firstBox ? (
+        <div className="flex flex-col gap-2">
+          <WordZoom sessionId={sessionId} pageId={attempt.pageId} box={firstBox} />
+          <p className="text-xs text-muted">The word in its line:</p>
+          <HandwritingStrip sessionId={sessionId} pageId={attempt.pageId} region={attempt.region} mark={firstBox} />
+        </div>
+      ) : (
+        <HandwritingStrip sessionId={sessionId} pageId={attempt.pageId} region={attempt.region} />
+      )}
       <p className="mt-4 text-xs font-bold uppercase tracking-wide text-gray-500">What we read</p>
       {reading}
 
@@ -132,7 +143,8 @@ function CheckCard({ attempt, number, sessionId, choice, onChange, onRetake }: {
       ) : (
         <div className="mt-4 flex flex-col gap-3 rounded-xl bg-yellow-50 p-4">
           {attempt.uncertainWords.map((u) => (
-            <div key={u.word}>
+            <div key={u.word} className="flex flex-col gap-2">
+              {several && u.box && <WordZoom sessionId={sessionId} pageId={attempt.pageId} box={u.box} />}
               <p className="text-sm font-bold">Which one did you write?</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {[u.word, ...u.alternatives].map((alt) => (
