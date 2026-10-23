@@ -12,8 +12,9 @@ export function SendButton({ waitSeconds = 0 }: { waitSeconds?: number }) {
     return () => clearTimeout(t);
   }, [left]);
   return (
-    <button disabled={pending || left > 0} className="btn btn-primary mt-2 w-full">
-      {pending ? "Sending…" : left > 0 ? `You can ask again in ${left}s` : "Email me a sign-in link"}
+    // Black, white and yellow, like the Nudi logo ("Kannada, with confidence").
+    <button disabled={pending || left > 0} className="btn mt-2 w-full bg-black text-white hover:bg-neutral-800 disabled:opacity-60">
+      {pending ? "Sending…" : left > 0 ? `You can ask again in ${left}s` : <span>Email me a sign-in <span className="text-[#fbce1a]">link</span></span>}
     </button>
   );
 }
