@@ -71,12 +71,15 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
-      <div className="flex items-center justify-between text-sm font-bold" style={{ color: "var(--header-ink)" }}>
-        <KnText text={title.kn} />
-        <span>Card {i + 1} of {cards.length}</span>
+      <div className="flex items-end justify-between gap-3" style={{ color: "var(--header-ink)" }}>
+        <KnText text={title.kn} className="text-sm font-bold" />
+        <span className="text-2xl font-semibold tabular-nums">
+          {i + 1} <span className="text-base font-normal text-muted">of {cards.length}</span>
+        </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-white/40">
-        <div className="h-full bg-accent transition-all" style={{ width: `${(i / cards.length) * 100}%` }} />
+      {/* Fills as cards are answered, in the logo's black. */}
+      <div className="h-3.5 overflow-hidden rounded-full border border-black/15 bg-white" role="progressbar" aria-valuemin={0} aria-valuemax={cards.length} aria-valuenow={i + (chosen ? 1 : 0)} aria-label="Cards done">
+        <div className="h-full rounded-full bg-black transition-all" style={{ width: `${((i + (chosen ? 1 : 0)) / cards.length) * 100}%` }} />
       </div>
       <div className="paper p-8 text-center">
         <TypeBadge key={i} card={card} changed={i > 0 && cards[i - 1].type !== card.type} />
