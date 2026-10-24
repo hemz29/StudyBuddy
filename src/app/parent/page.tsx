@@ -12,6 +12,7 @@ import { Logo } from "@/components/shell/Logo";
 import { logActivity } from "@/lib/server/activity";
 import { isAdmin } from "@/lib/server/admin";
 import { writingTime } from "@/lib/time";
+import { ActivityPing } from "@/components/ActivityPing";
 
 async function deleteChild(formData: FormData) {
   "use server";
@@ -49,6 +50,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
 
   return (
     <div className="app-bg min-h-screen">
+      <ActivityPing />
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6">
       {isDemo && <DemoBanner />}
       <div className="flex flex-wrap items-center gap-3">

@@ -1,27 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
 
-// Kali Kannada (ಕಲಿ ಕನ್ನಡ, "learn Kannada") mark: a white ಕ on a black tile.
+// The Kali logo's ಕಲಿ letters on black, cut to a square for the menu and icons.
 export function LogoMark({ size = 32 }: { size?: number }) {
-  return (
-    <span className="kn grid shrink-0 place-items-center rounded-[22%] bg-black font-bold text-white" style={{ width: size, height: size, fontSize: size * 0.55 }} aria-hidden>
-      ಕ
-    </span>
-  );
+  return <Image src="/brand/kali-mark.png" alt="" width={size} height={size} className="shrink-0 rounded-[22%]" aria-hidden priority />;
 }
 
-// The full logo for the sign-in, about, privacy and worksheet pages.
+// The full Kali logo for the sign-in, about, privacy and worksheet pages. `size` is its height in pixels.
 export function Wordmark({ size = 56 }: { size?: number }) {
-  return (
-    <span className="inline-flex items-center gap-3" aria-label="Kali Kannada – Kannada, with confidence">
-      <LogoMark size={size} />
-      <span className="flex flex-col text-left leading-tight">
-        <span className="serif font-semibold text-ink" style={{ fontSize: size * 0.42 }}>Kali Kannada</span>
-        <span className="text-muted" style={{ fontSize: Math.max(11, size * 0.22) }}>
-          <span className="kn">ಕಲಿ ಕನ್ನಡ</span> · Kannada, with confidence
-        </span>
-      </span>
-    </span>
-  );
+  const h = size * 2.4;
+  return <Image src="/brand/kali-logo.webp" alt="Kali Kannada – Kannada, with confidence" width={Math.round(h * 700 / 642)} height={Math.round(h)} className="rounded-2xl" priority />;
 }
 
 export function Logo({ href = "/learn" }: { href?: string }) {

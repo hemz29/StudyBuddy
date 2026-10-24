@@ -47,7 +47,7 @@ export function WorksheetMode({ session, worksheetId, controls }: { session: Pra
             <li className="chip bg-accent-soft text-ink">{ws.minutes} minutes</li>
           </ul>
         </div>
-        <a href={`/worksheets/${ws.id}.pdf`} target="_blank" rel="noreferrer" className="btn btn-ghost">Worksheet PDF</a>
+        <a href={`/api/download/${ws.id}`} target="_blank" rel="noreferrer" className="btn btn-ghost">Worksheet PDF</a>
       </header>
 
       {controls}

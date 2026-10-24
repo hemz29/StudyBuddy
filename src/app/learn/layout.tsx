@@ -4,11 +4,13 @@ import { AvatarImage } from "@/components/AvatarImage";
 import { Logo } from "@/components/shell/Logo";
 import { SideNav } from "@/components/shell/SideNav";
 import { LineIcon } from "@/components/LineIcon";
+import { ActivityPing } from "@/components/ActivityPing";
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
   const { child } = await requireChild();
   return (
     <div className="app-bg min-h-screen">
+      <ActivityPing />
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 lg:flex-row lg:gap-6 lg:py-6">
         <aside className="no-print flex flex-col gap-4 rounded-[var(--radius)] bg-white p-3 shadow-sm backdrop-blur-md lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:w-64 lg:shrink-0">
           <div className="flex items-center justify-between lg:px-2 lg:pt-1">

@@ -4,6 +4,8 @@ import { requireParent } from "@/lib/server/context";
 import { isAdmin, loadAdminData, type Family } from "@/lib/server/admin";
 import { writingTime } from "@/lib/time";
 import { Logo } from "@/components/shell/Logo";
+import { activityMix, busyTimes, devices, funnel, median, repeatParents, visits, weekly } from "@/lib/adminStats";
+import { Bars, GrowthChart } from "@/components/admin/AdminCharts";
 
 const ACTIVITY: Record<string, string> = {
   parent_dashboard: "Opened the parent dashboard",
@@ -12,6 +14,9 @@ const ACTIVITY: Record<string, string> = {
   worksheet_start: "Started a worksheet",
   cards_done: "Finished a set of practice cards",
   photo_upload: "Sent an answer photo",
+  page_view: "Opened a page",
+  worksheet_print: "Printed a worksheet",
+  worksheet_download: "Downloaded a worksheet PDF",
 };
 
 // "💻 75% · 📱 20% · tablet 5% (40 visits)" from the device noted on each visit.
@@ -35,11 +40,24 @@ export default async function Admin() {
   const childOf = new Map(d.children.map((c) => [c.id, c]));
   const worksheets = d.sessions.filter((s) => s.kind === "worksheet").sort((a, b) => b.startedAt.localeCompare(a.startedAt));
   const finished = worksheets.filter((s) => s.status === "graded");
-  const activeWeek = new Set(d.sessions.filter((s) => Date.now() - Date.parse(s.startedAt) < 7 * 864e5).map((s) => s.parentId));
   const hint2 = d.attempts.filter((a) => (a.helpLevel ?? 0) >= 2).length;
   const review = d.attempts.filter((a) => a.status === "review").length;
   const tokens = d.aiCalls.reduce((t, a) => t + Number(a.inputTokens) + Number(a.outputTokens), 0);
   const label = (f?: Family) => f?.email || "(unknown)";
+
+  const vs = visits(d.activity, d.sessions);
+  const repeat = repeatParents(d.activity, d.sessions);
+  const active30 = new Set(vs.filter((v) => Date.now() - v.start < 30 * 864e5).map((v) => v.parentId)).size;
+  const avgVisit = vs.length ? Math.round(vs.reduce((t, v) => t + v.minutes, 0) / vs.length) : null;
+  const printed = d.activity.filter((a) => a.kind === "worksheet_print" || a.kind === "worksheet_download").length;
+  const times = finished.map((s) => writingTime(s.startedAt, s.writingDoneAt, getWorksheet(s.worksheetId)?.minutes ?? 60)?.took).filter((t): t is number => !!t);
+  const medTime = median(times);
+  const avgScore = finished.length ? Math.round(finished.reduce((t, s) => t + (s.awarded ?? 0) / (s.max || 1), 0) / finished.length * 100) : null;
+  const hinted = d.attempts.filter((a) => (a.helpLevel ?? 0) >= 1).length;
+  const weeks = weekly(d.families, d.children, d.sessions, vs);
+  const busy = busyTimes(vs);
+  const top = Object.entries(worksheets.reduce<Record<string, number>>((m, s) => ((m[s.worksheetId] = (m[s.worksheetId] ?? 0) + 1), m), {}))
+    .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, n]) => ({ what: getWorksheet(id)?.title.en ?? id, n }));
 
   return (
     <div className="app-bg min-h-screen">
@@ -47,16 +65,34 @@ export default async function Admin() {
         <Logo href="/" />
         <h1 className="text-3xl">Pilot admin</h1>
 
-        <section className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          <Stat label="Families signed up" value={d.families.length} />
-          <Stat label="Children" value={d.children.length} />
-          <Stat label="Active this week" value={activeWeek.size} note="families" />
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+          <Stat label="Parents registered" value={d.families.length} />
+          <Stat label="Children registered" value={d.children.length} />
+          <Stat label="Active parents" value={new Set(vs.filter((v) => Date.now() - v.start < 7 * 864e5).map((v) => v.parentId)).size} note={`this week · ${active30} in 30 days`} />
+          <Stat label="Came back another day" value={repeat} note={d.families.length ? `${Math.round((repeat / d.families.length) * 100)}% of parents` : undefined} />
+          <Stat label="Average visit" value={avgVisit === null ? "–" : `${avgVisit} min`} note={`${vs.length} visits · ${d.families.length ? fmt(vs.length / d.families.length) : 0} per parent`} />
+          <Stat label="Worksheets printed" value={printed} note="downloads and prints" />
           <Stat label="Worksheets started" value={worksheets.length} note={`${finished.length} finished`} />
-          <Stat label="Hint 2 used" value={hint2} note="answers" />
+          <Stat label="Writing time" value={medTime === null ? "–" : `${Math.round(medTime)} min`} note="median per worksheet" />
+          <Stat label="Average score" value={avgScore === null ? "–" : `${avgScore}%`} note="finished worksheets" />
+          <Stat label="Answers with hints" value={d.attempts.length ? `${Math.round((hinted / d.attempts.length) * 100)}%` : "–"} note={`${hint2} used Hint 2`} />
           <Stat label="Waiting for review" value={review} note="answers" />
+          <Stat label="AI calls" value={d.aiCalls.length} note={`${tokens.toLocaleString("en-IN")} tokens`} />
         </section>
+
+        <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <GrowthChart data={weeks} />
+          <Bars title="Active parents per week" data={weeks} x="week" bars={[{ key: "active", name: "Parents" }]} />
+          <Bars title="Worksheets per week" data={weeks} x="week" bars={[{ key: "started", name: "Started" }, { key: "finished", name: "Finished" }]} />
+          <Bars title="From sign-up to coming back" note="Parents at each step" data={funnel(d.families, d.children, d.sessions, repeat)} x="step" bars={[{ key: "n", name: "Parents" }]} horizontal />
+          <Bars title="What families use" data={activityMix(d.activity, d.sessions)} x="what" bars={[{ key: "n", name: "Times" }]} horizontal />
+          <Bars title="Most started worksheets" data={top} x="what" bars={[{ key: "n", name: "Started" }]} horizontal />
+          <Bars title="Devices" note="Every recorded visit or action" data={devices(d.activity)} x="device" bars={[{ key: "n", name: "Events" }]} />
+          <Bars title="Busiest days" note="Visits, India time" data={busy.days} x="day" bars={[{ key: "visits", name: "Visits" }]} />
+          <Bars title="Busiest hours" note="Visits by hour of the day, India time" data={busy.hours} x="hour" bars={[{ key: "visits", name: "Visits" }]} />
+        </section>
+        <p className="text-xs text-muted">Visits group everything a family does with less than 30 minutes between steps. Page views and printing are counted from 24 Oct 2026, so earlier visits look shorter.</p>
         <p className="text-sm text-muted">Devices across all families: {deviceSplit(d.activity)}</p>
-        <p className="text-sm text-muted">AI use so far: {d.aiCalls.length} calls, {tokens.toLocaleString("en-IN")} tokens.</p>
         {d.activityMissing && (
           <p className="rounded-2xl bg-warn-soft p-4 text-warn">
             Page views aren&apos;t being recorded yet: run <code>supabase/migrations/0002_timer_activity.sql</code> in the Supabase SQL Editor.
@@ -124,11 +160,11 @@ export default async function Admin() {
   );
 }
 
-function Stat({ label, value, note }: { label: string; value: number; note?: string }) {
+function Stat({ label, value, note }: { label: string; value: number | string; note?: string }) {
   return (
-    <div className="card bg-white p-4">
-      <p className="text-sm font-bold text-muted">{label}</p>
-      <p className="mt-1 text-3xl font-extrabold">{value}</p>
+    <div className="card p-3">
+      <p className="text-xs font-bold text-muted">{label}</p>
+      <p className="mt-0.5 text-2xl font-light">{value}</p>
       {note && <p className="text-xs text-muted">{note}</p>}
     </div>
   );

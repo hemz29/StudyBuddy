@@ -17,7 +17,7 @@ export function WorksheetPaper({ ws }: { ws: Worksheet }) {
     <article className="worksheet mx-auto bg-white text-black">
       <header className="relative text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <div className="mb-3 flex justify-center"><Wordmark size={44} /></div>
+        <div className="mb-3 flex justify-center"><Wordmark size={28} /></div>
         <p className="pt-1 text-lg font-bold tracking-wide">GRADE VI · KANNADA 3rd LANGUAGE</p>
         <p className="kn mt-1 text-xl font-bold">{ws.title.kn}</p>
         <p className="text-sm">{ws.title.en}</p>

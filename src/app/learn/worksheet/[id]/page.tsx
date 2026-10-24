@@ -42,7 +42,7 @@ export default async function WorksheetIntro({ params, searchParams }: { params:
           ))}
         </ol>
         <div className="mt-6 flex flex-wrap gap-3">
-          <a href={`/worksheets/${ws.id}.pdf`} target="_blank" rel="noreferrer" className="btn btn-ghost">Download PDF</a>
+          <a href={`/api/download/${ws.id}`} target="_blank" rel="noreferrer" className="btn btn-ghost">Download PDF</a>
           <Link href={`/print/worksheet/${ws.id}`} target="_blank" className="btn btn-ghost">Print from browser</Link>
           <StartButton worksheetId={ws.id} retryOf={retry ?? null} />
         </div>
