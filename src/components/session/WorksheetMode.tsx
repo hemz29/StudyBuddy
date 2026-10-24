@@ -6,6 +6,7 @@ import { HINT2_RIGHT, HINT2_WRONG, hint1, hint2 } from "@/lib/help";
 import { transliterate } from "@/lib/transliterate";
 import type { PracticeSession } from "@/lib/store/types";
 import { KnText } from "@/components/Word";
+import { LineIcon } from "@/components/LineIcon";
 
 // The worksheet questions in large type while the child writes on paper, each with a Hint button.
 export function WorksheetMode({ session, worksheetId, controls }: { session: PracticeSession; worksheetId: string; controls: React.ReactNode }) {
@@ -41,7 +42,7 @@ export function WorksheetMode({ session, worksheetId, controls }: { session: Pra
           <h1 className="text-2xl"><KnText text={ws.title.kn} /></h1>
           <p className="text-muted">{ws.title.en}</p>
           <ul className="mt-3 flex flex-wrap gap-2 text-sm">
-            <li className="chip bg-accent-soft text-ink">✏️ Write your answers on paper, with the same numbers as below</li>
+            <li className="chip bg-accent-soft text-ink"><LineIcon name="pen" size={16} /> Write your answers on paper, with the same numbers as below</li>
             <li className="chip bg-accent-soft text-ink">{ws.totalMarks} marks</li>
             <li className="chip bg-accent-soft text-ink">{ws.minutes} minutes</li>
           </ul>
@@ -88,7 +89,7 @@ export function WorksheetMode({ session, worksheetId, controls }: { session: Pra
 function HintRules() {
   return (
     <p className="text-sm text-muted">
-      💡 Stuck? Press <b className="text-ink">Hint</b> next to a question. <b className="text-ink">Hint 1</b> is free.{" "}
+      <LineIcon name="bulb" size={18} className="mr-1 inline align-[-3px]" />Stuck? Press <b className="text-ink">Hint</b> next to a question. <b className="text-ink">Hint 1</b> is free.{" "}
       <b className="text-ink">Hint 2</b> shows four choices and you get <b className="text-ink">one try</b>: right gives <b className="text-ink">half marks</b>, wrong gives no marks.
     </p>
   );
@@ -118,7 +119,7 @@ function QuestionRow({ number, q, level, hidePrompt, open, pick }: { number: str
           )}
         </div>
         {level === 0 ? (
-          <button onClick={() => open(1)} className="chip h-9 shrink-0 bg-warn-soft px-4 text-warn">💡 Hint</button>
+          <button onClick={() => open(1)} className="chip h-9 shrink-0 bg-warn-soft px-4 text-warn"><LineIcon name="bulb" size={16} /> Hint</button>
         ) : level === 1 ? (
           <button onClick={() => open(2)} className="chip h-9 shrink-0 border border-warn/40 bg-white px-3 text-warn">Hint 2 · one try</button>
         ) : (

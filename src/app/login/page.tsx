@@ -5,6 +5,7 @@ import { isDemo, supabaseServer } from "@/lib/server/context";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabaseEnv";
 import { SendButton } from "./SendButton";
 import { HashError } from "./HashError";
+import { LineIcon } from "@/components/LineIcon";
 
 export const dynamic = "force-dynamic";
 
@@ -80,7 +81,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
           <div className="card mt-8 p-6">
             {sent ? (
               <div className="flex flex-col gap-2">
-                <p className="text-4xl">📬</p>
+                <LineIcon name="mail" size={40} />
                 <h2 className="text-2xl">Check your email</h2>
                 <p className="text-muted">
                   We sent a sign-in link to {email ? <b className="text-ink">{email}</b> : "your email"}. Open it on this device to continue. It can take a minute to arrive; check spam too.

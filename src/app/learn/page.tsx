@@ -4,6 +4,7 @@ import { requireChild, userStore } from "@/lib/server/context";
 import { AvatarImage } from "@/components/AvatarImage";
 import { ChoiceCard } from "@/components/shell/PageHeader";
 import { KnText } from "@/components/Word";
+import { LineIcon } from "@/components/LineIcon";
 
 export default async function LearnHome() {
   const { parent, child } = await requireChild();
@@ -35,10 +36,10 @@ export default async function LearnHome() {
       )}
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <ChoiceCard href="/learn/lessons" tone="sage" icon="📖" title="Read & Understand" sub="Stories and poems, with the meaning of every word" />
-        <ChoiceCard href="/learn/grammar" tone="peach" icon="✏️" title="Grammar" sub="Quick tap practice: opposites, plurals, gender, meanings" />
-        <ChoiceCard href="/learn/writing" tone="lavender" icon="📝" title="Writing practice" sub="One chapter at a time · 25 marks · 40 minutes" />
-        <ChoiceCard href="/learn/tests" tone="sky" icon="⭐" title="Practice tests" sub="Like the school paper · 40 marks · 1 hour" />
+        <ChoiceCard href="/learn/lessons" tone="sage" icon={<LineIcon name="book" />} title="Read & Understand" sub="Stories and poems, with the meaning of every word" />
+        <ChoiceCard href="/learn/grammar" tone="peach" icon={<LineIcon name="pen" />} title="Grammar" sub="Quick tap practice: opposites, plurals, gender, meanings" />
+        <ChoiceCard href="/learn/writing" tone="lavender" icon={<LineIcon name="page" />} title="Writing practice" sub="One chapter at a time · 25 marks · 40 minutes" />
+        <ChoiceCard href="/learn/tests" tone="sky" icon={<LineIcon name="star" />} title="Practice tests" sub="Like the school paper · 40 marks · 1 hour" />
       </div>
 
       <Link href="/learn/letters" className="card flex items-center gap-4 bg-white/85 p-4 transition hover:-translate-y-0.5">

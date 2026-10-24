@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { compressPage } from "@/components/session/UploadPanel";
 import { AvatarImage } from "@/components/AvatarImage";
+import { LineIcon } from "@/components/LineIcon";
 
 type Info = { nickname: string; avatar: string; worksheet?: { kn: string; en: string }; graded: boolean };
 type Shot = { file: File; url: string };
@@ -66,7 +67,7 @@ export function SnapApp({ token }: { token: string }) {
 
       {sent > 0 && shots.length === 0 && !sending ? (
         <div className="card p-6 text-center">
-          <p className="text-5xl">✅</p>
+          <LineIcon name="check" size={56} className="mx-auto" />
           <p className="mt-2 text-2xl font-extrabold">Sent!</p>
           <p className="mt-1 text-muted">{sent} page{sent > 1 ? "s" : ""} sent. Now look at the computer.</p>
           <label className="btn btn-ghost mt-5 w-full">
@@ -94,11 +95,11 @@ export function SnapApp({ token }: { token: string }) {
             </div>
           )}
           <label className={`btn w-full cursor-pointer text-lg ${shots.length ? "btn-ghost" : "btn-primary h-16"}`}>
-            📷 {shots.length ? "Take another page" : "Take photo"}
+            <LineIcon name="camera" size={22} /> {shots.length ? "Take another page" : "Take photo"}
             <input type="file" accept="image/*" capture="environment" className="sr-only" onChange={(e) => add(e.target.files)} />
           </label>
           <label className="btn btn-ghost w-full cursor-pointer">
-            🖼 Choose from gallery
+            <LineIcon name="image" size={22} /> Choose from gallery
             <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => add(e.target.files)} />
           </label>
           {shots.length > 0 && (

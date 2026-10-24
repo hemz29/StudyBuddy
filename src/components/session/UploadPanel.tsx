@@ -2,6 +2,7 @@
 import { useState } from "react";
 import imageCompression from "browser-image-compression";
 import type { SessionState } from "./SessionView";
+import { LineIcon } from "@/components/LineIcon";
 
 const PAGE_STATUS: Record<string, string> = {
   received: "Received",
@@ -61,7 +62,7 @@ export function UploadPanel({ state, onOpen, refresh, inline = false }: { state:
 
   const fromComputer = (
     <label className="btn btn-ghost cursor-pointer">
-      {busy ? "Uploading…" : inline ? "💻 From this computer" : "Upload photos from this computer"}
+      {busy ? "Uploading…" : inline ? <><LineIcon name="laptop" size={20} /> From this computer</> : "Upload photos from this computer"}
       <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" disabled={busy} onChange={(e) => uploadFiles(e.target.files)} />
     </label>
   );
@@ -95,7 +96,7 @@ export function UploadPanel({ state, onOpen, refresh, inline = false }: { state:
             <span className="text-sm text-muted">Send a photo of each page to be marked.</span>
           </p>
           <div className="flex flex-col gap-2 sm:flex-row">
-            {!qr && <button onClick={showQr} className="btn btn-primary">📷 From a phone</button>}
+            {!qr && <button onClick={showQr} className="btn btn-primary"><LineIcon name="camera" size={20} /> From a phone</button>}
             {fromComputer}
           </div>
         </div>
@@ -118,7 +119,7 @@ export function UploadPanel({ state, onOpen, refresh, inline = false }: { state:
       {!open ? (
         <>
           <p className="text-muted">Take a photo of each page with a phone. We&apos;ll read your handwriting and mark it.</p>
-          <button onClick={showQr} className="btn btn-primary">📷 Send photos from a phone</button>
+          <button onClick={showQr} className="btn btn-primary"><LineIcon name="camera" size={20} /> Send photos from a phone</button>
         </>
       ) : (
         <>

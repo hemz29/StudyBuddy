@@ -6,6 +6,7 @@ import { AvatarImage } from "@/components/AvatarImage";
 import { AvatarPicker } from "@/components/AvatarPicker";
 import { Logo } from "@/components/shell/Logo";
 import { DemoBanner } from "@/components/DemoBanner";
+import { LineIcon } from "@/components/LineIcon";
 
 async function addChild(formData: FormData) {
   "use server";
@@ -43,7 +44,7 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="flex items-center justify-between gap-4">
           <Logo href="/profiles" />
-          <Link href="/parent" className="btn btn-ghost">👪 Parent view</Link>
+          <Link href="/parent" className="btn btn-ghost"><LineIcon name="family" size={18} />Parent view</Link>
         </div>
         {isDemo && <div className="mt-4"><DemoBanner /></div>}
         <h1 className="mt-8 text-4xl">Who is practising today?</h1>

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { PracticeSession } from "@/lib/store/types";
+import { LineIcon } from "@/components/LineIcon";
 
 const mmss = (ms: number) => {
   const s = Math.floor(Math.abs(ms) / 1000);
@@ -28,7 +29,7 @@ export function Timer({ session, minutes }: { session: PracticeSession; minutes:
       aria-live="off"
       className={`flex items-center gap-3 rounded-2xl px-4 py-2 ${over ? "bg-peach" : "bg-accent-soft"}`}
     >
-      <span className="text-2xl">{done ? "✅" : over ? "🔔" : "⏱️"}</span>
+      <LineIcon name={done ? "check" : over ? "bell" : "clock"} size={30} />
       <span className="text-3xl font-extrabold tabular-nums">{over ? `+${mmss(left)}` : mmss(left)}</span>
       <span className="max-w-48 text-sm leading-tight text-muted">
         {done

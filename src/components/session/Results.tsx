@@ -8,6 +8,7 @@ import { HandwritingStrip } from "./HandwritingStrip";
 import type { SessionState } from "./SessionView";
 import { KnText } from "@/components/Word";
 import { HINT2_WRONG } from "@/lib/help";
+import { LineIcon } from "@/components/LineIcon";
 
 const ICON: Record<string, string> = { correct: "✓", partial: "½", incorrect: "✗", blank: "–", review: "…" };
 const TONE: Record<string, string> = { correct: "bg-good-soft text-good", partial: "bg-warn-soft text-warn", incorrect: "bg-bad-soft text-bad", blank: "bg-gray-100 text-gray-500", review: "bg-accent-soft" };
@@ -33,13 +34,13 @@ export function Results({ state, worksheetId }: { state: SessionState; worksheet
           <Image src="/art/celebration.webp" alt="" fill sizes="768px" className="object-cover" />
         </div>
         <div className="p-6 pt-4">
-        <p className="text-lg font-bold text-muted">{pct >= 80 ? "Brilliant work! 🌟" : pct >= 50 ? "Well done! 👏" : "Good effort – keep practising! 💪"}</p>
+        <p className="text-lg font-bold text-muted">{pct >= 80 ? "Brilliant work!" : pct >= 50 ? "Well done!" : "Good effort – keep practising!"}</p>
         <h1 className="mt-1 text-5xl">{fmt(awarded)} / {fmt(max)}</h1>
         <p className="text-lg text-muted">{pct}% · {ws.title.en}</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <span className="chip bg-accent-soft">Answered without hints: {onOwn} of {answered.length}</span>
           {hint2 > 0 && <span className="chip bg-peach text-peach-ink">Hint 2 used: {hint2} (half marks if picked right, 0 if wrong)</span>}
-          {time && <span className={`chip ${time.over ? "bg-peach text-peach-ink" : "bg-good-soft text-good"}`}>⏱️ {time.text}</span>}
+          {time && <span className={`chip ${time.over ? "bg-peach text-peach-ink" : "bg-good-soft text-good"}`}><LineIcon name="clock" size={16} className="mr-1 inline align-[-3px]" />{time.text}</span>}
           {review > 0 && <span className="chip bg-warn-soft text-warn">{review} answer(s) waiting for a grown-up to check</span>}
         </div>
         <p className="mt-3 text-xs text-muted">{MARKING.label}</p>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { QuestionType, Skill } from "@/content/schema";
 import { transliterate } from "@/lib/transliterate";
 import { KnText } from "@/components/Word";
+import { LineIcon, type IconName } from "@/components/LineIcon";
 
 export type Card = {
   questionId: string;
@@ -19,13 +20,13 @@ export type Card = {
 };
 
 // Each kind of question has its own colour and symbol, so a change of kind is noticed at a glance.
-const TYPE_STYLE: Partial<Record<QuestionType, { icon: string; className: string }>> = {
-  split: { icon: "✂️", className: "bg-peach text-peach-ink" },
-  plural: { icon: "👥", className: "bg-sky text-sky-ink" },
-  gender: { icon: "👧👦", className: "bg-lavender text-lavender-ink" },
-  opposite: { icon: "↔️", className: "bg-accent-soft text-accent" },
-  meaning_kn: { icon: "📖", className: "bg-warn-soft text-warn" },
-  rhyme: { icon: "🎵", className: "bg-good-soft text-good" },
+const TYPE_STYLE: Partial<Record<QuestionType, { icon: IconName; className: string }>> = {
+  split: { icon: "scissors", className: "bg-peach text-peach-ink" },
+  plural: { icon: "people", className: "bg-sky text-sky-ink" },
+  gender: { icon: "family", className: "bg-lavender text-lavender-ink" },
+  opposite: { icon: "swap", className: "bg-accent-soft text-accent" },
+  meaning_kn: { icon: "book", className: "bg-warn-soft text-warn" },
+  rhyme: { icon: "music", className: "bg-good-soft text-good" },
 };
 
 export function PracticeCards({ lessonId, title, cards }: { lessonId: string; title: { kn: string; en: string }; cards: Card[] }) {
@@ -58,7 +59,7 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
     const right = results.filter((r) => r.correct).length;
     return (
       <div className="card mx-auto max-w-xl p-8 text-center">
-        <p className="text-5xl">{right >= cards.length * 0.8 ? "🌟" : "👍"}</p>
+        <LineIcon name={right >= cards.length * 0.8 ? "trophy" : "sparkle"} size={56} className="mx-auto" />
         <h1 className="mt-3 text-3xl font-extrabold">{right} of {cards.length} correct</h1>
         <p className="mt-2 text-muted">{saved ? "Saved to your progress." : "Saving…"}</p>
         <div className="mt-6 flex justify-center gap-3">
@@ -120,10 +121,10 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
 }
 
 function TypeBadge({ card, changed }: { card: Card; changed: boolean }) {
-  const style = TYPE_STYLE[card.type] ?? { icon: "❓", className: "bg-gray-100 text-gray-700" };
+  const style: { icon: IconName; className: string } = TYPE_STYLE[card.type] ?? { icon: "question", className: "bg-gray-100 text-gray-700" };
   return (
     <div className={`mx-auto inline-flex items-center gap-3 rounded-2xl px-5 py-2.5 text-left ${style.className} ${changed ? "badge-pop" : ""}`}>
-      <span className="text-2xl" aria-hidden>{style.icon}</span>
+      <LineIcon name={style.icon} size={28} />
       <span className="flex flex-col leading-tight">
         <span className="text-lg font-extrabold">{card.label}</span>
         <KnText text={card.labelKn} className="text-sm opacity-80" />

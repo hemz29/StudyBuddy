@@ -19,7 +19,7 @@ function deviceSplit(acts: { device: string | null }[]) {
   const known = acts.filter((a) => a.device);
   if (!known.length) return "–";
   const pct = (d: string) => Math.round((known.filter((a) => a.device === d).length / known.length) * 100);
-  const parts = [["computer", "💻"], ["phone", "📱"], ["tablet", "tablet"]].filter(([d]) => pct(d) > 0).map(([d, label]) => `${label} ${pct(d)}%`);
+  const parts = [["computer", "Computer"], ["phone", "Phone"], ["tablet", "Tablet"]].filter(([d]) => pct(d) > 0).map(([d, label]) => `${label} ${pct(d)}%`);
   return `${parts.join(" · ")} (${known.length} visit${known.length > 1 ? "s" : ""})`;
 }
 const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));

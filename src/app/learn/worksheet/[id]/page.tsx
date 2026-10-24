@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getWorksheet, MARKING } from "@/content";
 import { StartButton } from "./StartButton";
 import { KnText } from "@/components/Word";
+import { LineIcon, type IconName } from "@/components/LineIcon";
 
 export default async function WorksheetIntro({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ retry?: string }> }) {
   const ws = getWorksheet((await params).id);
@@ -30,14 +31,14 @@ export default async function WorksheetIntro({ params, searchParams }: { params:
       <div className="card bg-white/90 p-6">
         <h2 className="text-xl">How it works</h2>
         <ol className="mt-3 flex flex-col gap-3">
-          {[
-            ["🖨️", "Print the worksheet (or copy the questions into your notebook with the same numbers)."],
-            ["⏱️", `Press “I'm ready” when you start writing. A ${ws.minutes === 60 ? "1-hour" : `${ws.minutes}-minute`} timer starts. If time runs out, you can still finish.`],
-            ["✍️", "Write your answers by hand. The questions also show on this screen. Hint 1 is free; Hint 2 shows four choices and you get one try: right gives half marks, wrong gives no marks for that question."],
-            ["📷", "Take a photo of each page with a phone – scan the QR code that appears here."],
-            ["✅", "Check that we read your writing correctly, then see your marks."],
-          ].map(([icon, text]) => (
-            <li key={text} className="flex gap-3"><span className="text-2xl">{icon}</span><span className="pt-1">{text}</span></li>
+          {([
+            ["printer", "Print the worksheet (or copy the questions into your notebook with the same numbers)."],
+            ["clock", `Press “I'm ready” when you start writing. A ${ws.minutes === 60 ? "1-hour" : `${ws.minutes}-minute`} timer starts. If time runs out, you can still finish.`],
+            ["pen", "Write your answers by hand. The questions also show on this screen. Hint 1 is free; Hint 2 shows four choices and you get one try: right gives half marks, wrong gives no marks for that question."],
+            ["camera", "Take a photo of each page with a phone – scan the QR code that appears here."],
+            ["check", "Check that we read your writing correctly, then see your marks."],
+          ] as [IconName, string][]).map(([icon, text]) => (
+            <li key={text} className="flex gap-3"><LineIcon name={icon} size={26} className="shrink-0" /><span className="pt-1">{text}</span></li>
           ))}
         </ol>
         <div className="mt-6 flex flex-wrap gap-3">

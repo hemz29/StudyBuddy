@@ -7,6 +7,7 @@ import { HandwritingStrip, WordZoom } from "./HandwritingStrip";
 import { UploadPanel } from "./UploadPanel";
 import type { SessionState } from "./SessionView";
 import { KnText } from "@/components/Word";
+import { LineIcon } from "@/components/LineIcon";
 
 // confirmed: the child has decided. flagged: none of the readings is what they wrote, so a grown-up checks it.
 type Choice = { confirmed: boolean; replace: { word: string; with: string }[]; flagged?: boolean };
@@ -49,7 +50,7 @@ export function CheckingScreen({ state, worksheetId, onDone }: { state: SessionS
 
   const allChecked = unsure.every((a) => choices[a.id]?.confirmed);
 
-  if (busy) return <div className="card mx-auto max-w-xl p-10 text-center"><p className="text-4xl">✏️</p><p className="mt-3 text-xl font-bold">Marking your work…</p><p className="text-muted">This takes up to a minute.</p></div>;
+  if (busy) return <div className="card mx-auto max-w-xl p-10 text-center"><LineIcon name="pen" size={44} className="mx-auto" /><p className="mt-3 text-xl font-bold">Marking your work…</p><p className="text-muted">This takes up to a minute.</p></div>;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4">
@@ -128,7 +129,7 @@ function CheckCard({ attempt, number, sessionId, choice, onChange, onRetake }: {
       {decided ? (
         <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-gray-50 px-4 py-3">
           <span className="font-bold">
-            {choice.flagged ? "🧑‍🏫 A grown-up will check this one" : picked.length ? "✓ Changed to what you wrote" : "✓ That's what you wrote"}
+            {choice.flagged ? "A grown-up will check this one" : picked.length ? "✓ Changed to what you wrote" : "✓ That's what you wrote"}
           </span>
           <button onClick={() => { setSaysNo(false); onChange({ confirmed: false, replace: picked }); }} className="text-sm font-bold text-accent">Change</button>
         </div>
