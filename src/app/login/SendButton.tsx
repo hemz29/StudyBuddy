@@ -12,7 +12,7 @@ export function SendButton({ waitSeconds = 0 }: { waitSeconds?: number }) {
     return () => clearTimeout(t);
   }, [left]);
   return (
-    // Black, white and yellow, like the Nudi logo ("Kannada, with confidence").
+    // Black, white and yellow, like the Kali Kannada logo ("Kannada, with confidence").
     <button disabled={pending || left > 0} className="btn btn-primary mt-2 w-full">
       {pending ? "Sending…" : left > 0 ? `You can ask again in ${left}s` : <span>Email me a sign-in <span className="text-[#fbce1a]">link</span></span>}
     </button>

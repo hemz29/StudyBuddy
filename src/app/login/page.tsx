@@ -1,3 +1,4 @@
+import { Wordmark } from "@/components/shell/Logo";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -76,7 +77,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       </div>
       <div className="flex flex-col justify-center px-6 py-10 lg:px-16">
         <div className="mx-auto w-full max-w-md">
-          <Image src="/brand/nudi-logo.webp" alt="Nudi – Kannada, with confidence" width={900} height={711} priority className="mx-auto w-56 rounded-3xl shadow-sm" />
+          <div className="flex justify-center"><Wordmark size={64} /></div>
           <p className="mt-6 text-center text-lg text-muted">Kannada practice for your child, with progress you can follow.</p>
           <div className="card mt-8 p-6">
             {sent ? (

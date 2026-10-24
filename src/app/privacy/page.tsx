@@ -1,8 +1,8 @@
-import Image from "next/image";
+import { Wordmark } from "@/components/shell/Logo";
 import Link from "next/link";
 import { KnText } from "@/components/Word";
 
-export const metadata = { title: "Privacy · Nudi" };
+export const metadata = { title: "Privacy · Kali Kannada" };
 
 const CONTACT = "hemlata.v.29@gmail.com";
 
@@ -13,7 +13,7 @@ export default function Privacy() {
     <main className="min-h-screen bg-bg px-4 py-10">
       <article className="mx-auto flex max-w-2xl flex-col gap-6">
         <Link href="/login" className="self-center">
-          <Image src="/brand/nudi-logo.webp" alt="Nudi – Kannada, with confidence" width={900} height={711} className="w-36 rounded-2xl" priority />
+          <Wordmark />
         </Link>
         <header>
           <h1 className="text-3xl">Privacy</h1>
@@ -22,7 +22,7 @@ export default function Privacy() {
 
         <Section title="Who we are">
           <p>
-            Nudi (<KnText text="ನುಡಿ" />) is a Kannada practice app for Grade 6 children, currently in a small pilot with invited families. It is run by
+            Kali Kannada (<KnText text="ಕಲಿ ಕನ್ನಡ" />) is a Kannada practice app for Grade 6 children, currently in a small pilot with invited families. It is run by
             Hemlata. Questions about your data: <a href={`mailto:${CONTACT}`} className="font-bold text-accent">{CONTACT}</a>.
           </p>
         </Section>
@@ -38,7 +38,7 @@ export default function Privacy() {
 
         <Section title="How we use it">
           <p>
-            Only to read and mark your child&apos;s work, show you their progress, and improve Nudi. There are no ads, and we never sell or share your
+            Only to read and mark your child&apos;s work, show you their progress, and improve Kali Kannada. There are no ads, and we never sell or share your
             data for marketing.
           </p>
         </Section>

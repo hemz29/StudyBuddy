@@ -1,9 +1,9 @@
-import Image from "next/image";
+import { LogoMark } from "@/components/shell/Logo";
 import Link from "next/link";
 import { KnText } from "@/components/Word";
 import { LineIcon, type IconName } from "@/components/LineIcon";
 
-export const metadata = { title: "About us · Nudi" };
+export const metadata = { title: "About us · Kali Kannada" };
 
 const EMAIL = "hemlata.v.29@gmail.com";
 
@@ -13,16 +13,16 @@ const STEPS: [IconName, string, string][] = [
   ["camera", "Get it marked", "A photo is marked against the teacher's key, with clear feedback."],
 ];
 
-// What Nudi is and why it exists. A first draft for the owner to edit.
+// What Kali Kannada is and why it exists. A first draft for the owner to edit.
 export default function About() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-4">
       <section className="card flex items-center gap-4 p-4 sm:p-5">
-        <Image src="/brand/nudi-logo-print.png" alt="Nudi – Kannada, with confidence" width={600} height={458} className="w-20 shrink-0" />
+        <LogoMark size={64} />
         <div>
-          <h1 className="text-2xl">About Nudi</h1>
+          <h1 className="text-2xl">About Kali Kannada</h1>
           <p className="text-sm text-muted">
-            <KnText text="ನುಡಿ" /> (nudi) means language, or speech. Grade 6 children practise Kannada on their own, and parents can see
+            <KnText text="ಕಲಿ ಕನ್ನಡ" /> (kali Kannada) means &ldquo;learn Kannada&rdquo;. Grade 6 children practise Kannada on their own, and parents can see
             they&apos;re ready for the exam, even without speaking Kannada themselves.
           </p>
         </div>
@@ -41,18 +41,18 @@ export default function About() {
       </section>
 
       <section className="card flex flex-col gap-3 p-5 sm:p-7">
-        <h2 className="text-2xl">Why I built Nudi</h2>
-        <div className="flex max-w-3xl flex-col gap-3 leading-relaxed">
+        <h2 className="text-2xl">Why I built Kali Kannada</h2>
+        <div className="flex max-w-3xl flex-col gap-3 text-justify leading-relaxed [hyphens:auto]">
           <p>I&apos;m a working mum of two wonderful kids. Like many parents across Karnataka, I&apos;ve seen how essential Kannada becomes as part of their school journey.</p>
           <p>But here&apos;s the truth: I don&apos;t know Kannada well enough to confidently guide them myself.</p>
           <p>Before every test or exam, I&apos;d spend 2–3 hours creating practice worksheets: researching, typing, formatting, hoping they covered what really mattered. I&apos;d even share them with other parents on our class WhatsApp group. Still, one question always lingered:</p>
           <p className="border-l-2 border-ink pl-4 font-medium">Am I teaching this right? Are my kids really learning what they need?</p>
           <p>Private tutors helped, but group classes rarely matched each child&apos;s unique learning pace. So I tried using general AI tools. They worked, up to a point. But copying text, translating, formatting quizzes… it was messy. And even after all that effort, I was never fully sure the content was accurate or culturally right.</p>
-          <p className="font-medium">That&apos;s when I decided to build Nudi.</p>
-          <p>Nudi brings every scattered step together, helping children read, understand, and practise Kannada with confidence, while saving parents hours of prep time.</p>
-          <p>And because language is more than grammar (it&apos;s culture and emotion), real Kannada educators help review Nudi&apos;s AI-generated content, refining it to feel human, natural, and trustworthy.</p>
-          <p>Nudi wasn&apos;t born because the world needed another learning app. It was born because parents like me needed something that truly worked.</p>
-          <p className="text-lg"><KnText text="ನುಡಿ" /> | Nudi<br /><span className="text-muted">Kannada, with confidence.</span></p>
+          <p className="font-medium">That&apos;s when I decided to build Kali Kannada.</p>
+          <p>Kali Kannada brings every scattered step together, helping children read, understand, and practise Kannada with confidence, while saving parents hours of prep time.</p>
+          <p>And because language is more than grammar (it&apos;s culture and emotion), real Kannada educators help review Kali Kannada&apos;s AI-generated content, refining it to feel human, natural, and trustworthy.</p>
+          <p>Kali Kannada wasn&apos;t born because the world needed another learning app. It was born because parents like me needed something that truly worked.</p>
+          <p className="text-lg"><KnText text="ಕಲಿ ಕನ್ನಡ" /> | Kali Kannada<br /><span className="text-muted">Kannada, with confidence.</span></p>
         </div>
       </section>
 

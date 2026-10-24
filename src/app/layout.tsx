@@ -10,7 +10,7 @@ const kannada = Noto_Sans_Kannada({ subsets: ["kannada"], weight: ["400", "600",
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Nudi – Kannada, with confidence",
+  title: "Kali Kannada – Kannada, with confidence",
   description: "Grade 6 Kannada (3rd language) practice: read, write by hand, get it marked, see progress.",
   manifest: "/manifest.webmanifest",
 };

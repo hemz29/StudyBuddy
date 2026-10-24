@@ -84,7 +84,7 @@ body {
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.04);
 }
 
-/* Headings: thin Montserrat, as in the Nudi logo. */
+/* Headings: thin Montserrat, as in the Kali Kannada logo. */
 h1,
 h2,
 .serif {
@@ -154,7 +154,7 @@ h2,
 .btn:active {
   transform: scale(0.98);
 }
-/* Buttons follow the Nudi logo: black for the main action, white with a dark outline for the rest. */
+/* Buttons follow the Kali Kannada logo: black for the main action, white with a dark outline for the rest. */
 .btn-primary {
   background: #000;
   color: #fff;

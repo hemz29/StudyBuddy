@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LineIcon, type IconName } from "@/components/LineIcon";
 
-export const metadata = { title: "Future plans · Nudi" };
+export const metadata = { title: "Future plans · Kali Kannada" };
 
 const IDEAS: [IconName, string, string][] = [
   ["layers", "Every chapter, more grades", "All Grade 6 chapters first, then Grades 5 to 8."],
@@ -9,7 +9,7 @@ const IDEAS: [IconName, string, string][] = [
   ["translate", "Meanings in your language", "Help in Telugu, Tamil, Hindi and more, not only English."],
   ["sound", "Listen and speak", "Hear every word read aloud, and practise saying it."],
   ["class", "Teacher view", "Teachers set worksheets and follow a whole class."],
-  ["phone", "Phone app", "Nudi on Android, with gentle practice reminders."],
+  ["phone", "Phone app", "Kali Kannada on Android, with gentle practice reminders."],
   ["globe", "More languages", "The same way of learning for other Indian languages."],
 ];
 
