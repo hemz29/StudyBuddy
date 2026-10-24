@@ -19,13 +19,14 @@ const TONES = {
 } as const;
 export type Tone = keyof typeof TONES;
 
-export function ChoiceCard({ href, tone, icon, title, sub, badge, children }: {
-  href: string; tone: Tone; icon?: React.ReactNode; title: React.ReactNode; sub?: React.ReactNode; badge?: React.ReactNode; children?: React.ReactNode;
+export function ChoiceCard({ href, tone, icon, eyebrow, title, sub, badge, children }: {
+  href: string; tone: Tone; icon?: React.ReactNode; eyebrow?: string; title: React.ReactNode; sub?: React.ReactNode; badge?: React.ReactNode; children?: React.ReactNode;
 }) {
   return (
     <Link href={href} className={`group flex flex-col gap-2 rounded-[var(--radius)] border border-white/70 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${TONES[tone]}`}>
       <div className="flex items-start justify-between gap-3">
         {icon && <span className="grid h-12 w-12 place-items-center rounded-full bg-white/80 text-2xl text-[var(--tone-ink)]">{icon}</span>}
+        {eyebrow && <span className="text-sm font-semibold uppercase tracking-[0.12em] text-ink">{eyebrow}</span>}
         {badge}
       </div>
       <span className="serif text-xl font-semibold text-ink">{title}</span>
