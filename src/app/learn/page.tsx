@@ -40,6 +40,15 @@ export default async function LearnHome() {
         <ChoiceCard href="/learn/writing" tone="lavender" icon="📝" title="Writing practice" sub="One chapter at a time · 25 marks · 40 minutes" />
         <ChoiceCard href="/learn/tests" tone="sky" icon="⭐" title="Practice tests" sub="Like the school paper · 40 marks · 1 hour" />
       </div>
+
+      <Link href="/learn/letters" className="card flex items-center gap-4 bg-white/85 p-4 transition hover:-translate-y-0.5">
+        <span className="kn grid h-12 w-12 place-items-center rounded-full bg-accent-soft text-2xl" aria-hidden>ಅ</span>
+        <span className="flex-1">
+          <span className="block text-lg">Letters <KnText text="ಅಕ್ಷರ" mode="hover" /></span>
+          <span className="text-sm text-muted">The Kannada alphabet, vowel signs, double letters and number names</span>
+        </span>
+        <span aria-hidden>→</span>
+      </Link>
     </div>
   );
 }

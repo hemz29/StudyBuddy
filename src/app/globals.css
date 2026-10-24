@@ -6,8 +6,8 @@
 :root {
   --bg: #fbf7f0;
   --surface: #fffdf9;
-  --ink: #2e3a34;
-  --muted: #6b746e;
+  --ink: #000000;
+  --muted: #3f3f3f;
   --line: #ece4d8;
   --accent: #5e8b76;
   --accent-ink: #ffffff;
@@ -33,6 +33,12 @@
   /* Montserrat is heavy at 700+; keep bold text lighter so the thin headings set the tone. */
   --font-weight-bold: 500;
   --font-weight-extrabold: 600;
+  /* Greys used for secondary text are darkened so all English text reads crisply on the pastel background. */
+  --color-gray-400: #6b6b6b;
+  --color-gray-500: #3f3f3f;
+  --color-gray-600: #333333;
+  --color-gray-700: #222222;
+  --color-gray-800: #111111;
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
@@ -66,7 +72,7 @@ body {
 
 body {
   font-family: var(--font-main), var(--font-kannada), system-ui, sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
 }
 

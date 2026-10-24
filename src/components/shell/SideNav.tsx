@@ -4,18 +4,24 @@ import { usePathname } from "next/navigation";
 import { KnText } from "@/components/Word";
 
 export const CHILD_NAV = [
-  { href: "/learn", label: "Home", icon: "🏠", exact: true },
-  { href: "/learn/lessons", label: "Read & Understand", icon: "📖", also: ["/learn/lesson/"] },
-  { href: "/learn/grammar", label: "Grammar", icon: "✏️", also: ["/learn/cards/"] },
-  { href: "/learn/writing", label: "Writing practice", icon: "📝" },
-  { href: "/learn/tests", label: "Practice tests", icon: "⭐" },
-  { href: "/learn/letters", label: "Letters ಅಕ್ಷರ", icon: "ಅ" },
+  {
+    href: "/learn",
+    label: "Learn",
+    icon: "📚",
+    exact: true,
+    also: ["/learn/lesson", "/learn/grammar", "/learn/cards/", "/learn/writing", "/learn/tests", "/learn/letters", "/learn/worksheet/", "/learn/session/"],
+  },
+  { href: "/learn/about", label: "About us", icon: "🌱" },
+  { href: "/learn/contact", label: "Contact us", icon: "✉️" },
+  { href: "/learn/future", label: "Future forward", icon: "🚀" },
 ];
 
-export function SideNav({ items = CHILD_NAV }: { items?: typeof CHILD_NAV }) {
+type NavItem = { href: string; label: string; icon: string; exact?: boolean; also?: string[] };
+
+export function SideNav({ items = CHILD_NAV }: { items?: NavItem[] }) {
   const path = usePathname();
-  const active = (i: (typeof CHILD_NAV)[number]) =>
-    i.exact ? path === i.href : path.startsWith(i.href) || (i.also ?? []).some((p) => path.startsWith(p));
+  const active = (i: NavItem) =>
+    (i.exact ? path === i.href : path.startsWith(i.href)) || ("also" in i && (i.also ?? []).some((p) => path.startsWith(p)));
   return (
     <nav className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
       {items.map((i) => (
