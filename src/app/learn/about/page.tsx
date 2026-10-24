@@ -5,6 +5,8 @@ import { LineIcon, type IconName } from "@/components/LineIcon";
 
 export const metadata = { title: "About us · Nudi" };
 
+const EMAIL = "hemlata.v.29@gmail.com";
+
 const STEPS: [IconName, string, string][] = [
   ["book", "Read and practise", "Lessons from the school syllabus, with the sound and meaning of every Kannada word one tap away."],
   ["pen", "Write by hand", "Worksheets and tests in the school's paper format, written on paper, just like the exam."],
@@ -40,11 +42,23 @@ export default function About() {
           Nudi is built by Hemlata, to give children Kannada practice they can do on their own and parents can trust. It is in a small
           pilot with invited families, and your feedback shapes what comes next.
         </p>
-        <p className="mt-2 flex flex-wrap gap-4 text-sm">
-          <Link href="/learn/contact" className="font-bold underline">Contact us</Link>
-          <Link href="/learn/future" className="font-bold underline">Future forward</Link>
-          <Link href="/privacy" className="font-bold underline">Privacy</Link>
-        </p>
+
+      </section>
+
+      <section id="contact" className="card flex scroll-mt-6 flex-col gap-3 bg-white/90 p-6">
+        <h2 className="text-xl">Contact us</h2>
+        <p>We read every message. Write to us about:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>Feedback: what helped, what was confusing, what you&apos;d like next</li>
+          <li>A mark you think is wrong: tell us the worksheet and question number</li>
+          <li>Deleting your account and all photos</li>
+        </ul>
+        <p className="select-all rounded-2xl bg-accent-soft px-5 py-4 text-xl font-semibold">{EMAIL}</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <a href={`mailto:${EMAIL}`} className="btn btn-primary">Write an email</a>
+          <Link href="/learn/future" className="text-sm font-bold underline">Future plans</Link>
+          <Link href="/privacy" className="text-sm font-bold underline">Privacy</Link>
+        </div>
       </section>
     </div>
   );

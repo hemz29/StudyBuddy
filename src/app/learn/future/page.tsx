@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LineIcon, type IconName } from "@/components/LineIcon";
 
-export const metadata = { title: "Future forward · Nudi" };
+export const metadata = { title: "Future plans · Nudi" };
 
 const IDEAS: [IconName, string, string][] = [
   ["layers", "Every chapter, then more grades", "All Grade 6 chapters first, then Grades 5 to 8."],
@@ -18,7 +18,7 @@ export default function Future() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <section className="card flex flex-col gap-2 bg-white/90 p-8">
-        <h1 className="text-3xl">Future forward</h1>
+        <h1 className="text-3xl">Future plans</h1>
         <p className="text-lg">Ideas we&apos;re working towards. They&apos;re plans, not promises, and the pilot families&apos; feedback decides what comes first.</p>
       </section>
 
@@ -33,7 +33,7 @@ export default function Future() {
       </section>
 
       <p className="text-center">
-        What would help your child most? <Link href="/learn/contact" className="font-bold underline">Tell us what you&apos;d like next</Link>
+        What would help your child most? <Link href="/learn/about#contact" className="font-bold underline">Tell us what you&apos;d like next</Link>
       </p>
     </div>
   );

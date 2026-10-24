@@ -5,10 +5,9 @@ import { KnText } from "@/components/Word";
 
 export const CHILD_NAV = [
   { href: "/learn", label: "Learn", exact: true, also: ["/learn/lesson", "/learn/grammar", "/learn/cards/", "/learn/letters"] },
-  { href: "/learn/future", label: "Future forward" },
   { href: "/learn/practice", label: "Practice", also: ["/learn/writing", "/learn/tests", "/learn/worksheet/", "/learn/session/"] },
-  { href: "/learn/about", label: "About us" },
-  { href: "/learn/contact", label: "Contact us" },
+  { href: "/learn/future", label: "Future plans" },
+  { href: "/learn/about", label: "About us", also: ["/learn/contact"] },
 ];
 
 type NavItem = { href: string; label: string; exact?: boolean; also?: string[] };
