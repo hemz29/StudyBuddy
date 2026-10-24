@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { KnText } from "@/components/Word";
+import { LineIcon, type IconName } from "@/components/LineIcon";
 
 export const metadata = { title: "About us · Nudi" };
 
-const STEPS = [
-  ["📖", "Read and practise", "Lessons from the school syllabus, with the sound and meaning of every Kannada word one tap away."],
-  ["✍️", "Write by hand", "Worksheets and tests in the school's paper format, written on paper, just like the exam."],
-  ["📷", "Get it marked", "A photo of the pages is read and marked against the teacher's answer key, with clear feedback."],
+const STEPS: [IconName, string, string][] = [
+  ["book", "Read and practise", "Lessons from the school syllabus, with the sound and meaning of every Kannada word one tap away."],
+  ["pen", "Write by hand", "Worksheets and tests in the school's paper format, written on paper, just like the exam."],
+  ["camera", "Get it marked", "A photo of the pages is read and marked against the teacher's answer key, with clear feedback."],
 ];
 
 // What Nudi is and why it exists. A first draft for the owner to edit.
@@ -26,7 +27,7 @@ export default function About() {
       <section className="grid gap-4 sm:grid-cols-3">
         {STEPS.map(([icon, title, text]) => (
           <div key={title} className="card flex flex-col gap-2 bg-white/90 p-5">
-            <span className="text-3xl" aria-hidden>{icon}</span>
+            <LineIcon name={icon} />
             <h2 className="text-xl">{title}</h2>
             <p className="text-sm">{text}</p>
           </div>

@@ -4,19 +4,14 @@ import { usePathname } from "next/navigation";
 import { KnText } from "@/components/Word";
 
 export const CHILD_NAV = [
-  {
-    href: "/learn",
-    label: "Learn",
-    icon: "📚",
-    exact: true,
-    also: ["/learn/lesson", "/learn/grammar", "/learn/cards/", "/learn/writing", "/learn/tests", "/learn/letters", "/learn/worksheet/", "/learn/session/"],
-  },
-  { href: "/learn/about", label: "About us", icon: "🌱" },
-  { href: "/learn/contact", label: "Contact us", icon: "✉️" },
-  { href: "/learn/future", label: "Future forward", icon: "🚀" },
+  { href: "/learn", label: "Learn", exact: true, also: ["/learn/lesson", "/learn/grammar", "/learn/cards/", "/learn/letters"] },
+  { href: "/learn/future", label: "Future forward" },
+  { href: "/learn/practice", label: "Practice", also: ["/learn/writing", "/learn/tests", "/learn/worksheet/", "/learn/session/"] },
+  { href: "/learn/about", label: "About us" },
+  { href: "/learn/contact", label: "Contact us" },
 ];
 
-type NavItem = { href: string; label: string; icon: string; exact?: boolean; also?: string[] };
+type NavItem = { href: string; label: string; exact?: boolean; also?: string[] };
 
 export function SideNav({ items = CHILD_NAV }: { items?: NavItem[] }) {
   const path = usePathname();
@@ -32,7 +27,6 @@ export function SideNav({ items = CHILD_NAV }: { items?: NavItem[] }) {
             active(i) ? "bg-accent-soft text-ink" : "text-muted hover:bg-white/70 hover:text-ink"
           }`}
         >
-          <span className="kn w-6 text-center text-base" aria-hidden>{i.icon}</span>
           <KnText text={i.label} mode="subtle" />
         </Link>
       ))}
