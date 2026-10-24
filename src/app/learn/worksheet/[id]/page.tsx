@@ -13,7 +13,7 @@ export default async function WorksheetIntro({ params, searchParams }: { params:
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-5">
       <Link href={ws.kind === "test" ? "/learn/tests" : "/learn/writing"} className="text-sm font-bold text-accent">← Back</Link>
-      <div className="card bg-white/90 p-6">
+      <div className="card bg-white p-6">
         <p className="text-sm font-bold text-muted">{ws.kind === "test" ? "Practice test" : "Chapter practice"} · {ws.totalMarks} marks · {ws.minutes === 60 ? "1 hour" : `${ws.minutes} minutes`}</p>
         <h1 className="mt-1 text-3xl">{ws.title.en}</h1>
         <p className="text-xl text-muted"><KnText text={ws.title.kn} /></p>
@@ -28,7 +28,7 @@ export default async function WorksheetIntro({ params, searchParams }: { params:
         <p className="mt-3 text-xs text-muted">{MARKING.label}</p>
       </div>
 
-      <div className="card bg-white/90 p-6">
+      <div className="card bg-white p-6">
         <h2 className="text-xl">How it works</h2>
         <ol className="mt-3 flex flex-col gap-3">
           {([

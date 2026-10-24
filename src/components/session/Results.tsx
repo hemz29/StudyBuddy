@@ -29,7 +29,7 @@ export function Results({ state, worksheetId }: { state: SessionState; worksheet
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4">
-      <div className="card overflow-hidden bg-white/95 text-center">
+      <div className="card overflow-hidden bg-white text-center">
         <div className="relative h-48 sm:h-60">
           <Image src="/art/celebration.webp" alt="" fill sizes="768px" className="object-cover" />
         </div>

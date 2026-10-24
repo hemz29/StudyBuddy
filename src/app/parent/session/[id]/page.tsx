@@ -52,7 +52,7 @@ export default async function SessionReview({ params }: { params: Promise<{ id: 
   return (
     <div className="app-bg min-h-screen"><main className="mx-auto flex max-w-4xl flex-col gap-4 px-4 py-8">
       <Link href="/parent" className="text-sm font-bold text-accent">← Dashboard</Link>
-      <div className="card bg-white/95 p-5">
+      <div className="card bg-white p-5">
         <h1 className="text-2xl">{ws.title.en}</h1>
         <p className="text-muted">
           {new Date(session.startedAt).toLocaleDateString("en-IN")} · {session.retryOf ? "Retry" : "First try"} · Score {fmt(session.awarded ?? 0)}/{fmt(session.max ?? 0)}

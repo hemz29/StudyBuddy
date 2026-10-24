@@ -10,12 +10,12 @@ export function PageHeader({ title, sub, back = "/learn" }: { title: React.React
   );
 }
 
-// Soft coloured choice card used across the child's pages.
+// White choice card, its colour kept to the icon chip and arrow, used across the child's pages.
 const TONES = {
-  sage: "bg-accent-soft/90 [--tone-ink:var(--accent)]",
-  peach: "bg-peach/90 [--tone-ink:var(--peach-ink)]",
-  lavender: "bg-lavender/90 [--tone-ink:var(--lavender-ink)]",
-  sky: "bg-sky/90 [--tone-ink:var(--sky-ink)]",
+  sage: "[--tone:var(--accent-soft)] [--tone-ink:var(--accent)]",
+  peach: "[--tone:var(--peach)] [--tone-ink:var(--peach-ink)]",
+  lavender: "[--tone:var(--lavender)] [--tone-ink:var(--lavender-ink)]",
+  sky: "[--tone:var(--sky)] [--tone-ink:var(--sky-ink)]",
 } as const;
 export type Tone = keyof typeof TONES;
 
@@ -23,16 +23,16 @@ export function ChoiceCard({ href, tone, icon, eyebrow, title, sub, badge, child
   href: string; tone: Tone; icon?: React.ReactNode; eyebrow?: string; title: React.ReactNode; sub?: React.ReactNode; badge?: React.ReactNode; children?: React.ReactNode;
 }) {
   return (
-    <Link href={href} className={`group flex flex-col gap-2 rounded-[var(--radius)] border border-white/70 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${TONES[tone]}`}>
+    <Link href={href} className={`group flex flex-col gap-2 card p-4 sm:p-5 transition hover:-translate-y-0.5 hover:shadow-md ${TONES[tone]}`}>
       <div className="flex items-start justify-between gap-3">
-        {icon && <span className="grid h-12 w-12 place-items-center rounded-full bg-white/80 text-2xl text-[var(--tone-ink)]">{icon}</span>}
+        {icon && <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--tone)] text-xl text-[var(--tone-ink)]">{icon}</span>}
         {eyebrow && <span className="text-sm font-semibold uppercase tracking-[0.12em] text-ink">{eyebrow}</span>}
         {badge}
       </div>
-      <span className="serif text-xl font-semibold text-ink">{title}</span>
+      <span className="serif text-lg font-semibold text-ink">{title}</span>
       {sub && <span className="text-sm text-muted">{sub}</span>}
       {children}
-      <span className="mt-auto pt-2 text-lg font-bold text-[var(--tone-ink)] transition group-hover:translate-x-1">→</span>
+      <span className="mt-auto text-lg font-bold text-[var(--tone-ink)] transition group-hover:translate-x-1">→</span>
     </Link>
   );
 }

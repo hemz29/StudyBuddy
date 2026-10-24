@@ -87,12 +87,12 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         <Stat label="Written without hints" value={written.length ? `${Math.round((own / written.length) * 100)}%` : "–"} note={written.length ? `${own} of ${written.length} written answers` : "Shows after the first worksheet"} />
       </section>
 
-      <section className="card bg-white/95 p-5">
+      <section className="card bg-white p-5">
         <h2 className="text-lg font-bold">Recommended next practice</h2>
         {rec ? <p className="mt-1">{rec.text}</p> : <p className="mt-1 text-muted">Not enough answers yet to make a fair suggestion. After a few worksheets, this will point to the area that needs most practice.</p>}
       </section>
 
-      <section className="card bg-white/95 p-5">
+      <section className="card bg-white p-5">
         <h2 className="text-lg font-bold">Skills</h2>
         <p className="text-sm text-muted">Each percentage only counts questions that test that skill. “Not practised yet” is not a low score.</p>
         <div className="mt-3 overflow-x-auto">
@@ -122,13 +122,13 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         </div>
       </section>
 
-      <section className="card bg-white/95 p-5">
+      <section className="card bg-white p-5">
         <h2 className="text-lg font-bold">Score over time</h2>
         <p className="text-sm text-muted">First try of each worksheet, as a percentage (worksheets have different totals). Indicative only: worksheets cover different chapters, and scores here don&apos;t predict school exam marks.</p>
         {trend.length >= 2 ? <ScoreChart points={trend} /> : <p className="mt-4 rounded-xl bg-accent-soft p-4 text-sm">Not enough worksheets yet to show a trend – {trend.length === 1 ? "one more" : "two"} to go.</p>}
       </section>
 
-      <section className="card bg-white/95 p-5">
+      <section className="card bg-white p-5">
         <h2 className="text-lg font-bold">History</h2>
         {worksheets.length === 0 ? <p className="mt-2 text-muted">No worksheets yet.</p> : (
           <div className="mt-3 overflow-x-auto">
@@ -152,7 +152,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         )}
       </section>
 
-      <section className="card bg-white/95 p-5 text-sm text-muted">
+      <section className="card bg-white p-5 text-sm text-muted">
         <h2 className="text-base font-bold text-ink">Your data</h2>
         <p className="mt-1">We store {child.nickname}&apos;s nickname, answers, marks and the answer photos (so you can check the marking). Photos are only visible to you. AI is used to read handwriting and mark sentence answers; we log how much it costs, not what was written.</p>
         <form action={deleteChild} className="mt-3">
@@ -167,7 +167,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
 
 function Stat({ label, value, note }: { label: string; value: string; note: string }) {
   return (
-    <div className="card bg-white/95 p-5">
+    <div className="card bg-white p-5">
       <p className="text-sm font-bold text-muted">{label}</p>
       <p className="mt-1 text-3xl font-extrabold">{value}</p>
       <p className="text-sm text-muted">{note}</p>

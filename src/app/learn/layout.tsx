@@ -10,7 +10,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
   return (
     <div className="app-bg min-h-screen">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 lg:flex-row lg:gap-6 lg:py-6">
-        <aside className="no-print flex flex-col gap-4 rounded-[var(--radius)] bg-white/75 p-3 shadow-sm backdrop-blur-md lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:w-64 lg:shrink-0">
+        <aside className="no-print flex flex-col gap-4 rounded-[var(--radius)] bg-white p-3 shadow-sm backdrop-blur-md lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:w-64 lg:shrink-0">
           <div className="flex items-center justify-between lg:px-2 lg:pt-1">
             <Logo />
             <Link href="/profiles" className="flex items-center gap-2 rounded-full bg-white/80 py-1 pl-1 pr-3 text-sm font-bold lg:hidden">

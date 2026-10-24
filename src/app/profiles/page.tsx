@@ -54,7 +54,7 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
             {children.map((c) => (
               <form key={c.id} action={pickChild}>
                 <input type="hidden" name="childId" value={c.id} />
-                <button className="card flex w-full flex-col items-center gap-2 bg-white/90 p-5 transition hover:-translate-y-0.5">
+                <button className="card flex w-full flex-col items-center gap-2 bg-white p-5 transition hover:-translate-y-0.5">
                   <AvatarImage avatar={c.theme} size={112} />
                   <span className="text-xl font-extrabold">{c.nickname}</span>
                 </button>
@@ -63,7 +63,7 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
           </div>
         )}
 
-        <details className="card mt-8 bg-white/90 p-6" open={children.length === 0}>
+        <details className="card mt-8 bg-white p-6" open={children.length === 0}>
           <summary className="cursor-pointer text-xl font-bold">Add a child</summary>
           <form action={addChild} className="mt-4 flex flex-col gap-5">
             <label className="flex flex-col gap-1">

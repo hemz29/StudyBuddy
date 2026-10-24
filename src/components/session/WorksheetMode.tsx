@@ -37,7 +37,7 @@ export function WorksheetMode({ session, worksheetId, controls }: { session: Pra
   let lastPart = "";
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
-      <header className="card flex flex-wrap items-center gap-4 bg-white/90 p-5">
+      <header className="card flex flex-wrap items-center gap-4 bg-white p-5">
         <div className="mr-auto min-w-0">
           <h1 className="text-2xl"><KnText text={ws.title.kn} /></h1>
           <p className="text-muted">{ws.title.en}</p>

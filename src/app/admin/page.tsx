@@ -126,7 +126,7 @@ export default async function Admin() {
 
 function Stat({ label, value, note }: { label: string; value: number; note?: string }) {
   return (
-    <div className="card bg-white/95 p-4">
+    <div className="card bg-white p-4">
       <p className="text-sm font-bold text-muted">{label}</p>
       <p className="mt-1 text-3xl font-extrabold">{value}</p>
       {note && <p className="text-xs text-muted">{note}</p>}
@@ -136,7 +136,7 @@ function Stat({ label, value, note }: { label: string; value: number; note?: str
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="card bg-white/95 p-5">
+    <section className="card bg-white p-5">
       <h2 className="text-xl">{title}</h2>
       {children}
     </section>

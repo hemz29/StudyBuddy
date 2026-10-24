@@ -48,7 +48,7 @@ export function SessionView({ sessionId, worksheetId }: { sessionId: string; wor
       session={session}
       worksheetId={worksheetId}
       controls={
-        <div className={`card flex flex-col gap-4 bg-white/95 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 ${writing ? "sm:sticky sm:top-3 sm:z-20" : ""}`}>
+        <div className={`card flex flex-col gap-4 bg-white p-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 ${writing ? "sm:sticky sm:top-3 sm:z-20" : ""}`}>
           <Timer session={session} minutes={getWorksheet(worksheetId)!.minutes} />
           <UploadPanel inline state={state} onOpen={() => setUploading(true)} refresh={refresh} />
         </div>

@@ -21,7 +21,7 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
   return (
     <div className="flex flex-col gap-5">
       <Link href="/learn/lessons" className="text-sm font-bold text-accent">← Back</Link>
-      <div className="card flex flex-wrap items-center gap-4 bg-white/90 p-5">
+      <div className="card flex flex-wrap items-center gap-4 bg-white p-5">
         <div className="mr-auto">
           <h1 className="text-3xl font-bold"><KnText text={lesson.title.kn} /></h1>
           <p className="text-2xl font-bold">
