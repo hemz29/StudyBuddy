@@ -1,6 +1,6 @@
+import { LineIcon } from "@/components/LineIcon";
 import { PRACTICE, TESTS } from "@/content";
 import { requireChild, userStore } from "@/lib/server/context";
-import { PageHeader } from "@/components/shell/PageHeader";
 import { WorksheetList } from "@/components/WorksheetList";
 import { doneCounts } from "@/lib/dashboard";
 
@@ -10,7 +10,20 @@ export default async function Practice() {
   const done = doneCounts(await (await userStore()).listSessions(parent.id, child.id));
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Practice" sub="Exam coming up? Every worksheet is here. Write by hand, take a photo, and get it marked." back={null} />
+      {/* A soft yellow band so the page's purpose stands out without shouting. */}
+      <header className="flex flex-col gap-3 rounded-[var(--radius)] border border-[var(--brand-yellow)]/60 bg-accent-soft p-6 sm:p-7">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">Exam coming up?</p>
+        <h1 className="text-3xl">Practice</h1>
+        <p>Every worksheet and test is here, in the school&apos;s paper format.</p>
+        <ol className="mt-1 flex flex-wrap gap-2 text-sm">
+          {([["pen", "Write by hand"], ["camera", "Take a photo"], ["check", "Get it marked"]] as const).map(([icon, label], i) => (
+            <li key={label} className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5">
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-black text-xs font-semibold text-[var(--brand-yellow)]">{i + 1}</span>
+              <LineIcon name={icon} size={18} /> {label}
+            </li>
+          ))}
+        </ol>
+      </header>
       <section className="flex flex-col gap-3">
         <h2 className="text-2xl">Practice tests</h2>
         <p className="text-muted">Like the school&apos;s Term 1 paper: Section A and B, 40 marks, 1 hour.</p>
