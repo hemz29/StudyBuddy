@@ -10,7 +10,7 @@ export async function startFree() {
   if (error) {
     // Supabase's own reason (e.g. "Anonymous sign-ins are disabled") is kept, so the owner can see what to fix.
     console.error("start free failed", error.message);
-    redirect(`/?mode=signin&error=${encodeURIComponent(`Starting without an account isn't available right now (${error.message}). Please sign in with Google or your email instead.`)}#signin`);
+    redirect(`/?mode=signup&error=${encodeURIComponent(`Starting without an account isn't available right now (${error.message}). Please sign in with Google or your email instead.`)}#signin`);
   }
   redirect("/profiles");
 }

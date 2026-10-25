@@ -39,7 +39,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   }
   const { sent, error, email, mode: m } = await searchParams;
   // Three ways in: try without an account, create one, or sign in. The last two open the same Google / email card.
-  const mode = m === "signin" || m === "signup" ? m : sent || error ? "signin" : null;
+  const mode = m === "signin" || m === "signup" ? m : sent || error ? "signup" : null;
 
   return (
     <div className="min-h-screen bg-bg text-ink">

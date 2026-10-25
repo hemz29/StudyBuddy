@@ -33,7 +33,7 @@ export async function SignInCard({ mode, sent, error, email = "" }: { mode: "sig
       ) : (
         <div className="flex flex-col gap-4">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-xl">{mode === "signup" ? "Create your free account" : "Welcome back"}</h2>
+            <h2 className="text-xl">{mode === "signup" ? "Sign in or create a free account" : "Welcome back"}</h2>
             <Link href="/" className="text-sm text-muted underline">← Back</Link>
           </div>
           <HashError />
