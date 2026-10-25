@@ -6,6 +6,7 @@ import { SideNav } from "@/components/shell/SideNav";
 import { LineIcon } from "@/components/LineIcon";
 import { ActivityPing } from "@/components/ActivityPing";
 import { SaveProgressStrip } from "@/components/SaveProgressStrip";
+import { SignOutButton } from "@/components/SignOutButton";
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
   const { parent, child } = await requireChild();
@@ -30,6 +31,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
               </span>
             </Link>
             <Link href="/parent" className="rounded-2xl px-4 py-2 text-sm font-bold text-muted hover:bg-white/70 hover:text-ink"><LineIcon name="family" size={18} className="mr-1.5 inline align-[-3px]" />Parent view</Link>
+            <SignOutButton isGuest={parent.isGuest} className="w-full rounded-2xl px-4 py-2 text-left text-sm font-bold text-muted hover:bg-white/70 hover:text-ink" />
           </div>
         </aside>
         <main className="min-w-0 flex-1 pb-16">

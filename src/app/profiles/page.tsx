@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { SignOutButton } from "@/components/SignOutButton";
 import { isDemo, requireParent, setActiveChild, userStore } from "@/lib/server/context";
 import { AVATARS } from "@/lib/avatars";
 import { AvatarImage } from "@/components/AvatarImage";
@@ -42,9 +43,10 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
   return (
     <main className="app-bg min-h-screen">
       <div className="mx-auto max-w-3xl px-4 py-8">
-        <div className="flex items-center justify-between gap-4">
-          <Logo href="/profiles" />
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="mr-auto"><Logo href="/profiles" /></span>
           <Link href="/parent" className="btn btn-ghost"><LineIcon name="family" size={18} />Parent view</Link>
+          <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
         </div>
         {isDemo && <div className="mt-4"><DemoBanner /></div>}
         <h1 className="mt-8 text-4xl">Who is practising today?</h1>
