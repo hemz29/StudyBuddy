@@ -7,7 +7,7 @@ import { INTENT, REPLACE } from "@/lib/feedback";
 export function FeedbackSurvey({ name }: { name?: string }) {
   const [step, setStep] = useState(0);
   const [intent, setIntent] = useState("");
-  const [replace, setReplace] = useState("");
+  const [replace, setReplace] = useState<string[]>([]);
   const [nps, setNps] = useState<number | null>(null);
   const [comment, setComment] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "error">("idle");
@@ -17,7 +17,7 @@ export function FeedbackSurvey({ name }: { name?: string }) {
     const res = await fetch("/api/feedback", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ intent, replace: replace || undefined, nps, comment: comment || undefined, name }),
+      body: JSON.stringify({ intent, replace: replace.length ? replace : undefined, nps, comment: comment || undefined, name }),
     }).catch(() => null);
     if (res?.ok) setStep(4);
     else setState("error");
@@ -44,14 +44,18 @@ export function FeedbackSurvey({ name }: { name?: string }) {
         <>
           <p className="text-sm text-muted">{name ? `Hi ${name}! ` : ""}3 taps, 30 seconds. Thank you for helping.</p>
           <h1 className="text-2xl">Will you use Kali Kannada for your child&apos;s next Kannada test?</h1>
-          <div className="flex flex-col gap-2">{INTENT.map((o) => choice(o, intent === o, () => { setIntent(o); setReplace(""); setStep(o === "Probably not" ? 2 : 1); }))}</div>
+          <div className="flex flex-col gap-2">{INTENT.map((o) => choice(o, intent === o, () => { setIntent(o); setReplace([]); setStep(o === "Probably not" ? 2 : 1); }))}</div>
         </>
       )}
 
       {step === 1 && (
         <>
           <h1 className="text-2xl">If yes, which part of your current Kannada preparation steps would this app replace?</h1>
-          <div className="flex flex-col gap-2">{REPLACE.map((o) => choice(o, replace === o, () => { setReplace(o); setStep(2); }))}</div>
+          <p className="-mt-3 text-sm text-muted">Pick all that apply</p>
+          <div className="flex flex-col gap-2">
+            {REPLACE.map((o) => choice(`${replace.includes(o) ? "✓ " : ""}${o}`, replace.includes(o), () => setReplace((r) => (r.includes(o) ? r.filter((x) => x !== o) : [...r, o]))))}
+          </div>
+          <button onClick={() => setStep(2)} className="btn btn-primary">{replace.length ? "Next" : "Skip"}</button>
         </>
       )}
 

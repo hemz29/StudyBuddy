@@ -90,7 +90,7 @@ export default async function Admin() {
                     <td className="py-2">{date(r.createdAt)}</td>
                     <td>{r.name || (r.parentId ? label(familyOf.get(r.parentId)) : "Anonymous")}</td>
                     <td>{r.answers.intent}</td>
-                    <td>{r.answers.replace ?? "–"}</td>
+                    <td>{[r.answers.replace ?? []].flat().join(", ") || "–"}</td>
                     <td>{r.answers.nps}</td>
                     <td className="min-w-64">{r.answers.comment ?? "–"}</td>
                   </tr>

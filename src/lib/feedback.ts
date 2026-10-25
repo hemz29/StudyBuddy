@@ -3,7 +3,8 @@
 export const INTENT = ["Definitely", "Probably", "Not sure", "Probably not"] as const;
 export const REPLACE = ["Making worksheets", "Checking answers", "Explaining meanings", "Tutor or classes", "Knowing if my child is exam-ready"] as const;
 
-export type FeedbackAnswers = { intent: string; replace?: string; nps: number; comment?: string };
+export type FeedbackAnswers = { intent: string; // Several choices; older answers hold a single string.
+  replace?: string | string[]; nps: number; comment?: string };
 export type FeedbackRow = { parentId: string | null; name: string | null; answers: FeedbackAnswers; createdAt: string };
 
 // Net Promoter Score: % who give 9–10 minus % who give 0–6.
@@ -14,4 +15,4 @@ export function nps(scores: number[]) {
 }
 
 export const countBy = (rows: FeedbackRow[], key: "intent" | "replace", options: readonly string[]) =>
-  options.map((o) => ({ what: o, n: rows.filter((r) => r.answers[key] === o).length }));
+  options.map((o) => ({ what: o, n: rows.filter((r) => [r.answers[key]].flat().includes(o)).length }));

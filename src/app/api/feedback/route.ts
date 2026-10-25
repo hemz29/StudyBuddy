@@ -7,7 +7,7 @@ import { INTENT, REPLACE } from "@/lib/feedback";
 const Body = z.object({
   intent: z.enum(INTENT),
   // Skipped by parents who answered "Probably not".
-  replace: z.enum(REPLACE).optional(),
+  replace: z.array(z.enum(REPLACE)).max(REPLACE.length).optional(),
   nps: z.number().int().min(0).max(10),
   comment: z.string().max(2000).optional(),
   name: z.string().max(60).optional(),
