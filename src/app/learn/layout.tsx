@@ -13,28 +13,22 @@ export default async function LearnLayout({ children }: { children: React.ReactN
   return (
     <div className="app-bg min-h-screen">
       <ActivityPing />
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 lg:flex-row lg:gap-6 lg:py-6">
-        <aside className="no-print flex flex-col gap-4 rounded-[var(--radius)] bg-white p-3 shadow-sm backdrop-blur-md lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:w-64 lg:shrink-0">
-          <div className="flex items-center justify-between lg:px-2 lg:pt-1">
-            <Logo />
-            <Link href="/profiles" className="flex items-center gap-2 rounded-full bg-white/80 py-1 pl-1 pr-3 text-sm font-bold lg:hidden">
-              <AvatarImage avatar={child.theme} size={32} /> {child.nickname}
+      {/* The same header as the home page: logo on the left, the menu across the top, the learner and account on the right. */}
+      <header className="no-print border-b border-line bg-bg/95 backdrop-blur lg:sticky lg:top-0 lg:z-30">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+          <Logo />
+          <div className="order-last w-full lg:order-none lg:w-auto lg:flex-1"><SideNav /></div>
+          <div className="ml-auto flex items-center gap-1">
+            <Link href="/profiles" title="Switch learner" className="flex items-center gap-2 rounded-full border border-line bg-white py-1 pl-1 pr-3 text-sm font-medium hover:border-black">
+              <AvatarImage avatar={child.theme} size={30} /> {child.nickname}
             </Link>
+            <Link href="/parent" title="Parent view" className="rounded-full px-3 py-2 text-sm font-medium text-muted hover:bg-white hover:text-ink"><LineIcon name="family" size={18} className="inline align-[-3px] sm:mr-1.5" /><span className="hidden sm:inline">Parent view</span></Link>
+            <SignOutButton isGuest={parent.isGuest} className="rounded-full px-3 py-2 text-sm font-medium text-muted hover:bg-white hover:text-ink" />
           </div>
-          <SideNav />
-          <div className="mt-auto hidden flex-col gap-2 lg:flex">
-            <Link href="/profiles" className="card flex items-center gap-3 p-3 transition hover:-translate-y-0.5">
-              <AvatarImage avatar={child.theme} size={48} />
-              <span className="flex flex-col">
-                <span className="font-extrabold">{child.nickname}</span>
-                <span className="text-xs text-muted">Switch learner</span>
-              </span>
-            </Link>
-            <Link href="/parent" className="rounded-2xl px-4 py-2 text-sm font-bold text-muted hover:bg-white/70 hover:text-ink"><LineIcon name="family" size={18} className="mr-1.5 inline align-[-3px]" />Parent view</Link>
-            <SignOutButton isGuest={parent.isGuest} className="w-full rounded-2xl px-4 py-2 text-left text-sm font-bold text-muted hover:bg-white/70 hover:text-ink" />
-          </div>
-        </aside>
-        <main className="min-w-0 flex-1 pb-16">
+        </div>
+      </header>
+      <div className="mx-auto max-w-6xl px-4 py-6">
+        <main className="min-w-0 pb-16">
           {isDemo && <p className="no-print mb-3 text-xs text-muted">Demo mode – progress is saved on this computer only.</p>}
           {parent.isGuest && <div className="mb-4"><SaveProgressStrip name={child.nickname} /></div>}
           {children}

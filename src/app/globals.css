@@ -97,8 +97,8 @@ h2,
 
 /* The watercolour background behind the child's pages. */
 .app-bg {
-  /* The floral artwork, faded right back so it is only a hint behind the white cards. */
-  background: linear-gradient(rgb(251 247 240 / 0.86), rgb(251 247 240 / 0.86)), var(--bg) url("/art/app-background.webp") center / cover fixed no-repeat;
+  /* Plain warm background, as on the home page. */
+  background: var(--bg);
 }
 
 /* Tappable Kannada word with a meaning on hover (desktop) or tap (touch). */

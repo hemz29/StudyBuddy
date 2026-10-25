@@ -20,18 +20,19 @@ export default async function LearnHome() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="card flex items-center gap-3 px-4 py-3">
-        <AvatarImage avatar={child.theme} size={44} className="shrink-0" />
+      {/* Black and yellow, like the home page's hero. */}
+      <section className="flex items-center gap-4 rounded-[var(--radius)] bg-black px-5 py-4 text-white">
+        <AvatarImage avatar={child.theme} size={48} className="shrink-0 rounded-full bg-white" />
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl leading-tight">Hello, {child.nickname}</h1>
-          <p className="truncate text-sm text-muted">
+          <h1 className="text-2xl leading-tight font-extralight">Hello, <span className="text-[var(--brand-yellow)]">{child.nickname}</span></h1>
+          <p className="truncate text-sm text-gray-300">
             {open[0] ? `Continue: ${getWorksheet(open[0].worksheetId)?.title.en}` : done ? `${done} worksheet${done === 1 ? "" : "s"} finished. Keep going!` : "Small steps, big progress."}
           </p>
         </div>
         {open[0] ? (
-          <Link href={`/learn/session/${open[0].id}`} className="btn btn-primary shrink-0">Continue →</Link>
+          <Link href={`/learn/session/${open[0].id}`} className="flex min-h-12 shrink-0 items-center rounded-full bg-[var(--brand-yellow)] px-5 font-semibold text-black">Continue →</Link>
         ) : (
-          <span className="hidden rounded-full bg-accent-soft px-3 py-1 text-sm text-accent sm:block"><KnText text="ಕಲಿಯೋಣ!" /></span>
+          <span className="hidden rounded-full bg-[var(--brand-yellow)] px-3 py-1 text-sm text-black sm:block"><KnText text="ಕಲಿಯೋಣ!" /></span>
         )}
       </section>
 

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { markDependsOnCheck } from "@/lib/grading/grade";
 import { redirect } from "next/navigation";
@@ -67,12 +66,12 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
           ))}
         {isAdmin(parent.email) && <Link href="/admin" className="btn btn-ghost">Admin</Link>}
       </div>
-      <header className="card relative overflow-hidden bg-white">
-        <Image src="/art/parent.webp" alt="" fill priority sizes="1152px" className="object-cover object-left opacity-90" />
-        <div className="relative ml-auto flex min-h-56 max-w-md flex-col justify-center gap-2 p-6 sm:min-h-64">
-          <AvatarImage avatar={child.theme} size={64} />
-          <h1 className="text-3xl">{child.nickname}&apos;s progress</h1>
-          <p className="text-muted">Grade 6 Kannada (3rd language) · {MARKING.label}</p>
+      <header className="flex flex-wrap items-center gap-5 rounded-[var(--radius)] bg-black p-6 text-white sm:p-8">
+        <AvatarImage avatar={child.theme} size={72} className="shrink-0 rounded-full bg-white" />
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--brand-yellow)]">Parent view</p>
+          <h1 className="text-3xl font-extralight sm:text-4xl">{child.nickname}&apos;s progress <span className="text-[var(--brand-yellow)]">you can follow.</span></h1>
+          <p className="text-sm text-gray-300">{MARKING.label}</p>
         </div>
       </header>
 
