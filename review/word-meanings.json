@@ -12903,6 +12903,18 @@
   "say": "sankhyaapadagaLu"
  },
  {
+  "word": "ಕಲಿ",
+  "teacherGlossary": false,
+  "lesson": "App screens",
+  "exampleKn": "ಕಲಿ ಕನ್ನಡ",
+  "exampleEn": "learn Kannada",
+  "en": "learn",
+  "base": "ಕಲಿ",
+  "baseEn": "to learn",
+  "confidence": "high",
+  "say": "kali"
+ },
+ {
   "word": "ಕಲಿಯೋಣ",
   "teacherGlossary": false,
   "lesson": "App screens",
