@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Wordmark } from "@/components/shell/Logo";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -8,6 +9,7 @@ import { GoogleLogo } from "@/components/GoogleLogo";
 import { SendButton } from "./SendButton";
 import { HashError } from "./HashError";
 import { LineIcon } from "@/components/LineIcon";
+import { startFree } from "@/lib/server/startFree";
 
 export const dynamic = "force-dynamic";
 
@@ -94,7 +96,14 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
               </div>
             )}
           </div>
-          <p className="mt-4 text-center text-sm"><a href="/privacy" className="text-muted underline">Privacy</a></p>
+          {!sent && (
+            <form action={startFree} className="card mt-4 flex flex-col items-center gap-2 p-5 text-center">
+              <p className="font-medium">New here? Try it first</p>
+              <button className="min-h-12 w-full rounded-full bg-[var(--brand-yellow)] px-6 font-semibold text-black hover:brightness-95">Start free – no sign-up →</button>
+              <p className="text-xs text-muted">No email needed. Save your progress whenever you like.</p>
+            </form>
+          )}
+          <p className="mt-4 text-center text-sm"><Link href="/" className="text-muted underline">About Kali Kannada</Link> · <a href="/privacy" className="text-muted underline">Privacy</a></p>
         </div>
       </div>
     </main>

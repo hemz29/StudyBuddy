@@ -1,20 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getActiveChild, getParent, isDemo, supabaseServer } from "@/lib/server/context";
+import { getActiveChild, getParent } from "@/lib/server/context";
+import { startFree } from "@/lib/server/startFree";
 import { LogoMark } from "@/components/shell/Logo";
 
 export const dynamic = "force-dynamic";
-
-// "Start free": a guest account with no email, so a family can use everything straight away. Adding an email or
-// Google later (on /save) keeps the same account and all its progress.
-async function startFree() {
-  "use server";
-  if (isDemo) redirect("/profiles");
-  const { error } = await (await supabaseServer()).auth.signInAnonymously();
-  if (error) redirect(`/login?error=${encodeURIComponent("Starting without an account isn't available right now. Please sign in with your email instead.")}`);
-  redirect("/profiles");
-}
 
 const TRUST = [
   ["Being reviewed by a Kannada educator", "so content is accurate and natural", "M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4"],
