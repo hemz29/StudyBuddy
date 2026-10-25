@@ -1,105 +1,101 @@
-# Nudi (ನುಡಿ)
+# Kali Kannada (ಕಲಿ ಕನ್ನಡ)
 
-Enabling parents to help their children learn Kannada confidently.
+**Kannada, with confidence.** Grade 6 Kannada (3rd language) practice for children, with progress parents can follow even if they don't speak Kannada.
 
+A child reads a lesson, practises with quick grammar cards, writes worksheets **by hand**, and sends a phone photo. The app reads the handwriting, the child confirms what was read, and the answers are marked against the teacher's answer key.
 
-Grade 6 Kannada (3rd language) practice for the Friday pilot. A child reads a lesson, writes a worksheet **by hand**, and sends a phone photo. The app reads the handwriting, the child confirms what was read, and then the answers are marked. Parents can follow progress without knowing Kannada.
+Live: https://kali-kannada.vercel.app
 
-## What's in the pilot
+## Features
 
-- **Lessons:** Panchatantra, Nanna Desha Nanna Jana and Kugutide Pakshi, from the teacher's notes. Each is shown in Kannada with a pronunciation aid in English letters and the English meaning.
-- **Word meanings:** hovering over (or tapping) any Kannada word shows how to say it and what it means, labelled "From teacher's notes" or "AI-suggested" with a confidence level. See *Word meanings* below.
-- **Practice cards:** quick tap drills for opposites, plurals, gender, meanings, word-splitting and rhymes.
-- **Worksheets:** nine, in the school's Term 1 paper format (Section A and B, marks as "(1X3=3)", Nudi logo top right).
-  - **Practice tests 1–3:** 40 marks, 1 hour, Panchatantra + Nanna Desha Nanna Jana. Test 1 is the school's Term 1 paper (9 Oct 2026).
-  - **Chapter practice A and B** for each chapter: 25 marks, 40 minutes.
-  - All are PDFs in `public/worksheets/`. Older worksheets are kept (marked `retired`) so past attempts still open.
-- **Timer:** starts at "I'm ready". When time is up the child sees a gentle alert and can finish; the time taken (and any extra) is shown to parents.
-- **Hints:** Hint 1 is free and explains the word or points to the right line without giving the answer. Hint 2 shows choices; an answer written after Hint 2 gets half marks. Parents see which hint was used on each question.
-- **Phone upload:** the desktop shows a QR code. The phone page (`/snap/<token>`) takes a camera photo or a gallery photo, compresses it and sends it. Photos can also be uploaded from the computer.
-- **Handwriting check:**
-  - Answers the AI reads with confidence go straight to marking.
-  - For unsure words, the child sees their own writing next to what was read. They confirm it, or pick one of the AI's alternative readings.
-  - They can never type an answer.
-- **Marking:**
-  - Most question types are marked **in code** against the teacher's answer key, with spelling near-miss feedback.
-  - One-sentence and own-sentence answers are marked by Claude against the teacher's model answer, rubric point by rubric point. The marks themselves are always computed in code.
-  - If the AI fails, the answer waits for a reviewer. The app never invents a mark.
-- **Parent dashboard (`/parent`):**
-  - Latest score and questions answered.
-  - Share of answers written without help.
-  - Skills, with "not practised yet" shown separately from low scores.
-  - Score over time (first tries only).
-  - History and a recommendation, made only when there's enough evidence.
-  - A review page where any mark can be checked or changed.
-- **Look and avatars:** one watercolour design (artwork in `artwork/`, web versions in `public/art/`). The child picks an avatar: Cricket star, Astronaut, Gamer & coder, Footballer or Cat buddy.
-- **Admin page (`/admin`):** only for the owner's email (`ADMIN_EMAILS`). Families, children, every worksheet session with score, time and hints, and which pages parents opened.
+### For families
+- **Public home page (`/`):** what the app does, how it works, the founder's story, and **"Start free – no sign-up"**.
+- **Guest start:** a family can start with no email (a Supabase anonymous account) and use everything. A "Save your progress" prompt lets them add an email or Google later. They keep the same account and all progress.
+- **Sign-in:** email link or Google.
+- **Learn page:** tiles grouped by action:
+  - **Learn:** Read & Understand, Grammar, Letters (ಅಕ್ಷರ)
+  - **Practise:** Writing practice, Practice tests, Practise speaking (coming soon)
+  - **My progress:** My scores
+- **Lessons:** Panchatantra, Nanna Desha Nanna Jana and Kugutide Pakshi, in Kannada with English-letter pronunciation and English meaning. Tapping or hovering on any Kannada word shows how to say it and what it means.
+- **Grammar cards:** tap drills for opposites, plurals, gender, meanings, word-splitting and rhymes. Wrong choices look like the real answer, so it can't be guessed.
+- **Letters:** the Kannada alphabet, vowel signs, double letters and number names.
+- **Worksheets and tests:** in the school's Term 1 paper format (PDFs in `public/worksheets/`).
+  - Practice tests 1–3: 40 marks, 1 hour.
+  - Chapter practice A and B: 25 marks, 40 minutes.
+  - There's a timer, and two hints per question:
+    - Hint 1 is free.
+    - Hint 2 shows choices, with one try. A right pick gets half marks; a wrong pick gets none.
+- **Phone upload:** a QR code opens the phone camera page.
+- **Handwriting check:** for unsure words the child sees a close-up of their own writing and confirms or corrects what was read. They never type answers.
+- **Marking:** most questions are marked in code against the answer key. Sentence answers are marked by Claude against the teacher's model answer, and the marks are always computed in code. If the AI fails, the answer waits for a reviewer.
+- **My scores (`/learn/scores`):** the child's latest and best scores, skills and marked worksheets.
+- **Parent page (`/parent`):**
+  - latest score, skills and score over time
+  - history, and a recommended next practice
+  - a review page where any mark can be checked or changed
+- **Feedback survey (`/feedback`):** 30 seconds, no sign-in, with a feedback button on the parent page.
+  - Questions: will you use it for the next test, which prep steps it would replace (several allowed), 0–10 recommend, and an optional comment.
+  - `?n=Name` greets the parent by name.
+- **About us, Future plans, Privacy** pages.
 
-Marks follow `src/content/grade6/marking.json`: the school's Grade 6 Term 1 pattern, 1 mark per item. To change marks, edit that file and run `npm run worksheets` to rebuild the PDFs.
+### For the owner: admin page (`/admin`, only for `ADMIN_EMAILS`)
+- **Feedback:** replies, % who will use it for the next test, NPS, charts and comments.
+- **Usage tiles:**
+  - parents (with email vs guests) and children
+  - active parents, and repeat visitors
+  - average visit time
+  - worksheets printed, started and finished
+  - writing time, average score, hint use, and AI calls
+- **Charts:**
+  - registrations and weekly active parents
+  - worksheets per week
+  - sign-up-to-return funnel
+  - what families use
+  - most read lessons and most started worksheets
+  - devices, and busiest days and hours
+- **What each child is doing:** days active, time spent, lessons read, cards, worksheets and hints, with plain-language signals, e.g. "Not seen for 9 days" or "Struggling with Grammar".
+- **Tables:** families (guests shown as Guest 1, 2…) and every worksheet session.
 
-## Run it on your computer (demo mode)
+Page views, worksheet downloads and prints are recorded in `activity_events`.
+
+## Run it locally (demo mode)
 
 ```bash
 npm install
 npm run dev        # http://localhost:3000
 ```
 
-Without any settings, the app runs in **demo mode**:
-- There is no sign-in, and data is saved in `.data/` on this computer.
-- "Term practice 1" shows the real child's answers from the school worksheet when you upload any photo, so the full flow can be tried without an AI key.
+With no Supabase settings the app runs in **demo mode**: no sign-in, and data is saved in `.data/`. Set `ADMIN_EMAILS=demo@studybuddy.local` to open `/admin`.
 
-## Go live (for Friday)
+## Set up
 
-### 1. Supabase (database and sign-in)
-1. Create a project at supabase.com. The free tier is fine.
-2. In the **SQL editor**, run `supabase/migrations/0001_init.sql`, then `0002_timer_activity.sql`. These create the tables, the row-level security rules, the private `answer-pages` photo bucket, the timer column and the admin page's activity log.
-3. Under **Authentication → URL configuration**, set the Site URL to your Vercel URL and add `https://<your-app>/auth/callback` to the redirect URLs.
-4. Copy the project URL, the `anon` key and the `service_role` key from **Project settings → API**.
+### Supabase
+1. In the SQL editor, run `supabase/migrations/0001_init.sql`, `0002_timer_activity.sql` and `0003_feedback.sql` in that order.
+2. Under **Authentication → Sign In / Providers**, turn on Google, **Allow anonymous sign-ins** (for "Start free") and **Allow manual linking** (so guests can save with Google).
+3. Under **Authentication → URL Configuration**, set the Site URL to the live address and add `https://<your-app>/**` to the redirect URLs.
 
-### 2. Claude API key
-Create a key at console.anthropic.com and add some credit. The app uses `claude-opus-5-5`; override it with `ANTHROPIC_MODEL` if needed.
-
-Check handwriting accuracy first. This runs the three real school worksheet pages and prints the reading accuracy, misreads and token use:
-
-```bash
-ANTHROPIC_API_KEY=sk-ant-... npm run test:handwriting
-```
-
-### 3. Vercel
-Import the GitHub repo into Vercel and add these environment variables:
+### Vercel environment variables
 
 | Name | Value |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service_role key (server only; never shared) |
-| `ANTHROPIC_API_KEY` | Claude API key |
-| `NEXT_PUBLIC_SITE_URL` | `https://kali-kannada.vercel.app` (used in QR codes) |
-
-Reading a page takes about a minute. The upload routes allow up to 300 seconds, which needs a Vercel plan that supports it (Fluid compute is on by default).
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service_role key (server only) |
+| `ANTHROPIC_API_KEY` | Claude API key (model `claude-opus-5-5`; override with `ANTHROPIC_MODEL`) |
+| `NEXT_PUBLIC_SITE_URL` | `https://kali-kannada.vercel.app` (used in QR codes and sign-in links) |
+| `ADMIN_EMAILS` | Comma-separated emails that can open `/admin` |
 
 ## Tests
 
 ```bash
-npm test               # content, answer-key marking on the real school worksheet, grading rules, dashboard maths
-npm run test:rls       # migration and row-level security on a throwaway local Postgres (family A can't see family B)
-npm run test:e2e       # browser run-through of the child journey (needs the app running; BASE=http://localhost:3000)
-npm run test:handwriting
+npm test               # content, marking, hints, admin stats, NPS
+npm run test:rls       # row-level security on a throwaway local Postgres
+npm run test:e2e       # browser run-through of the child journey (BASE=http://localhost:3000)
+npm run test:handwriting   # reads the real school worksheet pages (needs ANTHROPIC_API_KEY)
 ```
 
 ## Content
 
-- **Lessons** live in `src/content/grade6/*.ts`. They were transcribed from the teacher's notes, which have English translations and answer keys.
-- **`reviewNote` fields** mark points for the Kannada reviewer to confirm:
-  - Panchatantra gender change "ಅಣ್ಣ – ತಂಗಿ": the usual pair is ಅಕ್ಕ. Both are accepted for now.
-  - "ಹಿರಿಯ – ಕಿರಿಯ" is in the notes' gender list but is an opposite, so it was left out.
-  - Split: "ವಿದ್ಯಾಭ್ಯಾಸ = ವಿದ್ಯ + ಅಭ್ಯಾಸ". ವಿದ್ಯಾ/ವಿದ್ಯೆ are also accepted.
-  - The fill-in-the-blank position for "ಹಸಿರೇ ನಮ್ಮ ಉಸಿರು".
-  - Divya's decision (Kugutide Pakshi Q6).
-- **What the child wrote** on the school worksheet, read by eye, is in `src/content/grade6/sampleAnswers.ts`. It is used for tests and demo mode.
-
-## Word meanings
-
-- Every word in the lessons has a meaning. The teacher's word list comes first; the rest were suggested by AI (written, then checked by a second independent pass; anything the two passes disagreed on is marked medium or low confidence).
-- `review/word-meanings.json` is the master list. `review/teacher-review.xlsx` is the sheet for the Kannada teacher: answer-key questions, marking rules, and word meanings (test words first).
-- When the teacher returns the sheet: `python3 scripts/word_meanings.py import <file.xlsx>`. Checked words then show as "From teacher's notes".
+- Lessons are in `src/content/grade6/*.ts`, transcribed from the teacher's notes and answer keys. Marks follow `src/content/grade6/marking.json`. After changing them, run `npm run worksheets` to rebuild the PDFs.
+- Word meanings: `review/word-meanings.json` is the master list. `review/teacher-review.xlsx` is the sheet for the Kannada educator. Import her answers with `python3 scripts/word_meanings.py import <file.xlsx>`.
+- `reviewNote` fields in the lessons mark points still waiting for the educator's confirmation.
