@@ -7,6 +7,8 @@ import { writingTime } from "@/lib/time";
 import { Logo } from "@/components/shell/Logo";
 import { activityMix, busyTimes, childSummaries, devices, funnel, median, repeatParents, visits, weekly } from "@/lib/adminStats";
 import { Bars, GrowthChart } from "@/components/admin/AdminCharts";
+import { loadFeedback } from "@/lib/server/feedback";
+import { INTENT, REPLACE, countBy, nps } from "@/lib/feedback";
 
 // "💻 75% · 📱 20% · tablet 5% (40 visits)" from the device noted on each visit.
 function deviceSplit(acts: { device: string | null }[]) {
@@ -23,7 +25,7 @@ const date = (iso?: string | null) => (iso ? new Date(iso).toLocaleString("en-IN
 export default async function Admin() {
   const me = await requireParent();
   if (!isAdmin(me.email)) notFound();
-  const d = await loadAdminData();
+  const [d, fb] = await Promise.all([loadAdminData(), loadFeedback()]);
 
   const familyOf = new Map(d.families.map((f) => [f.parentId, f]));
   const childOf = new Map(d.children.map((c) => [c.id, c]));
@@ -52,6 +54,8 @@ export default async function Admin() {
     if (id) m[id] = (m[id] ?? 0) + 1;
     return m;
   }, {})).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([id, n]) => ({ what: getLesson(id)?.title.en ?? id, n }));
+  const score = nps(fb.rows.map((r) => r.answers.nps));
+  const willUse = fb.rows.filter((r) => r.answers.intent === "Definitely" || r.answers.intent === "Probably").length;
   const weeks = weekly(d.families, d.children, d.sessions, vs);
   const busy = busyTimes(vs);
   const top = Object.entries(worksheets.reduce<Record<string, number>>((m, s) => ((m[s.worksheetId] = (m[s.worksheetId] ?? 0) + 1), m), {}))
@@ -62,6 +66,39 @@ export default async function Admin() {
       <main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
         <Logo href="/" />
         <h1 className="text-3xl">Pilot admin</h1>
+
+        <Card title="Feedback">
+          {fb.missing ? (
+            <p className="mt-2 rounded-2xl bg-warn-soft p-4 text-warn">Answers can&apos;t be saved yet: run <code>supabase/migrations/0003_feedback.sql</code> in the Supabase SQL Editor.</p>
+          ) : !fb.rows.length ? (
+            <p className="mt-2 text-muted">No answers yet. Share <b>/feedback?n=Name</b> with parents.</p>
+          ) : (
+            <div className="mt-3 flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <Stat label="Replies" value={fb.rows.length} />
+                <Stat label="Will use it for the next test" value={`${Math.round((willUse / fb.rows.length) * 100)}%`} note={`${willUse} said definitely or probably`} />
+                <Stat label="NPS" value={score ?? "–"} note="% 9–10 minus % 0–6" />
+                <Stat label="Average recommend" value={(fb.rows.reduce((t, r) => t + r.answers.nps, 0) / fb.rows.length).toFixed(1)} note="out of 10" />
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <Bars title="Will you use it for your next Kannada test?" data={countBy(fb.rows, "intent", INTENT)} x="what" bars={[{ key: "n", name: "Parents" }]} horizontal />
+                <Bars title="What should it take off your plate?" data={countBy(fb.rows, "replace", REPLACE)} x="what" bars={[{ key: "n", name: "Parents" }]} horizontal />
+              </div>
+              <Table head={["When", "Who", "Next test", "Take off my plate", "Recommend", "Comment"]}>
+                {fb.rows.map((r, i) => (
+                  <tr key={i} className="border-t border-line align-top">
+                    <td className="py-2">{date(r.createdAt)}</td>
+                    <td>{r.name || (r.parentId ? label(familyOf.get(r.parentId)) : "Anonymous")}</td>
+                    <td>{r.answers.intent}</td>
+                    <td>{r.answers.replace}</td>
+                    <td>{r.answers.nps}</td>
+                    <td className="min-w-64">{r.answers.comment ?? "–"}</td>
+                  </tr>
+                ))}
+              </Table>
+            </div>
+          )}
+        </Card>
 
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
           <Stat label="Parents registered" value={d.families.length} note={`${d.families.length - guests} with email · ${guests} guests (no email yet)`} />
