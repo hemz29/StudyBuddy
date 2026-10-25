@@ -8,6 +8,14 @@ export const metadata = { title: "About us · Kali Kannada" };
 
 const EMAIL = "hemlata.v.29@gmail.com";
 
+// What a parent can do from here, as equal buttons.
+const ACTIONS: [string, IconName, string][] = [
+  [`mailto:${EMAIL}`, "mail", "Email us"],
+  ["/feedback", "chat", "Give feedback"],
+  ["/learn/future", "layers", "Future plans"],
+  ["/privacy", "lock", "Privacy"],
+];
+
 const STEPS: [IconName, string, string][] = [
   ["book", "Read and practise", "Syllabus lessons, every word's sound and meaning a tap away."],
   ["pen", "Write by hand", "Worksheets in the school's paper format, written on paper."],
@@ -67,14 +75,12 @@ export default function About() {
         <section id="contact" className="card flex scroll-mt-6 flex-col gap-2 p-4 sm:p-5">
           <h2 className="text-base font-bold">Contact us</h2>
           <p className="text-sm text-muted">Feedback, a mark you think is wrong (worksheet and question number), or deleting your account.</p>
-          <div className="flex flex-wrap items-center gap-3">
-            <a href={`mailto:${EMAIL}`} className="btn btn-primary">Email us</a>
-            <span className="select-all text-sm font-semibold">{EMAIL}</span>
-          </div>
-          <div className="flex gap-4 text-sm">
-            <Link href="/feedback" className="font-bold underline">Give feedback</Link>
-            <Link href="/learn/future" className="font-bold underline">Future plans</Link>
-            <Link href="/privacy" className="font-bold underline">Privacy</Link>
+          <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {ACTIONS.map(([href, icon, label]) => (
+              <Link key={label} href={href} className="flex items-center gap-2 rounded-2xl border border-line bg-white px-4 py-3 text-sm font-medium transition hover:border-black">
+                <LineIcon name={icon} size={20} /> {label}
+              </Link>
+            ))}
           </div>
         </section>
       </div>

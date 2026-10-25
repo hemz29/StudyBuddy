@@ -1,5 +1,6 @@
 // Simple one-colour line icons (they take the text colour), to match the site's thin Montserrat look.
 const PATHS = {
+  lock: "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4",
   chat: "M4 5h16v11H9l-5 4zM8 9h8M8 12h5",
   book: "M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5",
   pen: "M4 20l4-1L19 8a2.1 2.1 0 0 0-3-3L5 16zM14 6l3 3",
