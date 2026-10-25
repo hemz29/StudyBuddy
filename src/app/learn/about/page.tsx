@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { LogoMark } from "@/components/shell/Logo";
 import Link from "next/link";
 import { KnText } from "@/components/Word";
@@ -41,7 +42,13 @@ export default function About() {
       </section>
 
       <section className="card flex flex-col gap-3 p-5 sm:p-7">
-        <h2 className="text-2xl">Why I built Kali Kannada</h2>
+        <div className="flex items-center gap-4">
+          <Image src="/brand/founder.webp" alt="Hemlata, founder of Kali Kannada" width={480} height={480} className="h-20 w-20 shrink-0 rounded-full object-cover" />
+          <div>
+            <h2 className="text-2xl">Why I built Kali Kannada</h2>
+            <p className="text-sm text-muted">Hemlata, founder</p>
+          </div>
+        </div>
         <div className="flex max-w-3xl flex-col gap-3 text-justify leading-relaxed [hyphens:auto]">
           <p>I&apos;m a working mum of two wonderful kids. Like many parents across Karnataka, I&apos;ve seen how essential Kannada becomes as part of their school journey.</p>
           <p>But here&apos;s the truth: I don&apos;t know Kannada well enough to confidently guide them myself.</p>
