@@ -2,7 +2,7 @@ import type { Child, PracticeSession } from "@/lib/store/types";
 
 // Numbers for the admin page's charts, worked out from what's already stored. Pure, so they can be tested.
 
-type Event = { parentId: string; kind: string; createdAt: string; device: string | null; path?: string | null };
+type Event = { parentId: string; kind: string; createdAt: string; device: string | null; path?: string | null; childId?: string | null };
 type Family = { parentId: string; joinedAt: string | null };
 
 const MIN = 60_000;
@@ -138,3 +138,82 @@ export const median = (xs: number[]) => {
   const m = Math.floor(s.length / 2);
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
+
+type Attempt = { sessionId: string; skill: string; awarded: number | null; max: number; helpLevel: number | null };
+
+export type ChildSummary = {
+  childId: string;
+  parentId: string;
+  nickname: string;
+  days: number;
+  visits: number;
+  minutes: number;
+  lastSeen: number | null;
+  lessons: string[];
+  cardSets: number;
+  cardPct: number | null;
+  started: number;
+  finished: number;
+  worksheetPct: number | null;
+  hintPct: number | null;
+  weakest: { skill: string; pct: number } | null;
+  signals: string[];
+};
+
+const pctOf = (xs: { awarded: number | null; max: number | null }[]) => {
+  const max = xs.reduce((t, x) => t + (x.max ?? 0), 0);
+  return max ? Math.round((xs.reduce((t, x) => t + (x.awarded ?? 0), 0) / max) * 100) : null;
+};
+
+// What each child actually does: how often they come, what they open, how they score, and plain-language signals
+// for the owner ("Reads lessons but hasn't tried a worksheet", "Not seen for 9 days").
+export function childSummaries(children: Child[], sessions: PracticeSession[], attempts: Attempt[], events: Event[], skillName: (s: string) => string, now = Date.now()): ChildSummary[] {
+  return children.map((c) => {
+    const ev = events.filter((e) => e.childId === c.id).map((e) => ({ ...e, parentId: c.id }));
+    const ss = sessions.filter((s) => s.childId === c.id);
+    const vs = visits(ev, ss.map((s) => ({ ...s, parentId: c.id })));
+    const times = [...ev.map((e) => Date.parse(e.createdAt)), ...ss.map((s) => Date.parse(s.startedAt))];
+    const lastSeen = times.length ? Math.max(...times) : null;
+    const lessons = [...new Set(ev.map((e) => e.path?.match(/^\/learn\/lesson\/([^/?#]+)/)?.[1]).filter((x): x is string => !!x))];
+    const cards = ss.filter((s) => s.kind === "cards");
+    const ws = ss.filter((s) => s.kind === "worksheet");
+    const done = ws.filter((s) => s.status === "graded");
+    const ids = new Set(ss.map((s) => s.id));
+    const mine = attempts.filter((a) => ids.has(a.sessionId) && a.awarded !== null);
+    const written = attempts.filter((a) => done.some((s) => s.id === a.sessionId));
+    const bySkill = [...new Set(mine.map((a) => a.skill))]
+      .map((skill) => ({ skill, n: mine.filter((a) => a.skill === skill).length, pct: pctOf(mine.filter((a) => a.skill === skill))! }))
+      .filter((x) => x.n >= 3)
+      .sort((a, b) => a.pct - b.pct);
+    const weakest = bySkill[0] && bySkill[0].pct < 70 ? { skill: skillName(bySkill[0].skill), pct: bySkill[0].pct } : null;
+
+    const signals: string[] = [];
+    const idle = lastSeen === null ? null : Math.floor((now - lastSeen) / DAY);
+    if (lastSeen === null) signals.push("Added but never practised");
+    else if (idle! >= 7) signals.push(`Not seen for ${idle} days`);
+    if (lessons.length && !ws.length) signals.push("Reads lessons but hasn't tried a worksheet");
+    if (ws.length > done.length) signals.push(`${ws.length - done.length} worksheet${ws.length - done.length > 1 ? "s" : ""} started, not finished`);
+    if (cards.length && !lessons.length && !ws.length) signals.push("Only does grammar cards");
+    if (weakest) signals.push(`Struggling with ${weakest.skill} (${weakest.pct}%)`);
+    if (new Set(times.map((t) => istDay(new Date(t).toISOString()))).size >= 3) signals.push("Regular: practised on 3+ days");
+
+    return {
+      childId: c.id,
+      parentId: c.parentId,
+      nickname: c.nickname,
+      days: new Set(times.map((t) => istDay(new Date(t).toISOString()))).size,
+      visits: vs.length,
+      minutes: vs.reduce((t, v) => t + v.minutes, 0),
+      lastSeen,
+      lessons,
+      cardSets: cards.length,
+      cardPct: pctOf(cards),
+      started: ws.length,
+      finished: done.length,
+      worksheetPct: pctOf(done),
+      hintPct: written.length ? Math.round((written.filter((a) => (a.helpLevel ?? 0) >= 1).length / written.length) * 100) : null,
+      weakest,
+      signals,
+    };
+  });
+}

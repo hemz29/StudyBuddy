@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { funnel, repeatParents, visits, weekly } from "@/lib/adminStats";
+import { childSummaries, funnel, repeatParents, visits, weekly } from "@/lib/adminStats";
 import type { Child, PracticeSession } from "@/lib/store/types";
 
 const ev = (parentId: string, createdAt: string) => ({ parentId, kind: "page_view", createdAt, device: "phone" });
@@ -26,5 +26,15 @@ describe("admin stats", () => {
     const sessions = [{ parentId: "a", kind: "worksheet", status: "writing", startedAt: "2026-10-21T10:00:00Z", completedAt: null }] as PracticeSession[];
     const rows = weekly([], [], sessions, [], 2, Date.parse("2026-10-24T10:00:00Z"));
     expect(rows.map((r) => r.started)).toEqual([0, 1]);
+  });
+});
+
+describe("child summaries", () => {
+  it("flags a child who reads but hasn't tried a worksheet", () => {
+    const children = [{ id: "c", parentId: "a", nickname: "H", theme: "x", createdAt: "2026-10-01T10:00:00Z" }] as Child[];
+    const events = [{ parentId: "a", childId: "c", kind: "lesson_view", path: "/learn/lesson/l1", createdAt: "2026-10-20T10:00:00Z", device: null }];
+    const [s] = childSummaries(children, [], [], events, (x) => x, Date.parse("2026-10-21T10:00:00Z"));
+    expect(s.lessons).toEqual(["l1"]);
+    expect(s.signals).toContain("Reads lessons but hasn't tried a worksheet");
   });
 });

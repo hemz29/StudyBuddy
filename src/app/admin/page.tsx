@@ -1,23 +1,12 @@
 import { notFound } from "next/navigation";
-import { getWorksheet } from "@/content";
+import { getLesson, getWorksheet } from "@/content";
+import { SKILLS, type Skill } from "@/content/schema";
 import { requireParent } from "@/lib/server/context";
 import { isAdmin, loadAdminData, type Family } from "@/lib/server/admin";
 import { writingTime } from "@/lib/time";
 import { Logo } from "@/components/shell/Logo";
-import { activityMix, busyTimes, devices, funnel, median, repeatParents, visits, weekly } from "@/lib/adminStats";
+import { activityMix, busyTimes, childSummaries, devices, funnel, median, repeatParents, visits, weekly } from "@/lib/adminStats";
 import { Bars, GrowthChart } from "@/components/admin/AdminCharts";
-
-const ACTIVITY: Record<string, string> = {
-  parent_dashboard: "Opened the parent dashboard",
-  parent_session_review: "Reviewed a worksheet's answers",
-  lesson_view: "Child opened a lesson",
-  worksheet_start: "Started a worksheet",
-  cards_done: "Finished a set of practice cards",
-  photo_upload: "Sent an answer photo",
-  page_view: "Opened a page",
-  worksheet_print: "Printed a worksheet",
-  worksheet_download: "Downloaded a worksheet PDF",
-};
 
 // "💻 75% · 📱 20% · tablet 5% (40 visits)" from the device noted on each visit.
 function deviceSplit(acts: { device: string | null }[]) {
@@ -57,6 +46,12 @@ export default async function Admin() {
   const medTime = median(times);
   const avgScore = finished.length ? Math.round(finished.reduce((t, s) => t + (s.awarded ?? 0) / (s.max || 1), 0) / finished.length * 100) : null;
   const hinted = d.attempts.filter((a) => (a.helpLevel ?? 0) >= 1).length;
+  const kids = childSummaries(d.children, d.sessions, d.attempts, d.activity, (k) => SKILLS[k as Skill]?.en ?? k).sort((a, b) => (b.lastSeen ?? 0) - (a.lastSeen ?? 0));
+  const lessonViews = Object.entries(d.activity.reduce<Record<string, number>>((m, a) => {
+    const id = a.path?.match(/^\/learn\/lesson\/([^/?#]+)/)?.[1];
+    if (id) m[id] = (m[id] ?? 0) + 1;
+    return m;
+  }, {})).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([id, n]) => ({ what: getLesson(id)?.title.en ?? id, n }));
   const weeks = weekly(d.families, d.children, d.sessions, vs);
   const busy = busyTimes(vs);
   const top = Object.entries(worksheets.reduce<Record<string, number>>((m, s) => ((m[s.worksheetId] = (m[s.worksheetId] ?? 0) + 1), m), {}))
@@ -89,6 +84,7 @@ export default async function Admin() {
           <Bars title="Worksheets per week" data={weeks} x="week" bars={[{ key: "started", name: "Started" }, { key: "finished", name: "Finished" }]} />
           <Bars title="From sign-up to coming back" note="Parents at each step" data={funnel(d.families, d.children, d.sessions, repeat)} x="step" bars={[{ key: "n", name: "Parents" }]} horizontal />
           <Bars title="What families use" data={activityMix(d.activity, d.sessions)} x="what" bars={[{ key: "n", name: "Times" }]} horizontal />
+          <Bars title="Most read lessons" note="Times a lesson was opened" data={lessonViews} x="what" bars={[{ key: "n", name: "Opened" }]} horizontal />
           <Bars title="Most started worksheets" data={top} x="what" bars={[{ key: "n", name: "Started" }]} horizontal />
           <Bars title="Devices" note="Every recorded visit or action" data={devices(d.activity)} x="device" bars={[{ key: "n", name: "Events" }]} />
           <Bars title="Busiest days" note="Visits, India time" data={busy.days} x="day" bars={[{ key: "visits", name: "Visits" }]} />
@@ -101,6 +97,30 @@ export default async function Admin() {
             Page views aren&apos;t being recorded yet: run <code>supabase/migrations/0002_timer_activity.sql</code> in the Supabase SQL Editor.
           </p>
         )}
+
+        <Card title="What each child is doing">
+          <p className="mt-1 text-sm text-muted">One row per child, most recently active first. Signals point out who needs a nudge and where children get stuck.</p>
+          <Table head={["Child", "Family", "Days active", "Time spent", "Last seen", "Lessons read", "Grammar cards", "Worksheets", "Hints", "Signals"]}>
+            {kids.map((k) => (
+              <tr key={k.childId} className="border-t border-line align-top">
+                <td className="py-2 font-bold">{k.nickname}</td>
+                <td>{label(familyOf.get(k.parentId))}</td>
+                <td>{k.days} <span className="text-muted">({k.visits} visits)</span></td>
+                <td>{k.minutes ? `${k.minutes} min` : "–"}</td>
+                <td>{k.lastSeen ? date(new Date(k.lastSeen).toISOString()) : "Never"}</td>
+                <td>{k.lessons.length ? k.lessons.map((l) => getLesson(l)?.title.en ?? l).join(", ") : "–"}</td>
+                <td>{k.cardSets ? `${k.cardSets} sets · ${k.cardPct}%` : "–"}</td>
+                <td>{k.started ? `${k.finished} of ${k.started} finished${k.worksheetPct !== null ? ` · ${k.worksheetPct}%` : ""}` : "–"}</td>
+                <td>{k.hintPct === null ? "–" : `${k.hintPct}% of answers`}</td>
+                <td className="min-w-56">
+                  {k.signals.length ? (
+                    <ul className="flex flex-col gap-1">{k.signals.map((x) => <li key={x} className="rounded-lg bg-accent-soft px-2 py-1 text-xs">{x}</li>)}</ul>
+                  ) : <span className="text-muted">On track</span>}
+                </td>
+              </tr>
+            ))}
+          </Table>
+        </Card>
 
         <Card title="Families">
           <Table head={["Parent email", "Joined", "Last sign-in", "Children", "Worksheets (finished)", "Dashboard views", "Device use", "Last activity"]}>
@@ -146,18 +166,6 @@ export default async function Admin() {
           </Table>
         </Card>
 
-        <Card title="What parents and children opened (latest 100)">
-          <Table head={["When", "Family", "Child", "What"]}>
-            {[...d.activity].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 100).map((a, i) => (
-              <tr key={i} className="border-t border-line">
-                <td className="py-2">{date(a.createdAt)}</td>
-                <td>{label(familyOf.get(a.parentId))}</td>
-                <td>{(a.childId && childOf.get(a.childId)?.nickname) || "–"}</td>
-                <td>{ACTIVITY[a.kind] ?? a.kind} {a.path && <span className="text-muted">· {a.path}</span>}</td>
-              </tr>
-            ))}
-          </Table>
-        </Card>
       </main>
     </div>
   );

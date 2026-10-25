@@ -15,7 +15,7 @@ export type AdminData = {
   families: Family[];
   children: Child[];
   sessions: PracticeSession[];
-  attempts: Pick<QuestionAttempt, "sessionId" | "helpLevel" | "status" | "awarded" | "max" | "method">[];
+  attempts: Pick<QuestionAttempt, "sessionId" | "skill" | "helpLevel" | "status" | "awarded" | "max" | "method">[];
   activity: Activity[];
   aiCalls: { parentId: string; ok: boolean; inputTokens: number; outputTokens: number }[];
   activityMissing: boolean;
@@ -45,7 +45,7 @@ export async function loadAdminData(): Promise<AdminData> {
     db.auth.admin.listUsers({ perPage: 1000 }),
     all("children"),
     all("practice_sessions"),
-    all("question_attempts", "session_id, help_level, status, awarded, max, method"),
+    all("question_attempts", "session_id, skill, help_level, status, awarded, max, method"),
     all("activity_events", "parent_id, child_id, kind, path, created_at, detail"),
     all("ai_usage_events", "parent_id, ok, input_tokens, output_tokens"),
   ]);
