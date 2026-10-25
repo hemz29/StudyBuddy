@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { LogoMark } from "@/components/shell/Logo";
 import { INTENT, REPLACE } from "@/lib/feedback";
 
@@ -32,7 +33,7 @@ export function FeedbackSurvey({ name }: { name?: string }) {
   return (
     <div className="card flex w-full max-w-md flex-col gap-5 p-6 sm:p-8">
       <div className="flex items-center gap-3">
-        <LogoMark size={36} />
+        <Link href="/" aria-label="Back to Kali Kannada"><LogoMark size={36} /></Link>
         {step < 4 && (
           <div className="flex flex-1 gap-1.5" aria-label={`Question ${step + 1} of 4`}>
             {[0, 1, 2, 3].map((i) => <span key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-black" : "bg-line"}`} />)}
@@ -81,12 +82,14 @@ export function FeedbackSurvey({ name }: { name?: string }) {
         </>
       )}
 
+      {step === 0 && <Link href="/" className="self-start text-sm text-muted underline">← Back to Kali Kannada</Link>}
       {step > 0 && step < 4 && <button onClick={() => setStep(step === 2 && intent === "Probably not" ? 0 : step - 1)} className="self-start text-sm text-muted underline">← Back</button>}
 
       {step === 4 && (
         <>
           <h1 className="text-2xl">Thank you{name ? `, ${name}` : ""}!</h1>
           <p className="text-muted">Your answers have been sent.</p>
+          <Link href="/" className="btn btn-primary">Back to Kali Kannada</Link>
         </>
       )}
     </div>
