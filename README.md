@@ -42,7 +42,7 @@ Live: https://kali-kannada.vercel.app
   - Questions: will you use it for the next test, which prep steps it would replace (several allowed), 0–10 recommend, and an optional comment.
   - `?n=Name` greets the parent by name.
 - **About us:** Hema's story, and four contact buttons: Email us, Give feedback, Future plans, Privacy.
-- **Future plans:** roadmap ideas (more chapters and Grades 1 to 8, learning as a game, meanings in other languages, listen and speak, teacher view, phone app, more languages). "Tell us" opens an email.
+- **Future plans:** roadmap ideas (more chapters and Grades 1 to 8, learning as a game, meanings in other languages, a chat for doubts grounded in the lessons and answer key, listen and speak, teacher view, phone app, more languages). "Tell us" opens an email.
 - **Privacy** page.
 
 ### For the owner: admin page (`/admin`, only for `ADMIN_EMAILS`)

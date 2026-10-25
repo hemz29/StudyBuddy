@@ -6,6 +6,7 @@ const IDEAS: [IconName, string, string][] = [
   ["layers", "Every chapter, more grades", "All Grade 6 chapters first, then Grades 1 to 8."],
   ["star", "Learning as a game", "Streaks, badges and friendly challenges for daily practice."],
   ["translate", "Meanings in your language", "Help in Telugu, Tamil, Hindi and more, not only English."],
+  ["chat", "Ask a doubt, in your own words", "A chat that answers questions using only the lessons, the answer key and your child's own work."],
   ["sound", "Listen and speak", "Hear every word read aloud, and practise saying it."],
   ["class", "Teacher view", "Teachers set worksheets and follow a whole class."],
   ["phone", "Phone app", "Kali Kannada on Android, with gentle practice reminders."],
