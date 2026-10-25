@@ -156,6 +156,11 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         )}
       </section>
 
+      <Link href="/feedback" className="card flex items-center gap-3 p-4 transition hover:-translate-y-0.5">
+        <span className="flex-1"><b className="font-semibold">How is Kali Kannada working for you?</b> <span className="text-muted">Give feedback in 30 seconds.</span></span>
+        <span aria-hidden>→</span>
+      </Link>
+
       <section className="card bg-white p-5 text-sm text-muted">
         <h2 className="text-base font-bold text-ink">Your data</h2>
         <p className="mt-1">We store {child.nickname}&apos;s nickname, answers, marks and the answer photos (so you can check the marking). Photos are only visible to you. AI is used to read handwriting and mark sentence answers; we log how much it costs, not what was written.</p>

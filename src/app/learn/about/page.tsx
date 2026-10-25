@@ -65,6 +65,7 @@ export default function About() {
             <span className="select-all text-sm font-semibold">{EMAIL}</span>
           </div>
           <div className="flex gap-4 text-sm">
+            <Link href="/feedback" className="font-bold underline">Give feedback</Link>
             <Link href="/learn/future" className="font-bold underline">Future plans</Link>
             <Link href="/privacy" className="font-bold underline">Privacy</Link>
           </div>
