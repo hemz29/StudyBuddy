@@ -1,6 +1,6 @@
 # Kali Kannada (ಕಲಿ ಕನ್ನಡ)
 
-**Kannada, with confidence.** Grade 6 Kannada (3rd language) practice for children, with progress parents can follow even if they don't speak Kannada.
+**Kannada, with confidence.** Kannada practice aligned to the ICSE syllabus in Karnataka schools (Grade 6 content today), with progress parents can follow even if they don't speak Kannada. Currently in beta.
 
 A child reads a lesson, practises with quick grammar cards, writes worksheets **by hand**, and sends a phone photo. The app reads the handwriting, the child confirms what was read, and the answers are marked against the teacher's answer key.
 
@@ -9,9 +9,14 @@ Live: https://kali-kannada.vercel.app
 ## Features
 
 ### For families
-- **Public home page (`/`):** what the app does, how it works, the founder's story, and **"Start free – no sign-up"**.
+- **One home page (`/`) for every visitor.** It shows what the app does, how it works, and Hema's story with her portrait. There are three ways in:
+  - **Start free – no sign-up** (try without an account)
+  - **Create a free account**
+  - **Sign in**
+
+  Creating an account and signing in open the same small card with Google and an email link. `/login` forwards here.
 - **Guest start:** a family can start with no email (a Supabase anonymous account) and use everything. A "Save your progress" prompt lets them add an email or Google later. They keep the same account and all progress.
-- **Sign-in:** email link or Google.
+- **Sign out:** from the menu, the parent page and the learner picker. Guests are asked to save their progress first.
 - **Learn page:** tiles grouped by action:
   - **Learn:** Read & Understand, Grammar, Letters (ಅಕ್ಷರ)
   - **Practise:** Writing practice, Practice tests, Practise speaking (coming soon)
@@ -33,10 +38,12 @@ Live: https://kali-kannada.vercel.app
   - latest score, skills and score over time
   - history, and a recommended next practice
   - a review page where any mark can be checked or changed
-- **Feedback survey (`/feedback`):** 30 seconds, no sign-in, with a feedback button on the parent page.
+- **Feedback survey (`/feedback`):** 30 seconds, no sign-in. A "Give feedback" button and a floating feedback icon are on the parent page. It ends with a thank-you and a way back to the app.
   - Questions: will you use it for the next test, which prep steps it would replace (several allowed), 0–10 recommend, and an optional comment.
   - `?n=Name` greets the parent by name.
-- **About us, Future plans, Privacy** pages.
+- **About us:** Hema's story, and four contact buttons: Email us, Give feedback, Future plans, Privacy.
+- **Future plans:** roadmap ideas (more chapters and Grades 1 to 8, learning as a game, meanings in other languages, listen and speak, teacher view, phone app, more languages). "Tell us" opens an email.
+- **Privacy** page.
 
 ### For the owner: admin page (`/admin`, only for `ADMIN_EMAILS`)
 - **Feedback:** replies, % who will use it for the next test, NPS, charts and comments.
