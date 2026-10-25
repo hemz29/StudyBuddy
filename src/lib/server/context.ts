@@ -27,7 +27,7 @@ function checkSetup() {
     throw new Error(`Supabase isn't set up on Vercel. Missing environment variable(s): ${missing.join(", ")}. Add them in Vercel → Settings → Environment Variables, then redeploy.`);
 }
 
-const DEMO_PARENT = { id: "00000000-0000-4000-8000-000000000001", email: "demo@studybuddy.local" };
+const DEMO_PARENT = { id: "00000000-0000-4000-8000-000000000001", email: "demo@studybuddy.local", isGuest: false };
 
 export async function supabaseServer() {
   const jar = await cookies();
@@ -45,11 +45,12 @@ export async function supabaseServer() {
   });
 }
 
-export async function getParent(): Promise<{ id: string; email: string } | null> {
+// A guest started with "Start free": a real but anonymous Supabase user, until they add an email or Google.
+export async function getParent(): Promise<{ id: string; email: string; isGuest: boolean } | null> {
   checkSetup();
   if (isDemo) return DEMO_PARENT;
   const { data } = await (await supabaseServer()).auth.getUser();
-  return data.user ? { id: data.user.id, email: data.user.email ?? "" } : null;
+  return data.user ? { id: data.user.id, email: data.user.email ?? "", isGuest: Boolean(data.user.is_anonymous) } : null;
 }
 
 export async function requireParent() {

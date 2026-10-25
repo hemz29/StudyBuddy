@@ -9,9 +9,10 @@
   --ink: #000000;
   --muted: #3f3f3f;
   --line: #e6e6e6;
-  --accent: #5e8b76;
+  --accent: #000000;
+  --brand-yellow: #fbce1a;
   --accent-ink: #ffffff;
-  --accent-soft: #e6efe8;
+  --accent-soft: #fbf1cc;
   --peach: #f8e6d8;
   --peach-ink: #a85a2e;
   --lavender: #ece7f6;
@@ -96,7 +97,8 @@ h2,
 
 /* The watercolour background behind the child's pages. */
 .app-bg {
-  background: var(--bg) url("/art/app-background.webp") center / cover fixed no-repeat;
+  /* The floral artwork, faded right back so it is only a hint behind the white cards. */
+  background: linear-gradient(rgb(251 247 240 / 0.86), rgb(251 247 240 / 0.86)), var(--bg) url("/art/app-background.webp") center / cover fixed no-repeat;
 }
 
 /* Tappable Kannada word with a meaning on hover (desktop) or tap (touch). */

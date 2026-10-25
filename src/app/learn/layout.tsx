@@ -5,9 +5,10 @@ import { Logo } from "@/components/shell/Logo";
 import { SideNav } from "@/components/shell/SideNav";
 import { LineIcon } from "@/components/LineIcon";
 import { ActivityPing } from "@/components/ActivityPing";
+import { SaveProgressStrip } from "@/components/SaveProgressStrip";
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
-  const { child } = await requireChild();
+  const { parent, child } = await requireChild();
   return (
     <div className="app-bg min-h-screen">
       <ActivityPing />
@@ -33,6 +34,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
         </aside>
         <main className="min-w-0 flex-1 pb-16">
           {isDemo && <p className="no-print mb-3 text-xs text-muted">Demo mode – progress is saved on this computer only.</p>}
+          {parent.isGuest && <div className="mb-4"><SaveProgressStrip name={child.nickname} /></div>}
           {children}
         </main>
       </div>

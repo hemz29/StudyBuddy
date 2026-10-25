@@ -43,7 +43,10 @@ export default async function Admin() {
   const hint2 = d.attempts.filter((a) => (a.helpLevel ?? 0) >= 2).length;
   const review = d.attempts.filter((a) => a.status === "review").length;
   const tokens = d.aiCalls.reduce((t, a) => t + Number(a.inputTokens) + Number(a.outputTokens), 0);
-  const label = (f?: Family) => f?.email || "(unknown)";
+  // Guests have no email: they're numbered by when they started, "Guest 1", "Guest 2"...
+  const guestNo = new Map([...d.families].filter((f) => f.isGuest).sort((a, b) => (a.joinedAt ?? "").localeCompare(b.joinedAt ?? "")).map((f, i) => [f.parentId, i + 1]));
+  const label = (f?: Family) => (f ? f.email || (guestNo.has(f.parentId) ? `Guest ${guestNo.get(f.parentId)}` : "(unknown)") : "(unknown)");
+  const guests = d.families.filter((f) => f.isGuest).length;
 
   const vs = visits(d.activity, d.sessions);
   const repeat = repeatParents(d.activity, d.sessions);
@@ -66,7 +69,7 @@ export default async function Admin() {
         <h1 className="text-3xl">Pilot admin</h1>
 
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-          <Stat label="Parents registered" value={d.families.length} />
+          <Stat label="Parents registered" value={d.families.length} note={`${d.families.length - guests} with email · ${guests} guests (no email yet)`} />
           <Stat label="Children registered" value={d.children.length} />
           <Stat label="Active parents" value={new Set(vs.filter((v) => Date.now() - v.start < 7 * 864e5).map((v) => v.parentId)).size} note={`this week · ${active30} in 30 days`} />
           <Stat label="Came back another day" value={repeat} note={d.families.length ? `${Math.round((repeat / d.families.length) * 100)}% of parents` : undefined} />
@@ -108,7 +111,7 @@ export default async function Admin() {
               const last = [...ws.map((s) => s.startedAt), ...acts.map((a) => a.createdAt)].sort().at(-1);
               return (
                 <tr key={f.parentId} className="border-t border-line">
-                  <td className="py-2 font-bold">{f.email}</td>
+                  <td className="py-2 font-bold">{label(f)}{f.isGuest && <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium">guest</span>}</td>
                   <td>{date(f.joinedAt)}</td>
                   <td>{date(f.lastSignInAt)}</td>
                   <td>{kids.length ? kids.map((k) => k.nickname).join(", ") : <span className="text-warn">None yet</span>}</td>

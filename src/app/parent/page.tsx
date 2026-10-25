@@ -13,6 +13,7 @@ import { logActivity } from "@/lib/server/activity";
 import { isAdmin } from "@/lib/server/admin";
 import { writingTime } from "@/lib/time";
 import { ActivityPing } from "@/components/ActivityPing";
+import { SaveProgressStrip } from "@/components/SaveProgressStrip";
 
 async function deleteChild(formData: FormData) {
   "use server";
@@ -53,6 +54,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       <ActivityPing />
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6">
       {isDemo && <DemoBanner />}
+      {parent.isGuest && <SaveProgressStrip name={child.nickname} />}
       <div className="flex flex-wrap items-center gap-3">
         <span className="mr-auto"><Logo href="/" /></span>
         {children.length > 1 &&

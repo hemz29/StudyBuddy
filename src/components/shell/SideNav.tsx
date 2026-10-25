@@ -23,7 +23,7 @@ export function SideNav({ items = CHILD_NAV }: { items?: NavItem[] }) {
           key={i.href}
           href={i.href}
           className={`flex shrink-0 items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-bold transition ${
-            active(i) ? "bg-accent-soft text-ink" : "text-muted hover:bg-white/70 hover:text-ink"
+            active(i) ? "bg-black text-[var(--brand-yellow)]" : "text-muted hover:bg-white/70 hover:text-ink"
           }`}
         >
           <KnText text={i.label} mode="subtle" />

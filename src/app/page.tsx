@@ -1,9 +1,130 @@
+import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getActiveChild, getParent } from "@/lib/server/context";
+import { getActiveChild, getParent, isDemo, supabaseServer } from "@/lib/server/context";
+import { LogoMark } from "@/components/shell/Logo";
 
+export const dynamic = "force-dynamic";
+
+// "Start free": a guest account with no email, so a family can use everything straight away. Adding an email or
+// Google later (on /save) keeps the same account and all its progress.
+async function startFree() {
+  "use server";
+  if (isDemo) redirect("/profiles");
+  const { error } = await (await supabaseServer()).auth.signInAnonymously();
+  if (error) redirect(`/login?error=${encodeURIComponent("Starting without an account isn't available right now. Please sign in with your email instead.")}`);
+  redirect("/profiles");
+}
+
+const TRUST = [
+  ["Reviewed by Kannada educators", "so content is accurate and natural", "M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4"],
+  ["Follows the school syllabus", "chapters, grammar and paper format", "M4 5h16v12H4zM8 21h8M12 17v4"],
+  ["Private by design", "only a nickname, never sold or shared", "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4"],
+];
+
+const STEPS = [
+  ["Read and understand", "Every lesson from the textbook, with the sound and meaning of each Kannada word one tap away."],
+  ["Practise and write by hand", "Quick grammar cards, then worksheets and tests on paper, just like the school exam."],
+  ["Snap a photo, see the marks", "Answers are marked against the teacher's key, and you see progress by skill."],
+];
+
+function StartButton({ className = "" }: { className?: string }) {
+  return (
+    <form action={startFree}>
+      <button className={`min-h-14 rounded-full bg-[var(--brand-yellow)] px-7 text-base font-semibold text-black transition hover:brightness-95 ${className}`}>
+        Start free – no sign-up →
+      </button>
+    </form>
+  );
+}
+
+// The public home page. Signed-in families (guests included) go straight to their practice.
 export default async function Home() {
   const parent = await getParent();
-  if (!parent) redirect("/login");
-  const child = await getActiveChild(parent.id);
-  redirect(child ? "/learn" : "/profiles");
+  if (parent) {
+    const child = await getActiveChild(parent.id);
+    redirect(child ? "/learn" : "/profiles");
+  }
+
+  return (
+    <div className="min-h-screen bg-bg text-ink">
+      <header className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-4">
+        <LogoMark size={36} />
+        <span className="flex-1 text-lg font-medium">Kali Kannada</span>
+        <a href="#how" className="hidden px-3 py-2 text-sm sm:block">How it works</a>
+        <a href="#story" className="hidden px-3 py-2 text-sm sm:block">Our story</a>
+        <Link href="/login" className="btn btn-ghost">Sign in</Link>
+      </header>
+
+      <section className="bg-black text-white">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-10 px-4 py-14 sm:py-20">
+          <div className="flex min-w-0 flex-[999_1_460px] flex-col gap-5">
+            <p className="text-sm font-medium uppercase tracking-[0.16em] text-[var(--brand-yellow)]">Grade 6 Kannada · 3rd language</p>
+            <h1 className="text-4xl leading-tight font-extralight sm:text-5xl">
+              Kannada practice for your child, with progress <span className="text-[var(--brand-yellow)]">you can follow.</span>
+            </h1>
+            <p className="max-w-xl text-lg leading-relaxed text-gray-300">
+              Lessons with every word explained, worksheets in the school format, and handwritten answers marked from a photo. Even if you don&apos;t speak Kannada yourself.
+            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-3">
+              <StartButton />
+              <Link href="/login" className="flex min-h-14 items-center rounded-full border border-white/40 px-6 font-medium text-white hover:bg-white/10">I have an account</Link>
+            </div>
+            <p className="text-sm text-gray-400">Start in 10 seconds, no email needed · Free during the pilot · No ads</p>
+          </div>
+          <div className="flex flex-[1_1_300px] justify-center">
+            <Image src="/brand/kali-logo.webp" alt="Kali – Kannada, with confidence" width={700} height={642} priority className="w-full max-w-sm" />
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pt-7">
+        <div className="grid gap-3 sm:grid-cols-3">
+          {TRUST.map(([title, sub, d]) => (
+            <div key={title} className="card flex items-center gap-3 p-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0"><path d={d} /></svg>
+              <span className="text-sm leading-snug"><b className="font-semibold">{title}</b><br />{sub}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="how" className="mx-auto flex max-w-6xl scroll-mt-6 flex-col gap-5 px-4 pt-14">
+        <h2 className="text-3xl">How it works</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {STEPS.map(([title, text], i) => (
+            <div key={title} className="card flex flex-col gap-2 p-6">
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-black font-semibold text-[var(--brand-yellow)]">{i + 1}</span>
+              <h3 className="text-lg font-medium">{title}</h3>
+              <p className="text-sm leading-relaxed text-muted">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="story" className="mx-auto max-w-6xl scroll-mt-6 px-4 pt-14">
+        <div className="card flex flex-col gap-3 p-6 sm:p-10">
+          <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted">Why I built Kali Kannada</p>
+          <p className="text-xl leading-relaxed font-light sm:text-2xl">
+            &ldquo;I&apos;m a working mum of two, and I don&apos;t know Kannada well enough to guide my kids myself. I spent hours making worksheets and still
+            wondered: <b className="font-medium">am I teaching this right?</b> So I built the tool I needed.&rdquo;
+          </p>
+          <p className="text-sm">Hemlata, founder</p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-14">
+        <div className="flex flex-wrap items-center gap-6 rounded-[24px] bg-black p-8 text-white sm:p-10">
+          <div className="min-w-0 flex-[999_1_380px]">
+            <h2 className="text-3xl">See it for yourself. <span className="text-[var(--brand-yellow)]">No sign-up.</span></h2>
+            <p className="mt-2 text-gray-300">Add your child&apos;s nickname and start practising. Save your progress with your email whenever you like.</p>
+          </div>
+          <StartButton />
+        </div>
+        <p className="mt-7 text-center text-sm text-muted">
+          <Link href="/privacy" className="underline">Privacy</Link> · <a href="mailto:hemlata.v.29@gmail.com" className="underline">Contact</a> · Kali Kannada · Kannada, with confidence
+        </p>
+      </section>
+    </div>
+  );
 }

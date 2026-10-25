@@ -8,7 +8,7 @@ import { serviceClient } from "./context";
 const ADMINS = (process.env.ADMIN_EMAILS ?? "hemlata.v.29@gmail.com").split(",").map((e) => e.trim().toLowerCase());
 export const isAdmin = (email: string) => ADMINS.includes(email.toLowerCase());
 
-export type Family = { parentId: string; email: string; joinedAt: string | null; lastSignInAt: string | null };
+export type Family = { parentId: string; email: string; joinedAt: string | null; lastSignInAt: string | null; isGuest: boolean };
 export type Activity = { parentId: string; childId: string | null; kind: string; path: string | null; createdAt: string; device: string | null };
 const deviceIn = (detail: unknown) => ((detail as { device?: string } | null)?.device ?? null);
 export type AdminData = {
@@ -27,7 +27,7 @@ export async function loadAdminData(): Promise<AdminData> {
     const d = await localDump();
     const parents = [...new Set(d.children.map((c) => c.parentId))];
     return {
-      families: parents.map((p) => ({ parentId: p, email: "demo@studybuddy.local", joinedAt: null, lastSignInAt: null })),
+      families: parents.map((p) => ({ parentId: p, email: "demo@studybuddy.local", joinedAt: null, lastSignInAt: null, isGuest: false })),
       children: d.children,
       sessions: d.sessions,
       attempts: d.attempts,
@@ -50,7 +50,7 @@ export async function loadAdminData(): Promise<AdminData> {
     all("ai_usage_events", "parent_id, ok, input_tokens, output_tokens"),
   ]);
   return {
-    families: (users.data?.users ?? []).map((u) => ({ parentId: u.id, email: u.email ?? "", joinedAt: u.created_at ?? null, lastSignInAt: u.last_sign_in_at ?? null })),
+    families: (users.data?.users ?? []).map((u) => ({ parentId: u.id, email: u.email ?? "", joinedAt: u.created_at ?? null, lastSignInAt: u.last_sign_in_at ?? null, isGuest: Boolean(u.is_anonymous) })),
     children: children.rows as unknown as Child[],
     sessions: (sessions.rows as unknown as PracticeSession[]).map((s) => ({ ...s, awarded: s.awarded === null ? null : Number(s.awarded), max: s.max === null ? null : Number(s.max) })),
     attempts: (attempts.rows as unknown as AdminData["attempts"]).map((a) => ({ ...a, awarded: a.awarded === null ? null : Number(a.awarded), max: Number(a.max) })),
