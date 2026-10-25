@@ -23,7 +23,7 @@ export default function About() {
         <div>
           <h1 className="text-2xl">About Kali Kannada</h1>
           <p className="text-sm text-muted">
-            <KnText text="ಕಲಿ ಕನ್ನಡ" /> (kali Kannada) means &ldquo;learn Kannada&rdquo;. Grade 6 children practise Kannada on their own, and parents can see
+            <KnText text="ಕಲಿ ಕನ್ನಡ" /> (kali Kannada) means &ldquo;learn Kannada&rdquo;. Children practise Kannada on their own, aligned to the ICSE school syllabus in Karnataka, and parents can see
             they&apos;re ready for the exam, even without speaking Kannada themselves.
           </p>
         </div>

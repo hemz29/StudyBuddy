@@ -41,7 +41,7 @@ export default async function Home() {
     <div className="min-h-screen bg-bg text-ink">
       <header className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-4">
         <LogoMark size={36} />
-        <span className="flex-1 text-lg font-medium">Kali Kannada</span>
+        <span className="flex flex-1 items-center gap-2 text-lg font-medium">Kali Kannada <Beta /></span>
         <a href="#how" className="hidden px-3 py-2 text-sm sm:block">How it works</a>
         <a href="#story" className="hidden px-3 py-2 text-sm sm:block">Our story</a>
         <Link href="/login" className="btn btn-ghost">Sign in</Link>
@@ -50,7 +50,7 @@ export default async function Home() {
       <section className="bg-black text-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-10 px-4 py-14 sm:py-20">
           <div className="flex min-w-0 flex-[999_1_460px] flex-col gap-5">
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-[var(--brand-yellow)]">Grade 6 Kannada · 3rd language</p>
+            <p className="text-sm font-medium uppercase tracking-[0.16em] text-[var(--brand-yellow)]">Aligned to the ICSE Kannada syllabus · Karnataka schools</p>
             <h1 className="text-4xl leading-tight font-extralight sm:text-5xl">
               Kannada practice for your child, with progress <span className="text-[var(--brand-yellow)]">you can follow.</span>
             </h1>
@@ -61,7 +61,7 @@ export default async function Home() {
               <StartButton />
               <Link href="/login" className="flex min-h-14 items-center rounded-full border border-white/40 px-6 font-medium text-white hover:bg-white/10">I have an account</Link>
             </div>
-            <p className="text-sm text-gray-400">Start in 10 seconds, no email needed · Free during the pilot · No ads</p>
+            <p className="text-sm text-gray-400">Start in 10 seconds, no email needed · Free during the beta · No ads</p>
           </div>
           <div className="flex flex-[1_1_300px] justify-center">
             <Image src="/brand/kali-logo.webp" alt="Kali – Kannada, with confidence" width={700} height={642} priority className="w-full max-w-sm" />
@@ -121,4 +121,8 @@ export default async function Home() {
       </section>
     </div>
   );
+}
+
+function Beta() {
+  return <span className="rounded-full border border-black/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider">Beta</span>;
 }
