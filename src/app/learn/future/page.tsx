@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { LineIcon, type IconName } from "@/components/LineIcon";
 
 export const metadata = { title: "Future plans · Kali Kannada" };
@@ -35,7 +34,7 @@ export default function Future() {
       </section>
 
       <p className="text-sm">
-        What would help your child most? <Link href="/learn/about#contact" className="font-bold underline">Tell us</Link>
+        What would help your child most? <a href={`mailto:hemlata.v.29@gmail.com?subject=${encodeURIComponent("Idea for Kali Kannada")}`} className="font-bold underline">Tell us</a>
       </p>
     </div>
   );
