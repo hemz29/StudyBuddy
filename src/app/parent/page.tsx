@@ -13,6 +13,7 @@ import { logActivity } from "@/lib/server/activity";
 import { isAdmin } from "@/lib/server/admin";
 import { writingTime } from "@/lib/time";
 import { ActivityPing } from "@/components/ActivityPing";
+import { LineIcon } from "@/components/LineIcon";
 import { SaveProgressStrip } from "@/components/SaveProgressStrip";
 
 async function deleteChild(formData: FormData) {
@@ -57,6 +58,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       {parent.isGuest && <SaveProgressStrip name={child.nickname} />}
       <div className="flex flex-wrap items-center gap-3">
         <span className="mr-auto"><Logo href="/" /></span>
+        <Link href="/feedback" className="btn btn-ghost"><LineIcon name="chat" size={20} /> Give feedback</Link>
         {children.length > 1 &&
           children.map((c) => (
             <Link key={c.id} href={`/parent?child=${c.id}`} className={`chip h-9 px-4 ${c.id === child.id ? "bg-accent text-accent-ink" : "bg-white/80"}`}>{c.nickname}</Link>
@@ -170,6 +172,9 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         </form>
       </section>
     </main>
+      <Link href="/feedback" aria-label="Give feedback" title="Give feedback" className="fixed right-5 bottom-5 z-20 grid h-14 w-14 place-items-center rounded-full bg-black text-[var(--brand-yellow)] shadow-lg transition hover:scale-105">
+        <LineIcon name="chat" size={26} />
+      </Link>
     </div>
   );
 }
