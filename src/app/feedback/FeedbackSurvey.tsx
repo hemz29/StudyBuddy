@@ -24,7 +24,7 @@ export function FeedbackSurvey({ name }: { name?: string }) {
     const res = await fetch("/api/feedback", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ intent, replace, nps, comment: comment || undefined, name }),
+      body: JSON.stringify({ intent, replace: replace || undefined, nps, comment: comment || undefined, name }),
     }).catch(() => null);
     if (res?.ok) setStep(4);
     else setState("error");
@@ -51,13 +51,13 @@ export function FeedbackSurvey({ name }: { name?: string }) {
         <>
           <p className="text-sm text-muted">{name ? `Hi ${name}! ` : ""}3 taps, 30 seconds. Thank you for helping.</p>
           <h1 className="text-2xl">Will you use Kali Kannada for your child&apos;s next Kannada test?</h1>
-          <div className="flex flex-col gap-2">{INTENT.map((o) => choice(o, intent === o, () => { setIntent(o); setStep(1); }))}</div>
+          <div className="flex flex-col gap-2">{INTENT.map((o) => choice(o, intent === o, () => { setIntent(o); setReplace(""); setStep(o === "Probably not" ? 2 : 1); }))}</div>
         </>
       )}
 
       {step === 1 && (
         <>
-          <h1 className="text-2xl">Which part of Kannada prep would you most want it to take off your plate?</h1>
+          <h1 className="text-2xl">If yes, which part of your current Kannada preparation steps would this app replace?</h1>
           <div className="flex flex-col gap-2">{REPLACE.map((o) => choice(o, replace === o, () => { setReplace(o); setStep(2); }))}</div>
         </>
       )}
@@ -84,7 +84,7 @@ export function FeedbackSurvey({ name }: { name?: string }) {
         </>
       )}
 
-      {step > 0 && step < 4 && <button onClick={() => setStep(step - 1)} className="self-start text-sm text-muted underline">← Back</button>}
+      {step > 0 && step < 4 && <button onClick={() => setStep(step === 2 && intent === "Probably not" ? 0 : step - 1)} className="self-start text-sm text-muted underline">← Back</button>}
 
       {step === 4 && (
         <>

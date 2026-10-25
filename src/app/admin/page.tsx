@@ -82,15 +82,15 @@ export default async function Admin() {
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 <Bars title="Will you use it for your next Kannada test?" data={countBy(fb.rows, "intent", INTENT)} x="what" bars={[{ key: "n", name: "Parents" }]} horizontal />
-                <Bars title="What should it take off your plate?" data={countBy(fb.rows, "replace", REPLACE)} x="what" bars={[{ key: "n", name: "Parents" }]} horizontal />
+                <Bars title="Which prep step would it replace?" data={countBy(fb.rows, "replace", REPLACE)} x="what" bars={[{ key: "n", name: "Parents" }]} horizontal />
               </div>
-              <Table head={["When", "Who", "Next test", "Take off my plate", "Recommend", "Comment"]}>
+              <Table head={["When", "Who", "Next test", "Would replace", "Recommend", "Comment"]}>
                 {fb.rows.map((r, i) => (
                   <tr key={i} className="border-t border-line align-top">
                     <td className="py-2">{date(r.createdAt)}</td>
                     <td>{r.name || (r.parentId ? label(familyOf.get(r.parentId)) : "Anonymous")}</td>
                     <td>{r.answers.intent}</td>
-                    <td>{r.answers.replace}</td>
+                    <td>{r.answers.replace ?? "–"}</td>
                     <td>{r.answers.nps}</td>
                     <td className="min-w-64">{r.answers.comment ?? "–"}</td>
                   </tr>
