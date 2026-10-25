@@ -15,12 +15,12 @@ function friendly(message: string, email: string) {
   return { text: message, wait: 0 };
 }
 
-// The one place to sign in: Google or an email link. "Start free" sits beside it on the home page.
-export async function SignInCard({ sent, error, email = "" }: { sent?: string; error?: string; email?: string }) {
+// Google or an email link, for both creating an account and signing in (Supabase treats them the same).
+export async function SignInCard({ mode, sent, error, email = "" }: { mode: "signin" | "signup"; sent?: string; error?: string; email?: string }) {
   const problem = error ? friendly(error, email || "your email") : null;
   const google = await googleEnabled();
   return (
-    <div id="signin" className="card scroll-mt-6 p-6 text-ink">
+    <div className="card p-6 text-ink">
       {sent ? (
         <div className="flex flex-col gap-2">
           <LineIcon name="mail" size={40} />
@@ -28,11 +28,14 @@ export async function SignInCard({ sent, error, email = "" }: { sent?: string; e
           <p className="text-muted">
             We sent a sign-in link to {email ? <b className="text-ink">{email}</b> : "your email"}. Open it on this device to continue. It can take a minute to arrive; check spam too.
           </p>
-          <Link href="/#signin" className="mt-2 text-sm font-bold">Use a different email</Link>
+          <Link href={`/?mode=${mode}#signin`} className="mt-2 text-sm font-bold">Use a different email</Link>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          <h2 className="text-xl">Sign in or create an account</h2>
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-xl">{mode === "signup" ? "Create your free account" : "Welcome back"}</h2>
+            <Link href="/" className="text-sm text-muted underline">← Back</Link>
+          </div>
           <HashError />
           {google && (
             <>
@@ -43,11 +46,12 @@ export async function SignInCard({ sent, error, email = "" }: { sent?: string; e
             </>
           )}
           <form action={sendLink} className="flex flex-col gap-2">
+            <input type="hidden" name="mode" value={mode} />
             <label htmlFor="email" className="text-sm font-bold">Parent email</label>
             <input id="email" name="email" type="email" required defaultValue={email} autoComplete="email" className="h-12 rounded-xl border border-line bg-white px-4 text-lg" placeholder="you@example.com" />
             {problem && <p className={problem.wait ? "rounded-xl bg-accent-soft p-3 text-ink" : "text-bad"}>{problem.text}</p>}
             <SendButton waitSeconds={problem?.wait ?? 0} />
-            <p className="text-xs text-muted">No password needed. We only use your email to sign you in.</p>
+            <p className="text-xs text-muted">No password needed. We email you a link; we only use your email to sign you in.</p>
           </form>
         </div>
       )}

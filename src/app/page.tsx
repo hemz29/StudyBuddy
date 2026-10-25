@@ -31,13 +31,15 @@ function StartButton({ className = "" }: { className?: string }) {
 }
 
 // The public home page. Signed-in families (guests included) go straight to their practice.
-export default async function Home({ searchParams }: { searchParams: Promise<{ sent?: string; error?: string; email?: string }> }) {
+export default async function Home({ searchParams }: { searchParams: Promise<{ sent?: string; error?: string; email?: string; mode?: string }> }) {
   const parent = await getParent();
   if (parent) {
     const child = await getActiveChild(parent.id);
     redirect(child ? "/learn" : "/profiles");
   }
-  const { sent, error, email } = await searchParams;
+  const { sent, error, email, mode: m } = await searchParams;
+  // Three ways in: try without an account, create one, or sign in. The last two open the same Google / email card.
+  const mode = m === "signin" || m === "signup" ? m : sent || error ? "signin" : null;
 
   return (
     <div className="min-h-screen bg-bg text-ink">
@@ -46,10 +48,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         <span className="flex flex-1 items-center gap-2 text-lg font-medium">Kali Kannada <Beta /></span>
         <a href="#how" className="hidden px-3 py-2 text-sm sm:block">How it works</a>
         <a href="#story" className="hidden px-3 py-2 text-sm sm:block">Our story</a>
-        <a href="#signin" className="btn btn-ghost">Sign in</a>
+        <Link href="/?mode=signin#signin" className="btn btn-ghost">Sign in</Link>
       </header>
 
-      <section className="bg-black text-white">
+      <section id="signin" className="bg-black text-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-10 px-4 py-14 sm:py-20">
           <div className="flex min-w-0 flex-[999_1_460px] flex-col gap-5">
             <p className="text-sm font-medium uppercase tracking-[0.16em] text-[var(--brand-yellow)]">Aligned to the ICSE Kannada syllabus · Karnataka schools</p>
@@ -59,15 +61,27 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
             <p className="max-w-xl text-lg leading-relaxed text-gray-300">
               Lessons with every word explained, worksheets in the school format, and handwritten answers marked from a photo. Even if you don&apos;t speak Kannada yourself.
             </p>
-            <div className="mt-1 flex flex-wrap items-center gap-3">
-              <StartButton />
-              <a href="#signin" className="flex min-h-14 items-center rounded-full border border-white/40 px-6 font-medium text-white hover:bg-white/10">I have an account</a>
+            <div className="mt-2">
+              {mode ? (
+                <div className="max-w-md">
+                  <SignInCard mode={mode} sent={sent} error={error} email={email} />
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <StartButton />
+                    <Link href="/?mode=signup#signin" className="flex min-h-14 items-center rounded-full border border-white/40 px-6 font-medium text-white hover:bg-white/10">Create a free account</Link>
+                  </div>
+                  <p className="text-sm text-gray-400">
+                    Start in 10 seconds, no email needed · Free during the beta · Already have an account?{" "}
+                    <Link href="/?mode=signin#signin" className="font-medium text-white underline">Sign in</Link>
+                  </p>
+                </div>
+              )}
             </div>
-            <p className="text-sm text-gray-400">Start in 10 seconds, no email needed · Free during the beta · No ads</p>
           </div>
-          <div className="flex w-full max-w-md flex-[1_1_340px] flex-col items-center gap-6">
-            <Image src="/brand/kali-logo.webp" alt="Kali – Kannada, with confidence" width={700} height={642} priority className="hidden w-44 lg:block" />
-            <div className="w-full"><SignInCard sent={sent} error={error} email={email} /></div>
+          <div className="flex flex-[1_1_300px] justify-center">
+            <Image src="/brand/kali-logo.webp" alt="Kali – Kannada, with confidence" width={700} height={642} priority className="w-full max-w-sm" />
           </div>
         </div>
       </section>

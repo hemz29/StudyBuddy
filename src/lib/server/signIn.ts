@@ -11,7 +11,7 @@ export async function sendLink(formData: FormData) {
   if (!email) back(new URLSearchParams({ error: "Please enter your email" }));
   const origin = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const { error } = await (await supabaseServer()).auth.signInWithOtp({ email, options: { emailRedirectTo: `${origin}/auth/callback` } });
-  const q = new URLSearchParams({ email });
+  const q = new URLSearchParams({ email, mode: String(formData.get("mode") ?? "signin") });
   if (error) q.set("error", error.message);
   else q.set("sent", "1");
   back(q);
