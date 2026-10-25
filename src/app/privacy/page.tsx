@@ -23,7 +23,7 @@ export default function Privacy() {
         <Section title="Who we are">
           <p>
             Kali Kannada (<KnText text="ಕಲಿ ಕನ್ನಡ" />) is a Kannada practice app for Grade 6 children, currently in a small pilot with invited families. It is run by
-            Hemlata. Questions about your data: <a href={`mailto:${CONTACT}`} className="font-bold text-accent">{CONTACT}</a>.
+            Hema. Questions about your data: <a href={`mailto:${CONTACT}`} className="font-bold text-accent">{CONTACT}</a>.
           </p>
         </Section>
 
