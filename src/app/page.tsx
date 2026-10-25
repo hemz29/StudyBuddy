@@ -104,7 +104,7 @@ export default async function Home() {
 
       <section id="story" className="mx-auto max-w-6xl scroll-mt-6 px-4 pt-14">
         <div className="card flex flex-wrap items-center gap-8 p-6 sm:p-10">
-          <Image src="/brand/founder-portrait.webp" alt="Hema, who built Kali Kannada" width={450} height={600} className="h-44 w-33 shrink-0 rounded-2xl object-cover sm:h-52 sm:w-39" />
+          <Image src="/brand/hema.webp" alt="Hema, who built Kali Kannada" width={512} height={768} className="h-48 w-32 shrink-0 rounded-2xl sm:h-60 sm:w-40" />
           <div className="flex min-w-0 flex-[999_1_380px] flex-col gap-3">
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted">Why I built Kali Kannada</p>
           <p className="text-xl leading-relaxed font-light sm:text-2xl">

@@ -43,7 +43,7 @@ export default function About() {
 
       <section className="card flex flex-col gap-3 p-5 sm:p-7">
         <div className="flex items-center gap-4">
-          <Image src="/brand/founder-portrait.webp" alt="Hema, who built Kali Kannada" width={450} height={600} className="h-24 w-18 shrink-0 rounded-xl object-cover" />
+          <Image src="/brand/hema.webp" alt="Hema, who built Kali Kannada" width={512} height={768} className="h-30 w-20 shrink-0 rounded-xl" />
           <div>
             <h2 className="text-2xl">Why I built Kali Kannada</h2>
             <p className="text-sm text-muted">Hema, a parent who built Kali Kannada</p>
