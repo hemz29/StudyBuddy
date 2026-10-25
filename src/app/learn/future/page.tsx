@@ -3,7 +3,7 @@ import { LineIcon, type IconName } from "@/components/LineIcon";
 export const metadata = { title: "Future plans · Kali Kannada" };
 
 const IDEAS: [IconName, string, string][] = [
-  ["layers", "Every chapter, more grades", "All Grade 6 chapters first, then Grades 5 to 8."],
+  ["layers", "Every chapter, more grades", "All Grade 6 chapters first, then Grades 1 to 8."],
   ["star", "Learning as a game", "Streaks, badges and friendly challenges for daily practice."],
   ["translate", "Meanings in your language", "Help in Telugu, Tamil, Hindi and more, not only English."],
   ["sound", "Listen and speak", "Hear every word read aloud, and practise saying it."],
