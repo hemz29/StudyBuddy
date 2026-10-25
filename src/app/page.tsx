@@ -17,7 +17,7 @@ async function startFree() {
 }
 
 const TRUST = [
-  ["Reviewed by Kannada educators", "so content is accurate and natural", "M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4"],
+  ["Being reviewed by a Kannada educator", "so content is accurate and natural", "M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4"],
   ["Follows the school syllabus", "chapters, grammar and paper format", "M4 5h16v12H4zM8 21h8M12 17v4"],
   ["Private by design", "only a nickname, never sold or shared", "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4"],
 ];
