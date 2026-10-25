@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getActiveChild, getParent } from "@/lib/server/context";
 import { startFree } from "@/lib/server/startFree";
+import { SignInCard } from "@/components/signin/SignInCard";
 import { LogoMark } from "@/components/shell/Logo";
 
 export const dynamic = "force-dynamic";
@@ -30,12 +31,13 @@ function StartButton({ className = "" }: { className?: string }) {
 }
 
 // The public home page. Signed-in families (guests included) go straight to their practice.
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ sent?: string; error?: string; email?: string }> }) {
   const parent = await getParent();
   if (parent) {
     const child = await getActiveChild(parent.id);
     redirect(child ? "/learn" : "/profiles");
   }
+  const { sent, error, email } = await searchParams;
 
   return (
     <div className="min-h-screen bg-bg text-ink">
@@ -44,7 +46,7 @@ export default async function Home() {
         <span className="flex flex-1 items-center gap-2 text-lg font-medium">Kali Kannada <Beta /></span>
         <a href="#how" className="hidden px-3 py-2 text-sm sm:block">How it works</a>
         <a href="#story" className="hidden px-3 py-2 text-sm sm:block">Our story</a>
-        <Link href="/login" className="btn btn-ghost">Sign in</Link>
+        <a href="#signin" className="btn btn-ghost">Sign in</a>
       </header>
 
       <section className="bg-black text-white">
@@ -59,12 +61,13 @@ export default async function Home() {
             </p>
             <div className="mt-1 flex flex-wrap items-center gap-3">
               <StartButton />
-              <Link href="/login" className="flex min-h-14 items-center rounded-full border border-white/40 px-6 font-medium text-white hover:bg-white/10">I have an account</Link>
+              <a href="#signin" className="flex min-h-14 items-center rounded-full border border-white/40 px-6 font-medium text-white hover:bg-white/10">I have an account</a>
             </div>
             <p className="text-sm text-gray-400">Start in 10 seconds, no email needed · Free during the beta · No ads</p>
           </div>
-          <div className="flex flex-[1_1_300px] justify-center">
-            <Image src="/brand/kali-logo.webp" alt="Kali – Kannada, with confidence" width={700} height={642} priority className="w-full max-w-sm" />
+          <div className="flex w-full max-w-md flex-[1_1_340px] flex-col items-center gap-6">
+            <Image src="/brand/kali-logo.webp" alt="Kali – Kannada, with confidence" width={700} height={642} priority className="hidden w-44 lg:block" />
+            <div className="w-full"><SignInCard sent={sent} error={error} email={email} /></div>
           </div>
         </div>
       </section>

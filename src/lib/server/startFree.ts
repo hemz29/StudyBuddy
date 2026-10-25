@@ -7,6 +7,6 @@ import { isDemo, supabaseServer } from "./context";
 export async function startFree() {
   if (isDemo) redirect("/profiles");
   const { error } = await (await supabaseServer()).auth.signInAnonymously();
-  if (error) redirect(`/login?error=${encodeURIComponent("Starting without an account isn't available right now. Please sign in with your email instead.")}`);
+  if (error) redirect(`/?error=${encodeURIComponent("Starting without an account isn't available right now. Please sign in with your email instead.")}#signin`);
   redirect("/profiles");
 }

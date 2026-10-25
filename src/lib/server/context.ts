@@ -55,7 +55,7 @@ export async function getParent(): Promise<{ id: string; email: string; isGuest:
 
 export async function requireParent() {
   const parent = await getParent();
-  if (!parent) redirect("/login");
+  if (!parent) redirect("/#signin");
   return parent;
 }
 

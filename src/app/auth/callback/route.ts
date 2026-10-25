@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const to = next && /^\/[a-z]/.test(next) ? next : "/profiles";
   if (code) {
     const { error } = await (await supabaseServer()).auth.exchangeCodeForSession(code);
-    if (error) return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error.message)}`, request.url));
+    if (error) return NextResponse.redirect(new URL(`/?error=${encodeURIComponent(error.message)}#signin`, request.url));
   }
   return NextResponse.redirect(new URL(to, request.url));
 }

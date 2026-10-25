@@ -12,7 +12,7 @@ export default function Privacy() {
   return (
     <main className="min-h-screen bg-bg px-4 py-10">
       <article className="mx-auto flex max-w-2xl flex-col gap-6">
-        <Link href="/login" className="self-center">
+        <Link href="/" className="self-center">
           <Wordmark />
         </Link>
         <header>
@@ -66,7 +66,7 @@ export default function Privacy() {
           </p>
         </Section>
 
-        <Link href="/login" className="text-sm font-bold text-accent">← Back to sign in</Link>
+        <Link href="/" className="text-sm font-bold text-accent">← Back to Kali Kannada</Link>
       </article>
     </main>
   );
