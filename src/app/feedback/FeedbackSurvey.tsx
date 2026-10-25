@@ -1,14 +1,7 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
 import { LogoMark } from "@/components/shell/Logo";
 import { INTENT, REPLACE } from "@/lib/feedback";
-
-const PRACTICE = [
-  ["Panchatantra", "panchatantra-practice-a"],
-  ["Nanna Desha", "nanna-desha-practice-a"],
-  ["Kugutide Pakshi", "kugutide-pakshi-practice-a"],
-];
 
 // One question per screen; tapping an answer moves straight on, so it takes about 30 seconds.
 export function FeedbackSurvey({ name }: { name?: string }) {
@@ -89,13 +82,7 @@ export function FeedbackSurvey({ name }: { name?: string }) {
       {step === 4 && (
         <>
           <h1 className="text-2xl">Thank you{name ? `, ${name}` : ""}!</h1>
-          <p className="text-muted">That really helps. As a thank-you, here are free practice worksheets to print for your child:</p>
-          <div className="flex flex-col gap-2">
-            {PRACTICE.map(([title, id]) => (
-              <a key={id} href={`/worksheets/${id}.pdf`} target="_blank" rel="noreferrer" className="btn btn-ghost justify-between">{title} <span aria-hidden>↓</span></a>
-            ))}
-          </div>
-          <Link href="/" className="text-center text-sm underline">Open Kali Kannada</Link>
+          <p className="text-muted">Your answers have been sent.</p>
         </>
       )}
     </div>
