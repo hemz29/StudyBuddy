@@ -23,6 +23,15 @@ async function deleteChild(formData: FormData) {
   redirect("/parent");
 }
 
+async function renameChild(formData: FormData) {
+  "use server";
+  const parent = await requireParent();
+  const id = String(formData.get("childId"));
+  const nickname = String(formData.get("nickname") ?? "").trim().slice(0, 40);
+  if (nickname) await (await userStore()).updateChild(parent.id, id, { nickname });
+  redirect(`/parent?child=${id}`);
+}
+
 const STATUS = { not_started: "Not practised yet", in_progress: "Practised before", recent: "Practised this week" };
 const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 
@@ -167,6 +176,12 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       <section className="card bg-white p-5 text-sm text-muted">
         <h2 className="text-base font-bold text-ink">Your data</h2>
         <p className="mt-1">We store {child.nickname}&apos;s nickname, answers, marks and the answer photos (so you can check the marking). Photos are only visible to you. AI is used to read handwriting and mark sentence answers; we log how much it costs, not what was written.</p>
+        <form action={renameChild} className="mt-3 flex flex-wrap items-center gap-2">
+          <input type="hidden" name="childId" value={child.id} />
+          <label htmlFor="nickname" className="font-bold text-ink">Nickname</label>
+          <input id="nickname" name="nickname" defaultValue={child.nickname} required maxLength={40} className="h-10 rounded-xl border border-line bg-white px-3 text-ink" />
+          <button className="btn btn-ghost h-10 min-h-0">Rename</button>
+        </form>
         <form action={deleteChild} className="mt-3">
           <input type="hidden" name="childId" value={child.id} />
           <button className="font-bold text-bad underline">Delete {child.nickname}&apos;s profile and all their data</button>
