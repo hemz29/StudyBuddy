@@ -40,7 +40,7 @@ export default function About() {
       <section className="grid gap-3 sm:grid-cols-3">
         {STEPS.map(([icon, title, text], i) => (
           <div key={title} className="card flex items-start gap-3 p-4">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent"><LineIcon name={icon} size={18} /></span>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#f2f2f2] text-black"><LineIcon name={icon} size={18} /></span>
             <div>
               <h2 className="text-base font-bold">{i + 1}. {title}</h2>
               <p className="text-sm text-muted">{text}</p>

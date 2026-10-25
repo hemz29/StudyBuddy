@@ -4,7 +4,7 @@
 /* Design tokens: soft cream, sage, peach, lavender and sky, matching the watercolour artwork.
    Reading areas (.paper) always stay white with high-contrast text. */
 :root {
-  --bg: #fbf7f0;
+  --bg: #ffffff;
   --surface: #ffffff;
   --ink: #000000;
   --muted: #3f3f3f;
@@ -97,8 +97,8 @@ h2,
 
 /* The watercolour background behind the child's pages. */
 .app-bg {
-  /* Plain warm background, as on the home page. */
-  background: var(--bg);
+  /* White, with the floral artwork faded to a soft hint. */
+  background: linear-gradient(rgb(255 255 255 / 0.88), rgb(255 255 255 / 0.88)), #fff url("/art/app-background.webp") center / cover fixed no-repeat;
 }
 
 /* Tappable Kannada word with a meaning on hover (desktop) or tap (touch). */

@@ -11,12 +11,9 @@ export function PageHeader({ title, sub, back = "/learn" }: { title: React.React
 }
 
 // White choice card, its colour kept to the icon chip and arrow, used across the child's pages.
-const TONES = {
-  sage: "[--tone:var(--accent-soft)] [--tone-ink:var(--accent)]",
-  peach: "[--tone:var(--peach)] [--tone-ink:var(--peach-ink)]",
-  lavender: "[--tone:var(--lavender)] [--tone-ink:var(--lavender-ink)]",
-  sky: "[--tone:var(--sky)] [--tone-ink:var(--sky-ink)]",
-} as const;
+// Kept so pages can still name a tone, but every card now uses the same black, one-colour icons.
+const NEUTRAL = "[--tone:#f2f2f2] [--tone-ink:#000]";
+const TONES = { sage: NEUTRAL, peach: NEUTRAL, lavender: NEUTRAL, sky: NEUTRAL } as const;
 export type Tone = keyof typeof TONES;
 
 export function ChoiceCard({ href, tone, icon, eyebrow, title, sub, badge, children }: {
