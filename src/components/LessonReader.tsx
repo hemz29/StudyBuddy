@@ -41,8 +41,7 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
 
       <p className="rounded-2xl bg-white/80 px-4 py-2 text-sm text-muted">
         Hover over (or tap) any Kannada word to see how to say it and what it means.{" "}
-        <span className="chip bg-good-soft text-good">From teacher&apos;s notes</span> or{" "}
-        <span className="chip bg-lavender text-lavender-ink">AI-suggested</span> shows where each meaning comes from.
+        Every meaning comes from the teacher&apos;s notes or has been <span className="chip bg-good-soft text-good">checked by a Kannada teacher</span>.
       </p>
 
       {blocks.map((b, bi) => (

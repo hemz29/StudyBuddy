@@ -111,7 +111,7 @@ const HINT1: Record<QuestionType, (q: Question) => Hint1> = {
       .map(stripPunct)
       .filter((w) => w && !asked.has(w))
       .map((w) => [w, meaningOf(w)] as const)
-      .filter(([, m]) => m && m.source === "teacher")
+      .filter(([, m]) => m && m.source !== "ai")
       .slice(0, 3);
     return {
       lines: [

@@ -3,13 +3,13 @@ import aiWords from "./grade6/words.json";
 import { NUMBER_NAMES } from "./grade6/numbers";
 
 // Word meanings for hover/tap and for hints. The teacher's word list comes first; every other word has an
-// AI-suggested meaning with a confidence level, waiting for review by a Kannada teacher.
+// AI-suggested meaning, checked by a Kannada teacher (26 Oct 2026) unless it was added after that review.
 export type WordMeaning = {
   word: string;
   en: string;
   base?: string;
   baseEn?: string;
-  source: "teacher" | "ai";
+  source: "teacher" | "checked" | "ai";
   confidence?: "high" | "medium" | "low";
   meaningKn?: string;
 };
@@ -28,7 +28,7 @@ for (const [n, names] of Object.entries(NUMBER_NAMES))
 
 const AI = new Map<string, WordMeaning>();
 for (const w of aiWords as AiWord[])
-  AI.set(w.word, { word: w.word, en: w.en, base: w.base, baseEn: w.baseEn, source: w.reviewed ? "teacher" : "ai", confidence: w.confidence });
+  AI.set(w.word, { word: w.word, en: w.en, base: w.base, baseEn: w.baseEn, source: w.reviewed ? "checked" : "ai", confidence: w.confidence });
 
 export function meaningOf(raw: string): WordMeaning | undefined {
   const w = stripPunct(raw);

@@ -105,4 +105,4 @@ npm run test:handwriting   # reads the real school worksheet pages (needs ANTHRO
 
 - Lessons are in `src/content/grade6/*.ts`, transcribed from the teacher's notes and answer keys. Marks follow `src/content/grade6/marking.json`. After changing them, run `npm run worksheets` to rebuild the PDFs.
 - Word meanings: `review/word-meanings.json` is the master list. `review/teacher-review.xlsx` is the sheet for the Kannada educator. Import her answers with `python3 scripts/word_meanings.py import <file.xlsx>`.
-- `reviewNote` fields in the lessons mark points still waiting for the educator's confirmation.
+- A Kannada educator reviewed the answer key, marking and word meanings on 26 Oct 2026 and made two corrections (ಒಕ್ಕಲು, ಪ್ರತೀತಿ), now applied; her sheet is `review/teacher-review-returned-2026-10-26.xlsx`. Everything else, including the `reviewNote` points, was confirmed as it is. Word cards show "Checked by a Kannada teacher".

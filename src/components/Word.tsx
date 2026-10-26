@@ -97,8 +97,8 @@ function MeaningPopover({ word, anchor }: { word: string; anchor: HTMLElement })
               {m.baseEn ? ` = ${m.baseEn}` : ""}
             </span>
           )}
-          <span className={`mt-1 w-max rounded-full px-2 py-0.5 text-[11px] font-bold ${m.source === "teacher" ? "bg-good-soft text-good" : "bg-lavender text-lavender-ink"}`}>
-            {m.source === "teacher" ? "From teacher's notes" : `AI-suggested · ${m.confidence} confidence`}
+          <span className={`mt-1 w-max rounded-full px-2 py-0.5 text-[11px] font-bold ${m.source === "ai" ? "bg-lavender text-lavender-ink" : "bg-good-soft text-good"}`}>
+            {m.source === "teacher" ? "From teacher's notes" : m.source === "checked" ? "Checked by a Kannada teacher" : `AI-suggested · ${m.confidence} confidence`}
           </span>
         </>
       ) : aksharas(word).length > 1 ? (
