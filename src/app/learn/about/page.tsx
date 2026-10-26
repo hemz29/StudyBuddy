@@ -65,7 +65,7 @@ export default function About() {
           <p>Private tutors helped, but group classes rarely matched each child&apos;s unique learning pace, and one-to-one tutors are expensive. So I tried using general AI tools. They worked, up to a point. But copying text, translating, formatting quizzes… it was messy. And even after all that effort, I was never fully sure the content was accurate or culturally right.</p>
           <p className="font-medium">That&apos;s when I decided to build Kali Kannada.</p>
           <p>Kali Kannada brings every scattered step together, helping children read, understand, and practise Kannada with confidence, while saving parents hours of prep time.</p>
-          <p>And because language is more than grammar (it&apos;s culture and emotion), a real Kannada educator helps review Kali Kannada&apos;s AI-generated content, refining it to feel human, natural, and trustworthy.</p>
+          <p>And because language is more than grammar (it&apos;s culture and emotion), a real Kannada educator has reviewed Kali Kannada&apos;s answer key, so the marking is natural and trustworthy. Word meanings suggested by AI are clearly labelled as such.</p>
           <p>Kali Kannada wasn&apos;t born because the world needed another learning app. It was born because parents like me needed something that truly worked.</p>
           <p className="text-lg"><KnText text="ಕಲಿ ಕನ್ನಡ" /> | Kali Kannada<br /><span className="text-muted">Kannada, with confidence.</span></p>
         </div>
