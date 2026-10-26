@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
@@ -46,12 +47,15 @@ export async function supabaseServer() {
 }
 
 // A guest started with "Start free": a real but anonymous Supabase user, until they add an email or Google.
-export async function getParent(): Promise<{ id: string; email: string; isGuest: boolean } | null> {
+// Speed: getClaims() checks the sign-in token on this server (no round trip to Supabase when the project uses signing
+// keys), and cache() means a page, its layout and its helpers share one check per request.
+export const getParent = cache(async (): Promise<{ id: string; email: string; isGuest: boolean } | null> => {
   checkSetup();
   if (isDemo) return DEMO_PARENT;
-  const { data } = await (await supabaseServer()).auth.getUser();
-  return data.user ? { id: data.user.id, email: data.user.email ?? "", isGuest: Boolean(data.user.is_anonymous) } : null;
-}
+  const { data } = await (await supabaseServer()).auth.getClaims();
+  const c = data?.claims;
+  return c?.sub ? { id: c.sub, email: (c.email as string | undefined) ?? "", isGuest: Boolean(c.is_anonymous) } : null;
+});
 
 export async function requireParent() {
   const parent = await getParent();

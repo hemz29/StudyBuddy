@@ -27,7 +27,8 @@ export async function middleware(request: NextRequest) {
       },
     },
   });
-  await supabase.auth.getUser();
+  // Refreshes the sign-in when needed; getClaims() verifies the token locally where it can, which is faster than getUser().
+  await supabase.auth.getClaims();
   return response;
 }
 
