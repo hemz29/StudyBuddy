@@ -3,7 +3,8 @@ import { exercise, glossaryExercises, ownSentence, pairs, sentences } from "../h
 
 // Source: teacher's notes "Nanna desha Nanna Jana - translation" and "Nanna Desha Nanna Jana - Answer" (3-page version).
 const glossary = [
-  { word: "ಒಕ್ಕಲು", meaningKn: "ಬೇಸಾಯ", meaningEn: "Farming / Agriculture", enPrompt: "Agriculture" },
+  // Teacher review (26 Oct 2026): ಒಕ್ಕಲು here means ಮನೆತನ (family), not farming.
+  { word: "ಒಕ್ಕಲು", meaningKn: "ಮನೆತನ", meaningEn: "Family / Household", enPrompt: "Family" },
   { word: "ನೆಲೆ", meaningKn: "ವಾಸಸ್ಥಳ, ಆಶ್ರಯ", meaningEn: "Residence / Shelter" },
   { word: "ಪ್ರಾಣ", meaningKn: "ಉಸಿರು", meaningEn: "Life / Breath", enPrompt: "Breath" },
   { word: "ವರ್ತಮಾನ", meaningKn: "ಇಂದಿನ, ಪ್ರಸ್ತುತ", meaningEn: "The present / Current" },
@@ -25,7 +26,7 @@ export const nannaDeshaStanzas: [string, string][][] = [
     ["ಕೆಂಪು ನೆಲದ ಹಸಿರು ಬೆಳೆ", "The green crops of the red soil"],
     ["ಕಪ್ಪು ಬಣ್ಣ ಮೊಗದ ಕಳೆ", "The glow on the face of the dark complexion"],
     ["ಸೂರ್ಯ ಚಂದ್ರ ಚುಕ್ಕಿಗಳೆ", "The sun, the moon, and the stars"],
-    ["ನಮ್ಮ ಹಿರಿಯ ಒಕ್ಕಲು", "Are our ancient (ancestral) farmers"],
+    ["ನಮ್ಮ ಹಿರಿಯ ಒಕ್ಕಲು", "Are our elder family (ancestors)"],
   ],
   [
     ["ನೂರು ಭಾವ ಭಾಷೆ ನೆಲೆ", "The abode of a hundred emotions and languages"],

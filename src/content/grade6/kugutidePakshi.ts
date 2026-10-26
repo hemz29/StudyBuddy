@@ -10,7 +10,8 @@ const glossary = [
   { word: "ನಯನ", meaningKn: "ಕಣ್ಣು", meaningEn: "Eye" },
   { word: "ಪ್ರವಾಸಿ ತಾಣ", meaningKn: "ಪ್ರವಾಸಿಗರು ಬರುವ ಜಾಗ", meaningEn: "Tourist place" },
   { word: "ಹೊಂಬಣ್ಣ", meaningKn: "ಚಿನ್ನದ ಬಣ್ಣ", meaningEn: "Golden colour" },
-  { word: "ಪ್ರತೀತಿ", meaningKn: "ಪ್ರಸಿದ್ಧಿ", meaningEn: "Famous / well known belief" },
+  // Teacher review (26 Oct 2026): ಭಾವನೆ / ಅನಿಸಿಕೆ (belief, feeling) rather than ಪ್ರಸಿದ್ಧಿ.
+  { word: "ಪ್ರತೀತಿ", meaningKn: "ಭಾವನೆ, ಅನಿಸಿಕೆ", meaningEn: "Belief / Feeling" },
   { word: "ಮಿರುಗು", meaningKn: "ಹೊಳೆಯುವುದು", meaningEn: "Shine" },
   { word: "ಋಣ", meaningKn: "ಸಾಲ", meaningEn: "Debt / Loan" },
 ];

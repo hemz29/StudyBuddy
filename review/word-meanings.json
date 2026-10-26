@@ -6960,13 +6960,13 @@
   "teacherGlossary": true,
   "lesson": "nanna-desha",
   "exampleKn": "ನಮ್ಮ ಹಿರಿಯ ಒಕ್ಕಲು",
-  "exampleEn": "Are our ancient (ancestral) farmers",
-  "en": "farming folk (farmers)",
+  "exampleEn": "Are our elder family (ancestors)",
+  "en": "family, household",
   "base": "ಒಕ್ಕಲು",
-  "baseEn": "farming; farmer; household",
-  "confidence": "medium",
-  "note": "Textbook glosses it as ಬೇಸಾಯ (farming); 'family/household' is another possible reading in this line.",
-  "say": "okkalu"
+  "baseEn": "family; household",
+  "confidence": "high",
+  "say": "okkalu",
+  "teacherChecked": true
  },
  {
   "word": "ನೂರು",
@@ -9170,11 +9170,12 @@
   "lesson": "kugutide-pakshi",
   "exampleKn": "ಬಹಳ ಹಿಂದೆ ಇಲ್ಲಿ ನಾರದ ಮುನಿ ತಪಸ್ಸು ಮಾಡಿದ್ದರೆಂಬ ಪ್ರತೀತಿ. ಇಲ್ಲೊಂದು ಶಿವದೇವಾಲಯವೂ ಇದೆ. ಸದಾ ಹಚ್ಚಹಸುರಿನಿಂದ ಕೂಡಿ, ಗಿಡ ಮರಗಳಿಂದ ಕಂಗೊಳಿಸುತ್ತಿದೆ.",
   "exampleEn": "It is believed that a long time ago, Narada Muni performed penance here. There is also a Shiva temple here. It is always lush green, blooming with plants and trees.",
-  "en": "popular belief",
+  "en": "belief, feeling",
   "base": "ಪ್ರತೀತಿ",
-  "baseEn": "belief; fame",
+  "baseEn": "belief; feeling",
   "confidence": "high",
-  "say": "prateeti"
+  "say": "prateeti",
+  "teacherChecked": true
  },
  {
   "word": "ಇಲ್ಲೊಂದು",

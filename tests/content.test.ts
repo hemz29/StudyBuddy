@@ -44,7 +44,7 @@ describe("content", () => {
     const t = getWorksheet("test-1")!;
     const prompts = t.sections.map((s) => s.questions.map((q) => q.prompt).join(" | "));
     expect(prompts[0]).toBe("ಕಳೆ | ಭವಿಷ್ಯ | ಛಾವಣಿ");
-    expect(prompts[2]).toBe("Agriculture | Breath | Noble");
+    expect(prompts[2]).toBe("Family | Breath | Noble");
     expect(prompts[10]).toBe("೪೫ | ೩೩ | ೪೨ | ೩೪");
     expect(t.sections[11].questions[0].prompt).toBe("ಕೆಂಪು …");
   });
@@ -74,8 +74,9 @@ describe("answer key grading on the real school worksheet", () => {
       .filter(([, q]) => KEY_GRADED.includes(q.type))
       .map(([id, q, a]) => [id, gradeByKey(q, a).status] as const);
     const notCorrect = results.filter(([, s]) => s !== "correct");
-    // "ಲಕ್ಷ್ಯ/ಗಮನ" (two alternatives written together) is the only answer that needs the AI check.
-    expect(notCorrect).toEqual([["panchatantra.ekn.6", "unsure"]]);
+    // "ಲಕ್ಷ್ಯ/ಗಮನ" (two alternatives written together) needs the AI check. ಒಕ್ಕಲು was answered ಬೇಸಾಯ, the old key;
+    // the Kannada teacher's review (26 Oct 2026) changed its meaning to ಮನೆತನ, so that answer is no longer an automatic match and goes to the AI check.
+    expect(notCorrect).toEqual([["nanna-desha.mkn.1", "unsure"], ["panchatantra.ekn.6", "unsure"]]);
   });
 
   it("gives near-miss spelling feedback and half marks for a half-right who-said", () => {

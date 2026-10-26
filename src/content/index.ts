@@ -149,7 +149,7 @@ const TEST_B = { one_sentence: 6, who_said: 2, own_sentence: 3 };
 const test1Picks = [
   find(N, "meaning_kn", "ಕಳೆ"), find(N, "meaning_kn", "ಭವಿಷ್ಯ"), find(P, "meaning_kn", "ಛಾವಣಿ"),
   find(P, "meaning_en", "ಸಂದೇಹ"), find(P, "meaning_en", "ವ್ಯರ್ಥ"), find(N, "meaning_en", "ನೆಲೆ"),
-  find(N, "en_to_kn", "Agriculture"), find(N, "en_to_kn", "Breath"), find(P, "en_to_kn", "Noble"),
+  find(N, "en_to_kn", "Family"), find(N, "en_to_kn", "Breath"), find(P, "en_to_kn", "Noble"),
   find(N, "opposite", "ಹಿರಿಯ"), find(N, "opposite", "ಏರು"), find(P, "opposite", "ದುಃಖ"),
   find(P, "gender", "ರಾಕ್ಷಸ"), find(P, "gender", "ನಾಯಕ"), find(P, "gender", "ಕವಿ"),
   find(P, "plural", "ಸ್ನೇಹಿತ"), find(P, "plural", "ಯಂತ್ರ"),
