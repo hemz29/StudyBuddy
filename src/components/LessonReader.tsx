@@ -10,8 +10,8 @@ import audio from "@/content/audio.json";
 // Sentences with recorded Kannada speech (made by scripts/tts.mjs) as "<lessonId>/<sentenceId>", and the voices they were made with.
 const HAS_AUDIO = new Set<string>(audio.sentences);
 const VOICES = Object.keys(audio.voices) as ("female" | "male")[];
-// Playback speeds. Browsers keep the pitch when speeding up or slowing down, so the voice stays natural.
-const SPEEDS: [number, string][] = [[0.75, "Slow"], [1, "Normal"], [1.25, "Fast"]];
+// Slow playback for careful listening. Browsers keep the pitch when slowing down, so the voice stays natural.
+const SLOW = 0.5;
 
 type Sentence = { id: string; kn: string; en: string };
 
@@ -22,7 +22,8 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
   const [showEn, setShowEn] = useState(true);
   // Read aloud: one <audio> element plays a queue of sentences (one sentence, or a whole part).
   const [voice, setVoice] = useState<"female" | "male">(VOICES[0] ?? "female");
-  const [rate, setRate] = useState(1);
+  const [slow, setSlow] = useState(false);
+  const rate = slow ? SLOW : 1;
   const [queue, setQueue] = useState<string[]>([]);
   const player = useRef<HTMLAudioElement | null>(null);
   const playing = queue[0] ?? null;
@@ -41,7 +42,6 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
     a.defaultPlaybackRate = a.playbackRate = rate; // the default carries over to the next sentence's file
   }, [rate]);
   const play = (ids: string[]) => setQueue((q) => (q.length && q[0] === ids[0] ? [] : ids));
-  const lessonHasAudio = [...lesson.intro, ...lesson.parts.flatMap((p) => p.sentences)].some((s) => HAS_AUDIO.has(key(s.id)));
 
   const blocks: { heading?: { kn: string; en: string }; sentences: Sentence[]; intro?: boolean }[] = [
     ...(lesson.intro.length ? [{ heading: { kn: "ಪಾಠ ಪ್ರವೇಶ", en: "Introduction" }, sentences: lesson.intro, intro: true }] : []),
@@ -65,23 +65,13 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
           <Link href={`/learn/cards/${lesson.id}`} className="btn btn-soft max-sm:!hidden">Practise →</Link>
         </div>
 
-        {/* Reading tools, in the order a learner reaches for them: how the text is shown, then listening. */}
-        <div className="mt-5 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-line pt-4">
-          <ToolGroup label="Show">
-            <Toggle on={showTr} set={setShowTr} label="Sound it out" title="Kannada written in English letters" />
-            <Toggle on={showEn} set={setShowEn} label="English meaning" />
-          </ToolGroup>
-          {lessonHasAudio && (
-            <ToolGroup label="Listen">
-              {VOICES.length > 1 && <Segmented label="Voice" value={voice} set={setVoice} options={VOICES.map((v) => [v, titleCase(v)])} />}
-              <Segmented label="Speed" value={rate} set={setRate} options={SPEEDS} />
-            </ToolGroup>
-          )}
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+          <Toggle on={showTr} set={setShowTr} label="Sound it out" title="Kannada written in English letters" />
+          <Toggle on={showEn} set={setShowEn} label="English meaning" />
+          <p className="text-sm text-muted sm:ml-3">
+            Tap any word for its sound and meaning · <span className="text-good">checked by a Kannada teacher</span>
+          </p>
         </div>
-        <p className="mt-3 text-sm text-muted">
-          Tap any Kannada word to see how to say it and what it means.{" "}
-          <span className="text-good">✓ Every meaning is from your teacher&apos;s notes or checked by a Kannada teacher.</span>
-        </p>
       </div>
 
       {blocks.map((b, bi) => (
@@ -90,12 +80,22 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
             <h2 className="flex flex-wrap items-center gap-x-2 gap-y-2 border-b border-gray-100 bg-gray-50 px-5 py-3 font-sans font-bold">
               <span><KnText text={b.heading.kn} /> <span className="text-gray-500">· {b.heading.en}</span></span>
               {b.sentences.some((x) => HAS_AUDIO.has(key(x.id))) && (
-                <button
-                  onClick={() => play(b.sentences.filter((x) => HAS_AUDIO.has(key(x.id))).map((x) => key(x.id)))}
-                  className="ml-auto flex items-center gap-1.5 rounded-full bg-black px-3 py-1 text-sm font-medium text-[var(--brand-yellow)]"
-                >
-                  <LineIcon name="sound" size={16} /> {b.sentences.some((x) => key(x.id) === playing) && queue.length > 1 ? "Stop" : "Listen to this part"}
-                </button>
+                <span className="ml-auto flex items-center gap-1.5 font-medium">
+                  {VOICES.length > 1 && VOICES.map((v) => (
+                    <IconButton key={v} on={voice === v} onClick={() => setVoice(v)} label={`${titleCase(v)} voice`}>
+                      <LineIcon name={v} size={16} />
+                    </IconButton>
+                  ))}
+                  <IconButton on={slow} onClick={() => setSlow(!slow)} label={`Slow (${SLOW}×)`}>
+                    <span className="text-xs">{SLOW}×</span>
+                  </IconButton>
+                  <button
+                    onClick={() => play(b.sentences.filter((x) => HAS_AUDIO.has(key(x.id))).map((x) => key(x.id)))}
+                    className="ml-1 flex items-center gap-1.5 rounded-full bg-black px-3 py-1 text-sm text-[var(--brand-yellow)]"
+                  >
+                    <LineIcon name="sound" size={16} /> {b.sentences.some((x) => key(x.id) === playing) && queue.length > 1 ? "Stop" : "Listen to this part"}
+                  </button>
+                </span>
               )}
             </h2>
           )}
@@ -151,31 +151,18 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
   );
 }
 
-function ToolGroup({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex items-start gap-2">
-      <span className="w-14 shrink-0 pt-1.5 text-xs font-bold uppercase tracking-wide text-muted">{label}</span>
-      <div className="flex flex-wrap items-center gap-2">{children}</div>
-    </div>
-  );
-}
-
 function Toggle({ on, set, label, title }: { on: boolean; set: (v: boolean) => void; label: string; title?: string }) {
   return (
     <button onClick={() => set(!on)} title={title} aria-pressed={on} className={`rounded-full border px-3 py-1 text-sm ${on ? "border-black bg-black text-[var(--brand-yellow)]" : "border-line bg-white text-muted hover:border-black"}`}>
-      {on ? "✓ " : ""}{label}
+      {label}
     </button>
   );
 }
 
-function Segmented<T extends string | number>({ label, value, set, options }: { label: string; value: T; set: (v: T) => void; options: [T, string][] }) {
+function IconButton({ on, onClick, label, children }: { on: boolean; onClick: () => void; label: string; children: ReactNode }) {
   return (
-    <div className="flex rounded-full border border-line bg-white p-0.5 text-sm" role="group" aria-label={label}>
-      {options.map(([v, text]) => (
-        <button key={String(v)} onClick={() => set(v)} aria-pressed={value === v} className={`rounded-full px-3 py-0.5 ${value === v ? "bg-black text-[var(--brand-yellow)]" : "text-muted hover:text-black"}`}>
-          {text}
-        </button>
-      ))}
-    </div>
+    <button onClick={onClick} aria-pressed={on} aria-label={label} title={label} className={`grid h-7 w-7 place-items-center rounded-full ${on ? "bg-black text-[var(--brand-yellow)]" : "text-muted hover:bg-white hover:text-black"}`}>
+      {children}
+    </button>
   );
 }
