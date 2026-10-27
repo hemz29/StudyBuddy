@@ -2,7 +2,7 @@
 // saved once as MP3s in public/audio/, so families never call Google and the key never leaves this machine.
 // Usage: GOOGLE_TTS_API_KEY=... node scripts/tts.mjs <lessonId> [blockNumber ...]
 //   e.g. node scripts/tts.mjs panchatantra 1     (block 1 = the first part after the introduction; 0 = introduction)
-// Writes public/audio/<voice>/<sentenceId>.mp3 and updates src/content/audio.json.
+// Writes public/audio/<voice>/<lessonId>/<sentenceId>.mp3 and updates src/content/audio.json.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 
@@ -39,7 +39,7 @@ const done = new Set(manifest.sentences);
 let chars = 0;
 for (const [gender, voice] of chosen) {
   manifest.voices[gender] = voice.name;
-  await mkdir(`public/audio/${gender}`, { recursive: true });
+  await mkdir(`public/audio/${gender}/${lessonId}`, { recursive: true });
 }
 for (const bi of wanted) {
   for (const s of blocks[bi]?.sentences ?? []) {
@@ -49,10 +49,10 @@ for (const bi of wanted) {
         voice: { languageCode: "kn-IN", name: voice.name },
         audioConfig: { audioEncoding: "MP3", speakingRate: 0.9 },
       });
-      await writeFile(`public/audio/${gender}/${s.id}.mp3`, Buffer.from(out.audioContent, "base64"));
+      await writeFile(`public/audio/${gender}/${lessonId}/${s.id}.mp3`, Buffer.from(out.audioContent, "base64"));
       chars += s.kn.length;
     }
-    done.add(s.id);
+    done.add(`${lessonId}/${s.id}`); // sentence ids repeat across lessons
     process.stdout.write(".");
   }
 }
