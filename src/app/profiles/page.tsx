@@ -44,7 +44,7 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
     <main className="app-bg min-h-screen">
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="mr-auto"><Logo href="/profiles" /></span>
+          <span className="mr-auto"><Logo /></span>
           <Link href="/parent" className="btn btn-ghost"><LineIcon name="family" size={18} />Parent view</Link>
           <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
         </div>

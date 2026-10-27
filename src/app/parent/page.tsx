@@ -67,7 +67,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       {/* The parent page is a natural exit, so guests are reminded here even if they closed the prompt elsewhere. */}
       {parent.isGuest && <SaveProgressStrip name={child.nickname} dismissible={false} />}
       <div className="flex flex-wrap items-center gap-3">
-        <span className="mr-auto"><Logo href="/" /></span>
+        <span className="mr-auto"><Logo /></span>
         <Link href="/feedback" className="btn btn-ghost"><LineIcon name="chat" size={20} /> Give feedback</Link>
         <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
         {children.length > 1 &&
