@@ -93,9 +93,17 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
               {b.sentences.some((x) => HAS_AUDIO.has(key(x.id))) && (
                 <span className="ml-auto flex items-center gap-1.5 font-medium">
                   {VOICES.length > 1 && VOICES.map((v) => (
-                    <IconButton key={v} on={voice === v} onClick={() => setVoice(v)} label={`${titleCase(v)} voice`}>
-                      <LineIcon name={v} size={16} />
-                    </IconButton>
+                    <button
+                      key={v}
+                      onClick={() => setVoice(v)}
+                      aria-pressed={voice === v}
+                      aria-label={`${titleCase(v)} voice`}
+                      title={`${titleCase(v)} voice`}
+                      className={`grid h-8 w-8 place-items-center rounded-full transition ${voice === v ? "bg-accent-soft ring-1 ring-[var(--brand-yellow)]" : "opacity-40 grayscale hover:opacity-80 hover:grayscale-0"}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element -- a tiny fixed-size icon */}
+                      <img src={`/icons/voice-${v}.png`} alt="" width={24} height={24} />
+                    </button>
                   ))}
                   <IconButton on={rate !== 1} onClick={() => setRate(SPEEDS[(SPEEDS.indexOf(rate) + 1) % SPEEDS.length])} label={`Speed ${rate}× (tap to change)`}>
                     <span className="text-xs">{rate}×</span>
