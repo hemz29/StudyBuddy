@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { transliterate } from "@/lib/transliterate";
 import { KnText } from "@/components/Word";
+import { LineIcon } from "@/components/LineIcon";
+import { playWord, wordsWithAudio } from "@/lib/readAloud";
 import { ALPHABET_TREE, SOUNDS_LIKE, countLetters, type TreeNode } from "@/content/grade6/alphabet";
 
 // The textbook's ವರ್ಣಮಾಲೆ tree, to explore: tap a branch to open it, tap a letter to hear how it's said.
@@ -9,7 +11,16 @@ export function LetterTree() {
   const branches = ALPHABET_TREE.children!;
   const [open, setOpen] = useState(0);
   const [letter, setLetter] = useState<string | null>(null);
+  const [canHear, setCanHear] = useState(false);
   const branch = branches[open];
+  // Picking a letter also says it, when there's a recording for it.
+  const pick = (l: string) => {
+    setLetter(l);
+    wordsWithAudio().then((w) => {
+      setCanHear(w.has(l));
+      if (w.has(l)) playWord(l);
+    });
+  };
 
   return (
     <div className="flex flex-col items-center gap-0">
@@ -36,19 +47,24 @@ export function LetterTree() {
         {branch.note && <p className="mb-3 text-center text-sm text-muted"><KnText text={branch.note} /></p>}
         {/* A branch with sub-groups (ವರ್ಗೀಯ) gets the full width so its three columns have room. */}
         <div className={`grid gap-3 ${branch.children!.some((c) => c.children) ? "" : branch.children!.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
-          {branch.children!.map((c) => <Branch key={c.kn} node={c} pick={setLetter} picked={letter} />)}
+          {branch.children!.map((c) => <Branch key={c.kn} node={c} pick={pick} picked={letter} />)}
         </div>
       </div>
 
       <p className="mt-3 min-h-10 text-center text-sm" aria-live="polite">
         {letter ? (
           <>
+            {canHear && (
+              <button onClick={() => playWord(letter)} aria-label="Hear it again" title="Hear it again" className="mr-2 inline-grid h-8 w-8 place-items-center rounded-full bg-black align-middle text-[var(--brand-yellow)]">
+                <LineIcon name="sound" size={16} />
+              </button>
+            )}
             <span className="kn mr-2 text-2xl font-bold align-middle">{letter}</span>
             <b>{transliterate(letter)}</b>
             {SOUNDS_LIKE[letter] && <span className="ml-2 rounded-md bg-accent-soft px-1.5 py-0.5">like {SOUNDS_LIKE[letter]}</span>}
           </>
         ) : (
-          <span className="text-muted">Tap a branch above, then tap any letter to see how it&apos;s said.</span>
+          <span className="text-muted">Tap a branch above, then tap any letter to hear how it&apos;s said.</span>
         )}
       </p>
     </div>

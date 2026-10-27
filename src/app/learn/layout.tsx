@@ -7,6 +7,7 @@ import { Logo } from "@/components/shell/Logo";
 import { SideNav } from "@/components/shell/SideNav";
 import { LineIcon } from "@/components/LineIcon";
 import { ActivityPing } from "@/components/ActivityPing";
+import { LocalTracker } from "@/components/LocalTracker";
 import { SaveProgressStrip } from "@/components/SaveProgressStrip";
 import { SignOutButton } from "@/components/SignOutButton";
 
@@ -18,6 +19,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
   return (
     <div className="app-bg min-h-screen">
       <ActivityPing />
+      <LocalTracker childId={child.id} />
       {/* The same header as the home page: logo on the left, the menu across the top, the learner and account on the right. */}
       <header className="no-print border-b border-line bg-bg/95 backdrop-blur lg:sticky lg:top-0 lg:z-30">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">

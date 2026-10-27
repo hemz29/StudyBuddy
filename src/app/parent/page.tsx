@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { markDependsOnCheck } from "@/lib/grading/grade";
 import { redirect } from "next/navigation";
-import { getWorksheet, MARKING } from "@/content";
+import { getWorksheet, LESSONS, MARKING } from "@/content";
 import { isDemo, requireParent, userStore } from "@/lib/server/context";
 import { recommendation, scoreTrend, skillRows } from "@/lib/dashboard";
 import { ScoreChart } from "@/components/parent/ScoreChart";
+import { DeviceStats } from "@/components/parent/DeviceStats";
 import { DemoBanner } from "@/components/DemoBanner";
 import { AvatarImage } from "@/components/AvatarImage";
 import { Logo } from "@/components/shell/Logo";
@@ -103,6 +104,8 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         <Stat label="Questions answered" value={String(answered.length)} note={`${fullMarks} got full marks`} />
         <Stat label="Written without hints" value={written.length ? `${Math.round((own / written.length) * 100)}%` : "–"} note={written.length ? `${own} of ${written.length} written answers` : "Shows after the first worksheet"} />
       </section>
+
+      <DeviceStats childId={child.id} nickname={child.nickname} lessonTitles={Object.fromEntries(LESSONS.map((l) => [l.id, l.title.en]))} />
 
       <section className="card bg-white p-5">
         <h2 className="text-lg font-bold">Recommended next practice</h2>

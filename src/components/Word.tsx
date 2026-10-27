@@ -4,6 +4,8 @@ import { createPortal } from "react-dom";
 import { aksharas, meaningOf, stripPunct } from "@/content/words";
 import { transliterate } from "@/lib/transliterate";
 import { LineIcon } from "@/components/LineIcon";
+import { playWord, wordsWithAudio } from "@/lib/readAloud";
+import { stats } from "@/lib/localStats";
 
 const KANNADA = /[ಀ-೿]/;
 
@@ -35,9 +37,24 @@ export function Word({ raw, children, mode = "normal", index }: { raw: string; c
   const ref = useRef<HTMLSpanElement>(null);
   const pointer = useRef("mouse");
   const word = stripPunct(raw);
-  // With a mouse, hovering shows the meaning, so a click reads aloud from here; on touch, the popover offers it.
+  // With a mouse, hovering shows the meaning, so a click plays the word (or, in a lesson, reads aloud from it);
+  // on touch, the tap shows the meaning and the popover offers the same buttons.
   const readFrom = useContext(ReadFromContext);
   const read = readFrom && index !== undefined && mode === "normal" ? () => readFrom(index) : null;
+  const [hasAudio, setHasAudio] = useState(false);
+  const hear = mode === "normal" && hasAudio ? () => playWord(word) : null;
+
+  useEffect(() => {
+    if (!open || mode !== "normal") return;
+    let live = true;
+    wordsWithAudio().then((w) => live && setHasAudio(w.has(word)));
+    // Counted as looked up once it has been open long enough to read, not when the mouse just passes over.
+    const t = setTimeout(() => stats.lookedUp(word), 700);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [open, mode, word]);
 
   useEffect(() => {
     if (!open) return;
@@ -67,9 +84,13 @@ export function Word({ raw, children, mode = "normal", index }: { raw: string; c
           tabIndex={0}
           className="word"
           onPointerDown={(e) => (pointer.current = e.pointerType)}
-          onClick={() => (read && pointer.current === "mouse" ? read() : setOpen(true))}
+          onClick={() => {
+            if (pointer.current !== "mouse") return setOpen(true);
+            if (read) return read();
+            wordsWithAudio().then((w) => w.has(word) && playWord(word));
+          }}
           onFocus={() => setOpen(true)}
-          onBlur={() => setOpen(false)}
+          onBlur={(e) => !(e.relatedTarget as Element | null)?.closest?.("[data-word-popover]") && setOpen(false)}
         >
           {children ?? raw}
         </span>
@@ -77,7 +98,7 @@ export function Word({ raw, children, mode = "normal", index }: { raw: string; c
         <span className={mode === "hover" ? "word-hover" : "word-subtle"}>{children ?? raw}</span>
       )}
       {open && ref.current && (
-        <MeaningPopover word={word} anchor={ref.current} read={read} touch={pointer.current !== "mouse"} close={() => setOpen(false)} />
+        <MeaningPopover word={word} anchor={ref.current} read={read} hear={hear} touch={pointer.current !== "mouse"} close={() => setOpen(false)} />
       )}
     </span>
   );
@@ -87,7 +108,8 @@ const GAP = 8;
 
 // Rendered on <body> with fixed positioning, so cards with overflow-hidden can't clip it.
 // Centred above the word, flipped below when there's no room, and kept inside the screen.
-function MeaningPopover({ word, anchor, read, touch, close }: { word: string; anchor: HTMLElement; read: (() => void) | null; touch: boolean; close: () => void }) {
+type Action = (() => void) | null;
+function MeaningPopover({ word, anchor, read, hear, touch, close }: { word: string; anchor: HTMLElement; read: Action; hear: Action; touch: boolean; close: () => void }) {
   const m = meaningOf(word);
   const box = useRef<HTMLSpanElement>(null);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
@@ -106,8 +128,10 @@ function MeaningPopover({ word, anchor, read, touch, close }: { word: string; an
       ref={box}
       role="tooltip"
       data-word-popover
+      // Tapping a button here mustn't move focus off the word, or the popover closes before the tap lands.
+      onMouseDown={(e) => e.preventDefault()}
       style={{ left: pos?.left ?? 0, top: pos?.top ?? 0, visibility: pos ? "visible" : "hidden" }}
-      className={`${read && touch ? "" : "pointer-events-none "}fixed z-50 flex w-max max-w-64 flex-col gap-0.5 rounded-2xl border border-line bg-white px-4 py-3 text-left font-sans text-sm leading-snug text-ink shadow-xl`}
+      className={`${(read || hear) && touch ? "" : "pointer-events-none "}fixed z-50 flex w-max max-w-64 flex-col gap-0.5 rounded-2xl border border-line bg-white px-4 py-3 text-left font-sans text-sm leading-snug text-ink shadow-xl`}
     >
       <span className="kn text-lg font-bold leading-tight">{word}</span>
       <span className="italic text-muted">{transliterate(word)}</span>
@@ -128,14 +152,21 @@ function MeaningPopover({ word, anchor, read, touch, close }: { word: string; an
       ) : aksharas(word).length > 1 ? (
         <span className="mt-1 text-muted">Meaning not added yet.</span>
       ) : null}
-      {read &&
-        (touch ? (
-          <button onClick={() => { read(); close(); }} className="mt-2 flex w-max items-center gap-1.5 rounded-full bg-black px-3 py-1 text-sm text-[var(--brand-yellow)]">
-            <LineIcon name="sound" size={14} /> Read from here
-          </button>
-        ) : (
-          <span className="mt-1 text-xs text-muted">Click to read aloud from here</span>
-        ))}
+      {touch && (read || hear) && (
+        <span className="mt-2 flex flex-wrap gap-1.5">
+          {hear && (
+            <button onClick={hear} className="flex items-center gap-1.5 rounded-full bg-black px-3 py-1 text-sm text-[var(--brand-yellow)]">
+              <LineIcon name="sound" size={14} /> Hear it
+            </button>
+          )}
+          {read && (
+            <button onClick={() => { read(); close(); }} className="flex items-center gap-1.5 rounded-full border border-black px-3 py-1 text-sm">
+              Read from here
+            </button>
+          )}
+        </span>
+      )}
+      {!touch && (read || hear) && <span className="mt-1 text-xs text-muted">{read ? "Click to read aloud from here" : "Click to hear it"}</span>}
     </span>,
     document.body,
   );

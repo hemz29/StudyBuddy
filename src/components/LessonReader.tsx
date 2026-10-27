@@ -1,19 +1,19 @@
 "use client";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Lesson } from "@/content/schema";
 import { transliterate } from "@/lib/transliterate";
 import { KnText, ReadFromContext } from "@/components/Word";
 import { LineIcon } from "@/components/LineIcon";
 import audio from "@/content/audio.json";
+import { ReadAloudControls } from "@/components/ReadAloudControls";
+import { onStopAudio, stopOtherAudio, useReadAloud } from "@/lib/readAloud";
+import { stats } from "@/lib/localStats";
 
 // Sentences with recorded Kannada speech (made by scripts/tts.mjs) as "<lessonId>/<sentenceId>", and the voices they were made with.
 // FROM_WORD sentences also have "<sentenceId>-w<n>" files, read from word n onwards.
 const HAS_AUDIO = new Set<string>(audio.sentences);
 const FROM_WORD = new Set<string>((audio as { fromWord?: string[] }).fromWord ?? []);
-const VOICES = Object.keys(audio.voices) as ("female" | "male")[];
-// Reading speeds, stepped through with one button. Browsers keep the pitch when slowing down, so the voice stays natural.
-const SPEEDS = [1, 0.75, 0.5];
 
 type Sentence = { id: string; kn: string; en: string };
 
@@ -23,8 +23,7 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
   const [showTr, setShowTr] = useState(true);
   const [showEn, setShowEn] = useState(true);
   // Read aloud: one <audio> element plays a queue of sentences (one sentence, or a whole part).
-  const [voice, setVoice] = useState<"female" | "male">(VOICES[0] ?? "female");
-  const [rate, setRate] = useState(1);
+  const { voice, rate } = useReadAloud();
   const [queue, setQueue] = useState<string[]>([]);
   const player = useRef<HTMLAudioElement | null>(null);
   // The queue holds audio file names; a sentence read from a word onwards plays "<key>-w<n>".
@@ -34,9 +33,13 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
     const a = player.current;
     if (!a) return;
     if (!playing) return a.pause();
+    stopOtherAudio(player);
     a.src = `/audio/${voice}/${queue[0]}.mp3`;
     a.play().catch(() => setQueue([]));
+    stats.listened(lesson.id);
   }, [queue[0], voice]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A word played elsewhere on the page stops the reading.
+  useEffect(() => onStopAudio(player, () => setQueue([])), []);
   useEffect(() => {
     const a = player.current;
     if (!a) return;
@@ -92,22 +95,7 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
               <span><KnText text={b.heading.kn} /> <span className="text-gray-500">· {b.heading.en}</span></span>
               {b.sentences.some((x) => HAS_AUDIO.has(key(x.id))) && (
                 <span className="ml-auto flex items-center gap-1.5 font-medium">
-                  {VOICES.length > 1 && VOICES.map((v) => (
-                    <button
-                      key={v}
-                      onClick={() => setVoice(v)}
-                      aria-pressed={voice === v}
-                      aria-label={`${titleCase(v)} voice`}
-                      title={`${titleCase(v)} voice`}
-                      className={`grid h-8 w-8 place-items-center rounded-full transition ${voice === v ? "bg-accent-soft ring-1 ring-[var(--brand-yellow)]" : "opacity-40 grayscale hover:opacity-80 hover:grayscale-0"}`}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element -- a tiny fixed-size icon */}
-                      <img src={`/icons/voice-${v}.png`} alt="" width={24} height={24} />
-                    </button>
-                  ))}
-                  <IconButton on={rate !== 1} onClick={() => setRate(SPEEDS[(SPEEDS.indexOf(rate) + 1) % SPEEDS.length])} label={`Speed ${rate}× (tap to change)`}>
-                    <span className="text-xs">{rate}×</span>
-                  </IconButton>
+                  <ReadAloudControls />
                   <button
                     onClick={() => play(b.sentences.filter((x) => HAS_AUDIO.has(key(x.id))).map((x) => key(x.id)))}
                     className="ml-1 flex items-center gap-1.5 rounded-full bg-black px-3 py-1 text-sm text-[var(--brand-yellow)]"
@@ -180,10 +168,3 @@ function Toggle({ on, set, label, title }: { on: boolean; set: (v: boolean) => v
   );
 }
 
-function IconButton({ on, onClick, label, children }: { on: boolean; onClick: () => void; label: string; children: ReactNode }) {
-  return (
-    <button onClick={onClick} aria-pressed={on} aria-label={label} title={label} className={`grid h-7 min-w-7 place-items-center rounded-full px-1 ${on ? "bg-black text-[var(--brand-yellow)]" : "text-muted hover:bg-white hover:text-black"}`}>
-      {children}
-    </button>
-  );
-}

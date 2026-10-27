@@ -5,6 +5,7 @@ import type { QuestionType, Skill } from "@/content/schema";
 import { transliterate } from "@/lib/transliterate";
 import { KnText } from "@/components/Word";
 import { LineIcon, type IconName } from "@/components/LineIcon";
+import { stats } from "@/lib/localStats";
 
 export type Card = {
   questionId: string;
@@ -40,6 +41,7 @@ export function PracticeCards({ lessonId, title, cards }: { lessonId: string; ti
   const results = cards.map((c, k) => ({ questionId: c.questionId, correct: picks[k] === c.correct }));
 
   async function finish() {
+    stats.cards(lessonId, results.filter((r) => r.correct).length, results.length);
     await fetch("/api/cards", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ lessonId, results }) });
     setSaved(true);
   }
