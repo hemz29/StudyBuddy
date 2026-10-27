@@ -1,16 +1,12 @@
 import { transliterate } from "@/lib/transliterate";
 import { NUMBER_NAMES, toKannadaDigits } from "@/content/grade6/numbers";
 import { KnText } from "@/components/Word";
+import { LetterTree } from "@/components/LetterTree";
+import { SOUNDS_LIKE } from "@/content/grade6/alphabet";
 
 // From the teacher's "Varnamale / Kagunita / Ottakshara / number names" notes.
 const VOWELS = "ಅ ಆ ಇ ಈ ಉ ಊ ಋ ಎ ಏ ಐ ಒ ಓ ಔ".split(" ");
 const SHORT = "ಅ ಇ ಉ ಋ ಎ ಒ".split(" ");
-// "Sounds like" hints for English speakers, shown under each vowel.
-const SOUNDS_LIKE: Record<string, string> = {
-  "ಅ": "u in 'up'", "ಆ": "a in 'father'", "ಇ": "i in 'sit'", "ಈ": "ee in 'see'", "ಉ": "u in 'put'", "ಊ": "oo in 'food'",
-  "ಋ": "ru in 'root'", "ಎ": "e in 'pet'", "ಏ": "'hey' without the h", "ಐ": "'eye'", "ಒ": "o in 'obey', short", "ಓ": "o in 'go'",
-  "ಔ": "ow in 'cow'",
-};
 const VARGA: [string[], string][] = [
   ["ಕ ಖ ಗ ಘ ಙ".split(" "), "Kantya – from the throat"],
   ["ಚ ಛ ಜ ಝ ಞ".split(" "), "Taluvya – between the two jaws (palate)"],
@@ -43,7 +39,13 @@ export default function Letters() {
   return (
     <div className="flex flex-col gap-5">
       <section className="paper p-5">
-        <h1 className="text-2xl font-extrabold"><KnText text="ಕನ್ನಡ ವರ್ಣಮಾಲೆ" /> · Kannada alphabet (49)</h1>
+        <h1 className="text-2xl font-extrabold"><KnText text="ವರ್ಣಮಾಲೆ" /> · The alphabet tree</h1>
+        <p className="mt-1 mb-4 text-sm text-gray-600">How all 49 letters fit together, as in your textbook.</p>
+        <LetterTree />
+      </section>
+
+      <section className="paper p-5">
+        <h2 className="text-2xl font-extrabold"><KnText text="ಕನ್ನಡ ವರ್ಣಮಾಲೆ" /> · Kannada alphabet (49)</h2>
         <h2 className="mt-4 font-bold"><KnText text="ಸ್ವರಗಳು" /> · Vowels (13) <span className="font-normal text-gray-500">– said freely</span></h2>
         {/* 13 vowels as two even rows (7 + 6) on wider screens, equal-width tiles. */}
         <div className="mt-2 grid max-w-4xl grid-cols-4 gap-2 sm:grid-cols-7 [&>span]:h-full [&>span>span:last-child]:max-w-none">{VOWELS.map((v) => <Letter key={v} k={v} like={SOUNDS_LIKE[v]} />)}</div>
