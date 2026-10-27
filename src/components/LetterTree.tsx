@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { transliterate } from "@/lib/transliterate";
+import { KnText } from "@/components/Word";
 import { ALPHABET_TREE, SOUNDS_LIKE, countLetters, type TreeNode } from "@/content/grade6/alphabet";
 
 // The textbook's ವರ್ಣಮಾಲೆ tree, to explore: tap a branch to open it, tap a letter to hear how it's said.
@@ -23,7 +24,7 @@ export function LetterTree() {
             aria-pressed={open === i}
             className={`relative flex min-w-0 flex-col items-center rounded-2xl border px-1.5 py-3 text-center transition before:absolute before:-top-3 before:h-3 before:w-px before:bg-black/30 ${open === i ? "border-[var(--brand-yellow)] bg-accent-soft" : "border-line bg-white hover:border-black"}`}
           >
-            <span className="kn text-sm font-semibold [overflow-wrap:anywhere] sm:text-lg">{b.kn}</span>
+            <KnText text={b.kn} mode="hover" className="kn text-sm font-semibold [overflow-wrap:anywhere] sm:text-lg" />
             <span className="text-xs text-muted">{b.en} · {countLetters(b)}</span>
           </button>
         ))}
@@ -32,7 +33,7 @@ export function LetterTree() {
 
       {/* The open branch, all the way down to its letters. */}
       <div className="w-full max-w-3xl rounded-[var(--radius)] border border-line bg-white p-4">
-        {branch.note && <p className="mb-3 text-center text-sm text-muted">{branch.note}</p>}
+        {branch.note && <p className="mb-3 text-center text-sm text-muted"><KnText text={branch.note} /></p>}
         {/* A branch with sub-groups (ವರ್ಗೀಯ) gets the full width so its three columns have room. */}
         <div className={`grid gap-3 ${branch.children!.some((c) => c.children) ? "" : branch.children!.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
           {branch.children!.map((c) => <Branch key={c.kn} node={c} pick={setLetter} picked={letter} />)}
@@ -58,9 +59,9 @@ function Branch({ node, pick, picked }: { node: TreeNode; pick: (l: string) => v
   return (
     <div className="flex flex-col gap-2 rounded-2xl bg-[#f7f7f7] p-3">
       <div className="text-center">
-        <span className="kn font-semibold">{node.kn}</span>
+        <KnText text={node.kn} className="kn font-semibold" />
         <span className="text-xs text-muted"> · {node.en}{countLetters(node) ? ` · ${countLetters(node)}` : ""}</span>
-        {node.note && <p className="text-xs text-muted">{node.note}</p>}
+        {node.note && <p className="text-xs text-muted"><KnText text={node.note} /></p>}
       </div>
       {node.children && (
         <div className="grid gap-2 border-t border-black/10 pt-2 sm:grid-cols-3">
@@ -89,7 +90,7 @@ function Branch({ node, pick, picked }: { node: TreeNode; pick: (l: string) => v
 function Pill({ node, root }: { node: TreeNode; root?: boolean }) {
   return (
     <div className={`flex flex-col items-center rounded-2xl px-5 py-2 ${root ? "bg-black text-white" : "bg-white"}`}>
-      <span className="kn text-xl font-semibold text-[var(--brand-yellow)]">{node.kn}</span>
+      <KnText text={node.kn} className="kn text-xl font-semibold text-[var(--brand-yellow)]" />
       <span className="text-xs text-gray-300">{node.en} · {countLetters(node)} letters</span>
     </div>
   );
