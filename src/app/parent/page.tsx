@@ -64,7 +64,8 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       <ActivityPing />
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6">
       {isDemo && <DemoBanner />}
-      {parent.isGuest && <SaveProgressStrip name={child.nickname} />}
+      {/* The parent page is a natural exit, so guests are reminded here even if they closed the prompt elsewhere. */}
+      {parent.isGuest && <SaveProgressStrip name={child.nickname} dismissible={false} />}
       <div className="flex flex-wrap items-center gap-3">
         <span className="mr-auto"><Logo href="/" /></span>
         <Link href="/feedback" className="btn btn-ghost"><LineIcon name="chat" size={20} /> Give feedback</Link>

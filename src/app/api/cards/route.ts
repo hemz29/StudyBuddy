@@ -3,6 +3,7 @@ import { z } from "zod";
 import { MARKING, getQuestion } from "@/content";
 import { getActiveChild, getParent, userStore } from "@/lib/server/context";
 import { logActivity } from "@/lib/server/activity";
+import { notePractised } from "@/lib/server/practised";
 
 const Body = z.object({
   lessonId: z.string(),
@@ -64,5 +65,6 @@ export async function POST(req: Request) {
     }),
   );
   await logActivity(store, parent.id, { kind: "cards_done", path: `/learn/cards/${body.data.lessonId}`, childId: child.id });
+  await notePractised();
   return NextResponse.json({ ok: true });
 }

@@ -4,6 +4,7 @@ import { MARKING, getWorksheet } from "@/content";
 import { getActiveChild, getParent, userStore } from "@/lib/server/context";
 import { fail } from "@/lib/server/api";
 import { logActivity } from "@/lib/server/activity";
+import { notePractised } from "@/lib/server/practised";
 
 const Body = z.object({ worksheetId: z.string(), retryOf: z.string().nullable().optional() });
 
@@ -33,5 +34,6 @@ export async function POST(req: Request) {
     completedAt: null,
   });
   await logActivity(store, parent.id, { kind: "worksheet_start", path: `/learn/worksheet/${ws.id}`, childId: child.id });
+  await notePractised();
   return NextResponse.json({ id: session.id });
 }

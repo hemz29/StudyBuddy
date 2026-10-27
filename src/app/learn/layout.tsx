@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+import { PRACTISED_COOKIE } from "@/lib/server/practised";
 import Link from "next/link";
 import { requireChild, isDemo } from "@/lib/server/context";
 import { AvatarImage } from "@/components/AvatarImage";
@@ -10,6 +12,9 @@ import { SignOutButton } from "@/components/SignOutButton";
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
   const { parent, child } = await requireChild();
+  // Guests see the save prompt only once they've practised something, and not again here once they've closed it.
+  const jar = await cookies();
+  const showSave = parent.isGuest && jar.has(PRACTISED_COOKIE) && !jar.has("kk_save_dismissed");
   return (
     <div className="app-bg min-h-screen">
       <ActivityPing />
@@ -30,7 +35,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
       <div className="mx-auto max-w-6xl px-4 py-6">
         <main className="min-w-0 pb-16">
           {isDemo && <p className="no-print mb-3 text-xs text-muted">Demo mode – progress is saved on this computer only.</p>}
-          {parent.isGuest && <div className="mb-4"><SaveProgressStrip name={child.nickname} /></div>}
+          {showSave && <div className="mb-4"><SaveProgressStrip name={child.nickname} /></div>}
           {children}
         </main>
       </div>
