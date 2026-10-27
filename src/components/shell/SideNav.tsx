@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { KnText } from "@/components/Word";
 
 export const CHILD_NAV = [
-  { href: "/learn", label: "Learn", exact: true, also: ["/learn/lesson", "/learn/grammar", "/learn/cards/", "/learn/letters", "/learn/scores"] },
+  { href: "/learn", label: "Learn", exact: true, also: ["/learn/lesson", "/learn/grammar", "/learn/cards/", "/learn/letters", "/learn/numbers", "/learn/scores"] },
   { href: "/learn/practice", label: "Practice", also: ["/learn/writing", "/learn/tests", "/learn/worksheet/", "/learn/session/"] },
   { href: "/learn/future", label: "Future plans" },
   { href: "/learn/about", label: "About us", also: ["/learn/contact"] },

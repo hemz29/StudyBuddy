@@ -1,5 +1,4 @@
 import { transliterate } from "@/lib/transliterate";
-import { NUMBER_NAMES, toKannadaDigits } from "@/content/grade6/numbers";
 import { KnText } from "@/components/Word";
 import { LetterTree } from "@/components/LetterTree";
 import { SOUNDS_LIKE } from "@/content/grade6/alphabet";
@@ -96,17 +95,6 @@ export default function Letters() {
         <div className="mt-3 flex flex-wrap gap-2">{OTTAKSHARA.map((o) => <Letter key={o} k={o} size="text-2xl" />)}</div>
       </section>
 
-      <section className="paper p-5">
-        <h2 className="font-bold"><KnText text="ಸಂಖ್ಯಾಪದಗಳು" /> · Number names 1–50</h2>
-        <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-3 lg:grid-cols-5">
-          {Object.entries(NUMBER_NAMES).map(([n, names]) => (
-            <div key={n} className="flex items-baseline gap-2">
-              <span className="kn w-10 text-right font-bold">{toKannadaDigits(n)}</span>
-              <KnText text={names[0]} />
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
