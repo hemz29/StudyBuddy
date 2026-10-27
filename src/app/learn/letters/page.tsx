@@ -33,8 +33,8 @@ function Letter({ k, size = "text-3xl", like }: { k: string; size?: string; like
   return (
     <span className="flex flex-col items-center rounded-xl border border-gray-100 px-2 py-1.5">
       <span className={`kn ${size} font-bold`}>{k}</span>
-      <span className="text-xs italic text-gray-500">{transliterate(k)}</span>
-      {like && <span className="mt-0.5 max-w-24 text-center text-[11px] leading-tight text-muted">like {like}</span>}
+      <span className="text-sm font-semibold text-ink">{transliterate(k)}</span>
+      {like && <span className="mt-1.5 max-w-24 rounded-md bg-accent-soft px-1.5 py-0.5 text-center text-[11px] leading-tight text-ink">like {like}</span>}
     </span>
   );
 }
