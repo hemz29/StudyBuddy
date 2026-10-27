@@ -5,6 +5,12 @@ import { KnText } from "@/components/Word";
 // From the teacher's "Varnamale / Kagunita / Ottakshara / number names" notes.
 const VOWELS = "ಅ ಆ ಇ ಈ ಉ ಊ ಋ ಎ ಏ ಐ ಒ ಓ ಔ".split(" ");
 const SHORT = "ಅ ಇ ಉ ಋ ಎ ಒ".split(" ");
+// "Sounds like" hints for English speakers, shown under each vowel.
+const SOUNDS_LIKE: Record<string, string> = {
+  "ಅ": "u in 'up'", "ಆ": "a in 'father'", "ಇ": "i in 'sit'", "ಈ": "ee in 'see'", "ಉ": "u in 'put'", "ಊ": "oo in 'food'",
+  "ಋ": "ru in 'rub'", "ಎ": "e in 'pet'", "ಏ": "'hey' without the h", "ಐ": "'eye'", "ಒ": "o in 'obey', short", "ಓ": "o in 'go'",
+  "ಔ": "ow in 'cow'",
+};
 const VARGA: [string[], string][] = [
   ["ಕ ಖ ಗ ಘ ಙ".split(" "), "Kantya – from the throat"],
   ["ಚ ಛ ಜ ಝ ಞ".split(" "), "Taluvya – between the two jaws (palate)"],
@@ -23,11 +29,12 @@ const OTTAKSHARA = "ಕ್ಕ ಖ್ಖ ಗ್ಗ ಘ್ಘ ಙ್ಙ ಚ್ಚ 
 
 // Letters are shown as letters, with their sound underneath. They don't get word meanings: ಏ is also a word ("Hey!")
 // and ಆ, ಈ mean "that", "these", which would be confusing next to the alphabet.
-function Letter({ k, size = "text-3xl" }: { k: string; size?: string }) {
+function Letter({ k, size = "text-3xl", like }: { k: string; size?: string; like?: string }) {
   return (
     <span className="flex flex-col items-center rounded-xl border border-gray-100 px-2 py-1.5">
       <span className={`kn ${size} font-bold`}>{k}</span>
       <span className="text-xs italic text-gray-500">{transliterate(k)}</span>
+      {like && <span className="mt-0.5 max-w-24 text-center text-[11px] leading-tight text-muted">like {like}</span>}
     </span>
   );
 }
@@ -38,7 +45,7 @@ export default function Letters() {
       <section className="paper p-5">
         <h1 className="text-2xl font-extrabold"><KnText text="ಕನ್ನಡ ವರ್ಣಮಾಲೆ" /> · Kannada alphabet (49)</h1>
         <h2 className="mt-4 font-bold"><KnText text="ಸ್ವರಗಳು" /> · Vowels (13) <span className="font-normal text-gray-500">– said freely</span></h2>
-        <div className="mt-2 flex flex-wrap gap-2">{VOWELS.map((v) => <Letter key={v} k={v} />)}</div>
+        <div className="mt-2 flex flex-wrap gap-2">{VOWELS.map((v) => <Letter key={v} k={v} like={SOUNDS_LIKE[v]} />)}</div>
         <p className="mt-2 text-sm text-gray-600">
           Short (<KnText text="ಹ್ರಸ್ವ" />, said quickly): <span className="kn">{SHORT.join(" ")}</span> · Long (<KnText text="ದೀರ್ಘ" />, said longer): the other seven.
           Yogavaahagalu (2): <span className="kn">ಅಂ ಅಃ</span>
