@@ -21,10 +21,12 @@ const SIGNS: [string, string, string][] = [
 ];
 const OTTAKSHARA = "ಕ್ಕ ಖ್ಖ ಗ್ಗ ಘ್ಘ ಙ್ಙ ಚ್ಚ ಛ್ಛ ಜ್ಜ ಝ್ಝ ಞ್ಞ ಟ್ಟ ಠ್ಠ ಡ್ಡ ಢ್ಢ ಣ್ಣ ತ್ತ ಥ್ಥ ದ್ದ ಧ್ಧ ನ್ನ ಪ್ಪ ಫ್ಫ ಬ್ಬ ಭ್ಭ ಮ್ಮ ಯ್ಯ ರ್ರ ಲ್ಲ ವ್ವ ಶ್ಶ ಸ್ಸ ಹ್ಹ ಳ್ಳ".split(" ");
 
+// Letters are shown as letters, with their sound underneath. They don't get word meanings: ಏ is also a word ("Hey!")
+// and ಆ, ಈ mean "that", "these", which would be confusing next to the alphabet.
 function Letter({ k, size = "text-3xl" }: { k: string; size?: string }) {
   return (
     <span className="flex flex-col items-center rounded-xl border border-gray-100 px-2 py-1.5">
-      <KnText text={k} className={`${size} font-bold`} />
+      <span className={`kn ${size} font-bold`}>{k}</span>
       <span className="text-xs italic text-gray-500">{transliterate(k)}</span>
     </span>
   );
@@ -38,13 +40,13 @@ export default function Letters() {
         <h2 className="mt-4 font-bold"><KnText text="ಸ್ವರಗಳು" /> · Vowels (13) <span className="font-normal text-gray-500">– said freely</span></h2>
         <div className="mt-2 flex flex-wrap gap-2">{VOWELS.map((v) => <Letter key={v} k={v} />)}</div>
         <p className="mt-2 text-sm text-gray-600">
-          Short (<KnText text="ಹ್ರಸ್ವ" />, said quickly): <KnText text={SHORT.join(" ")} /> · Long (<KnText text="ದೀರ್ಘ" />, said longer): the other seven.
-          Yogavaahagalu (2): <KnText text="ಅಂ ಅಃ" />
+          Short (<KnText text="ಹ್ರಸ್ವ" />, said quickly): <span className="kn">{SHORT.join(" ")}</span> · Long (<KnText text="ದೀರ್ಘ" />, said longer): the other seven.
+          Yogavaahagalu (2): <span className="kn">ಅಂ ಅಃ</span>
         </p>
       </section>
 
       <section className="paper p-5">
-        <h2 className="font-bold"><KnText text="ವ್ಯಂಜನಗಳು" /> · Consonants (34) <span className="font-normal text-gray-500">– said with a vowel: <KnText text="ಕ್ + ಅ = ಕ" /></span></h2>
+        <h2 className="font-bold"><KnText text="ವ್ಯಂಜನಗಳು" /> · Consonants (34) <span className="font-normal text-gray-500">– said with a vowel: <span className="kn">ಕ್ + ಅ = ಕ</span></span></h2>
         <p className="mt-1 text-sm text-gray-600">
           In each row: columns 1 and 3 are <b>alpapraana</b> (little breath), columns 2 and 4 are <b>mahaapraana</b> (more breath, e.g. <KnText text="ಭ" /> in <KnText text="ಭಾರತ" />), column 5 is <b>anunaasika</b> (through the nose).
         </p>
@@ -70,7 +72,7 @@ export default function Letters() {
             const k = v === "ಅ" ? "ಕ" : v === "ಅಂ" ? "ಕಂ" : v === "ಅಃ" ? "ಕಃ" : "ಕ" + sign;
             return (
               <div key={v} className="flex flex-col items-center rounded-xl border border-gray-100 p-2 text-center">
-                <KnText text={k} className="text-3xl font-bold" />
+                <span className="kn text-3xl font-bold">{k}</span>
                 <span className="text-xs italic text-gray-500">{transliterate(k)}</span>
                 <span className="text-[0.7rem] text-gray-600">{name}</span>
               </div>
