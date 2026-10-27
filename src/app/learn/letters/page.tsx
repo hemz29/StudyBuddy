@@ -8,7 +8,7 @@ const SHORT = "ಅ ಇ ಉ ಋ ಎ ಒ".split(" ");
 // "Sounds like" hints for English speakers, shown under each vowel.
 const SOUNDS_LIKE: Record<string, string> = {
   "ಅ": "u in 'up'", "ಆ": "a in 'father'", "ಇ": "i in 'sit'", "ಈ": "ee in 'see'", "ಉ": "u in 'put'", "ಊ": "oo in 'food'",
-  "ಋ": "ru in 'rub'", "ಎ": "e in 'pet'", "ಏ": "'hey' without the h", "ಐ": "'eye'", "ಒ": "o in 'obey', short", "ಓ": "o in 'go'",
+  "ಋ": "ru in 'root'", "ಎ": "e in 'pet'", "ಏ": "'hey' without the h", "ಐ": "'eye'", "ಒ": "o in 'obey', short", "ಓ": "o in 'go'",
   "ಔ": "ow in 'cow'",
 };
 const VARGA: [string[], string][] = [
