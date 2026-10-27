@@ -41,7 +41,7 @@ export default async function LearnHome() {
           <Group title="Learn" cols={4}>
             <ChoiceCard href="/learn/lessons" tone="sage" icon={<LineIcon name="book" size={20} />} title="Read & Understand" sub="Stories and poems, every word explained" />
             <ChoiceCard href="/learn/grammar" tone="peach" icon={<LineIcon name="pen" size={20} />} title="Grammar" sub="Opposites, plurals, gender, meanings" />
-            <ChoiceCard href="/learn/letters" tone="lavender" icon={<span className="kn text-lg" aria-hidden>ಅ</span>} title="Alphabet" sub="Letters, vowel signs, double letters" />
+            <ChoiceCard href="/learn/letters" tone="lavender" icon={<span className="kn text-lg" aria-hidden>ಅ</span>} title="Alphabets" sub="Letters, vowel signs, double letters" />
             <ChoiceCard href="/learn/numbers" tone="sky" icon={<span className="kn text-lg" aria-hidden>೧</span>} title="Numbers" sub="Numerals and number names 1–50" />
           </Group>
           <Group title="Practise">

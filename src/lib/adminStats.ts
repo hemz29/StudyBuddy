@@ -125,7 +125,7 @@ export function activityMix(events: Event[], sessions: PracticeSession[]) {
   return [
     { what: "Lessons", n: events.filter((e) => e.kind === "lesson_view").length || views(/^\/learn\/lesson\//) },
     { what: "Grammar cards", n: sessions.filter((s) => s.kind === "cards").length },
-    { what: "Alphabet", n: views(/^\/learn\/letters/) },
+    { what: "Alphabets", n: views(/^\/learn\/letters/) },
     { what: "Numbers", n: views(/^\/learn\/numbers/) },
     { what: "Worksheets & tests", n: sessions.filter((s) => s.kind === "worksheet").length },
     { what: "My scores", n: views(/^\/learn\/scores/) },
