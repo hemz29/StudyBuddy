@@ -45,7 +45,8 @@ export default function Letters() {
       <section className="paper p-5">
         <h1 className="text-2xl font-extrabold"><KnText text="ಕನ್ನಡ ವರ್ಣಮಾಲೆ" /> · Kannada alphabet (49)</h1>
         <h2 className="mt-4 font-bold"><KnText text="ಸ್ವರಗಳು" /> · Vowels (13) <span className="font-normal text-gray-500">– said freely</span></h2>
-        <div className="mt-2 flex flex-wrap gap-2">{VOWELS.map((v) => <Letter key={v} k={v} like={SOUNDS_LIKE[v]} />)}</div>
+        {/* 13 vowels as two even rows (7 + 6) on wider screens, equal-width tiles. */}
+        <div className="mt-2 grid max-w-4xl grid-cols-4 gap-2 sm:grid-cols-7 [&>span]:h-full [&>span>span:last-child]:max-w-none">{VOWELS.map((v) => <Letter key={v} k={v} like={SOUNDS_LIKE[v]} />)}</div>
         <p className="mt-2 text-sm text-gray-600">
           Short (<KnText text="ಹ್ರಸ್ವ" />, said quickly): <span className="kn">{SHORT.join(" ")}</span> · Long (<KnText text="ದೀರ್ಘ" />, said longer): the other seven.
           Yogavaahagalu (2): <span className="kn">ಅಂ ಅಃ</span>
