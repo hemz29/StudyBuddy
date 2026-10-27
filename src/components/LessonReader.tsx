@@ -3,15 +3,17 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { Lesson } from "@/content/schema";
 import { transliterate } from "@/lib/transliterate";
-import { KnText } from "@/components/Word";
+import { KnText, ReadFromContext } from "@/components/Word";
 import { LineIcon } from "@/components/LineIcon";
 import audio from "@/content/audio.json";
 
 // Sentences with recorded Kannada speech (made by scripts/tts.mjs) as "<lessonId>/<sentenceId>", and the voices they were made with.
+// FROM_WORD sentences also have "<sentenceId>-w<n>" files, read from word n onwards.
 const HAS_AUDIO = new Set<string>(audio.sentences);
+const FROM_WORD = new Set<string>((audio as { fromWord?: string[] }).fromWord ?? []);
 const VOICES = Object.keys(audio.voices) as ("female" | "male")[];
-// Slow playback for careful listening. Browsers keep the pitch when slowing down, so the voice stays natural.
-const SLOW = 0.5;
+// Reading speeds, stepped through with one button. Browsers keep the pitch when slowing down, so the voice stays natural.
+const SPEEDS = [1, 0.75, 0.5];
 
 type Sentence = { id: string; kn: string; en: string };
 
@@ -22,26 +24,35 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
   const [showEn, setShowEn] = useState(true);
   // Read aloud: one <audio> element plays a queue of sentences (one sentence, or a whole part).
   const [voice, setVoice] = useState<"female" | "male">(VOICES[0] ?? "female");
-  const [slow, setSlow] = useState(false);
-  const rate = slow ? SLOW : 1;
+  const [rate, setRate] = useState(1);
   const [queue, setQueue] = useState<string[]>([]);
   const player = useRef<HTMLAudioElement | null>(null);
-  const playing = queue[0] ?? null;
+  // The queue holds audio file names; a sentence read from a word onwards plays "<key>-w<n>".
+  const playing = queue[0]?.replace(/-w\d+$/, "") ?? null;
   const key = (id: string) => `${lesson.id}/${id}`;
   useEffect(() => {
     const a = player.current;
     if (!a) return;
     if (!playing) return a.pause();
-    a.src = `/audio/${voice}/${playing}.mp3`;
+    a.src = `/audio/${voice}/${queue[0]}.mp3`;
     a.play().catch(() => setQueue([]));
-  }, [playing, voice]);
+  }, [queue[0], voice]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const a = player.current;
     if (!a) return;
     a.preservesPitch = true;
     a.defaultPlaybackRate = a.playbackRate = rate; // the default carries over to the next sentence's file
   }, [rate]);
-  const play = (ids: string[]) => setQueue((q) => (q.length && q[0] === ids[0] ? [] : ids));
+  // Tapping a Listen button again while it is reading stops it.
+  const play = (ids: string[]) => setQueue(playing && ids.includes(playing) ? [] : ids);
+  // Tapping a word reads from it to the end of the part. Restarting from a word never toggles playback off.
+  const readFrom = (sentences: Sentence[], i: number, w: number) => {
+    const rest = sentences.slice(i).filter((x) => HAS_AUDIO.has(key(x.id))).map((x) => key(x.id));
+    if (!rest.length || rest[0] !== key(sentences[i].id)) return;
+    if (w > 0 && FROM_WORD.has(rest[0])) rest[0] += `-w${w}`;
+    if (rest[0] === queue[0] && player.current) player.current.currentTime = 0; // same word again: start it over
+    setQueue(rest);
+  };
 
   const blocks: { heading?: { kn: string; en: string }; sentences: Sentence[]; intro?: boolean }[] = [
     ...(lesson.intro.length ? [{ heading: { kn: "ಪಾಠ ಪ್ರವೇಶ", en: "Introduction" }, sentences: lesson.intro, intro: true }] : []),
@@ -86,8 +97,8 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
                       <LineIcon name={v} size={16} />
                     </IconButton>
                   ))}
-                  <IconButton on={slow} onClick={() => setSlow(!slow)} label={`Slow (${SLOW}×)`}>
-                    <span className="text-xs">{SLOW}×</span>
+                  <IconButton on={rate !== 1} onClick={() => setRate(SPEEDS[(SPEEDS.indexOf(rate) + 1) % SPEEDS.length])} label={`Speed ${rate}× (tap to change)`}>
+                    <span className="text-xs">{rate}×</span>
                   </IconButton>
                   <button
                     onClick={() => play(b.sentences.filter((x) => HAS_AUDIO.has(key(x.id))).map((x) => key(x.id)))}
@@ -100,7 +111,7 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
             </h2>
           )}
           <ol className={lesson.kind === "poem" && !b.intro ? "py-2" : "divide-y divide-gray-100"}>
-            {b.sentences.map((s) => (
+            {b.sentences.map((s, si) => (
               <li key={s.id} className={`grid gap-3 px-5 ${lesson.kind === "poem" && !b.intro ? "py-1.5" : "py-3"} ${showEn ? "md:grid-cols-2" : ""}`}>
                 <div className={playing === key(s.id) ? "-mx-2 rounded-xl bg-accent-soft px-2" : ""}>
                   <p className="text-[1.45rem] leading-relaxed">
@@ -114,7 +125,9 @@ export function LessonReader({ lesson }: { lesson: Lesson }) {
                         <LineIcon name="sound" size={16} />
                       </button>
                     )}
-                    <KnText text={s.kn} />
+                    <ReadFromContext.Provider value={HAS_AUDIO.has(key(s.id)) ? (w) => readFrom(b.sentences, si, w) : null}>
+                      <KnText text={s.kn} />
+                    </ReadFromContext.Provider>
                   </p>
                   {showTr && <p className="mt-0.5 text-[0.95rem] italic text-gray-500">{transliterate(s.kn)}</p>}
                 </div>
@@ -161,7 +174,7 @@ function Toggle({ on, set, label, title }: { on: boolean; set: (v: boolean) => v
 
 function IconButton({ on, onClick, label, children }: { on: boolean; onClick: () => void; label: string; children: ReactNode }) {
   return (
-    <button onClick={onClick} aria-pressed={on} aria-label={label} title={label} className={`grid h-7 w-7 place-items-center rounded-full ${on ? "bg-black text-[var(--brand-yellow)]" : "text-muted hover:bg-white hover:text-black"}`}>
+    <button onClick={onClick} aria-pressed={on} aria-label={label} title={label} className={`grid h-7 min-w-7 place-items-center rounded-full px-1 ${on ? "bg-black text-[var(--brand-yellow)]" : "text-muted hover:bg-white hover:text-black"}`}>
       {children}
     </button>
   );

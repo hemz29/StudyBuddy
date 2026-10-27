@@ -2,8 +2,9 @@
 // saved once as MP3s in public/audio/, so families never call Google and the key never leaves this machine.
 // Usage: GOOGLE_TTS_API_KEY=... node scripts/tts.mjs <lessonId> [blockNumber ...]
 //   e.g. node scripts/tts.mjs panchatantra 1     (block 1 = the first part after the introduction; 0 = introduction)
-// Writes public/audio/<voice>/<lessonId>/<sentenceId>.mp3 and updates src/content/audio.json.
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+// Writes public/audio/<voice>/<lessonId>/<sentenceId>.mp3, plus <sentenceId>-w<n>.mp3 read from word n onwards
+// (tap a word to read from there), and updates src/content/audio.json. Files that already exist are kept, not re-sent.
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 
 const KEY = process.env.GOOGLE_TTS_API_KEY;
@@ -36,6 +37,8 @@ const wanted = blockArgs.length ? blockArgs.map(Number) : blocks.map((_, i) => i
 const manifestPath = "src/content/audio.json";
 const manifest = JSON.parse(await readFile(manifestPath, "utf8").catch(() => '{"voices":{},"sentences":[]}'));
 const done = new Set(manifest.sentences);
+const fromWord = new Set(manifest.fromWord ?? []);
+const exists = (f) => access(f).then(() => true, () => false);
 let chars = 0;
 for (const [gender, voice] of chosen) {
   manifest.voices[gender] = voice.name;
@@ -43,19 +46,27 @@ for (const [gender, voice] of chosen) {
 }
 for (const bi of wanted) {
   for (const s of blocks[bi]?.sentences ?? []) {
+    const words = s.kn.split(/\s+/).filter(Boolean);
     for (const [gender, voice] of chosen) {
-      const out = await call("text:synthesize", {
-        input: { text: s.kn },
-        voice: { languageCode: "kn-IN", name: voice.name },
-        audioConfig: { audioEncoding: "MP3", speakingRate: 0.9 },
-      });
-      await writeFile(`public/audio/${gender}/${lessonId}/${s.id}.mp3`, Buffer.from(out.audioContent, "base64"));
-      chars += s.kn.length;
+      for (let w = 0; w < words.length; w++) {
+        const file = `public/audio/${gender}/${lessonId}/${s.id}${w ? `-w${w}` : ""}.mp3`;
+        if (await exists(file)) continue;
+        const text = words.slice(w).join(" ");
+        const out = await call("text:synthesize", {
+          input: { text },
+          voice: { languageCode: "kn-IN", name: voice.name },
+          audioConfig: { audioEncoding: "MP3", speakingRate: 0.9 },
+        });
+        await writeFile(file, Buffer.from(out.audioContent, "base64"));
+        chars += text.length;
+      }
     }
+    if (words.length > 1) fromWord.add(`${lessonId}/${s.id}`);
     done.add(`${lessonId}/${s.id}`); // sentence ids repeat across lessons
     process.stdout.write(".");
   }
 }
 manifest.sentences = [...done].sort();
+manifest.fromWord = [...fromWord].sort();
 await writeFile(manifestPath, JSON.stringify(manifest, null, 1) + "\n");
 console.log(`\nDone: ${manifest.sentences.length} sentences with audio; ${chars} characters sent to Google this run.`);
