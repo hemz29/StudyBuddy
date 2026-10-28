@@ -24,10 +24,12 @@ export function DeviceStats({ childId, nickname, lessonTitles }: { childId: stri
   useEffect(() => setS(readStats(childId)), [childId]);
   if (s === undefined) return null; // first render on the server: storage isn't readable there
 
+  // This calendar week, Monday to Sunday; days still to come are shown as empty outlines.
+  const now = new Date();
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
   const week = [...Array(7)].map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - 6 + i);
-    return { label: d.toLocaleDateString("en-IN", { weekday: "narrow" }), sec: s?.days[dayKey(d)] ?? 0 };
+    const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+    return { label: d.toLocaleDateString("en-IN", { weekday: "narrow" }), sec: s?.days[dayKey(d)] ?? 0, future: d > now };
   });
   const weekSec = week.reduce((t, d) => t + d.sec, 0);
   const totalSec = Object.values(s?.days ?? {}).reduce((t, x) => t + x, 0);
@@ -52,12 +54,12 @@ export function DeviceStats({ childId, nickname, lessonTitles }: { childId: stri
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Tile label="Learning time this week" value={minutes(weekSec)} note={`${minutes(totalSec)} since ${new Date(s.firstAt).toLocaleDateString("en-IN")}`} />
             <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="text-sm font-bold text-muted">Days practised</p>
+              <p className="text-sm font-bold text-muted">Days practised this week</p>
               <p className="mt-1 text-3xl font-extrabold">{week.filter((d) => d.sec).length}<span className="text-base font-normal text-muted"> of 7</span></p>
               <div className="mt-2 flex gap-1.5" aria-hidden>
                 {week.map((d, i) => (
                   <span key={i} className="flex flex-col items-center gap-0.5 text-[10px] text-muted">
-                    <span className={`h-3 w-3 rounded-full ${d.sec ? "bg-black" : "bg-line"}`} />
+                    <span className={`h-3 w-3 rounded-full ${d.sec ? "bg-black" : d.future ? "border border-line" : "bg-line"}`} />
                     {d.label}
                   </span>
                 ))}
