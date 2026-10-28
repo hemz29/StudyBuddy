@@ -144,6 +144,9 @@ function pick(lessonIds: string[], quota: Partial<Record<QuestionType, number>>,
 // Term test pattern (Grade VI Term 1, 40 marks, 1 hour). Section A 20 + Section B 20, every item 1 mark.
 const TEST_A = { meaning_kn: 3, meaning_en: 3, en_to_kn: 3, opposite: 3, gender: 3, plural: 2, split: 3 };
 const TEST_B = { one_sentence: 6, who_said: 2, own_sentence: 3 };
+// The whole term paper, marks per question type (each item is 1 mark): Section A, Section B, 4 number names,
+// one poem stanza (4 lines) and the poet's name. The exam readiness meter weighs skills by this.
+export const TERM_PAPER: Partial<Record<QuestionType, number>> = { ...TEST_A, ...TEST_B, number_name: 4, poem_line: 4, poet_name: 1 };
 
 // Test 1 is the school's Term 1 paper (9 Oct 2026), question for question.
 const test1Picks = [

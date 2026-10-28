@@ -3,6 +3,8 @@ import { getWorksheet } from "@/content";
 import { requireChild, userStore } from "@/lib/server/context";
 import { skillRows } from "@/lib/dashboard";
 import { PageHeader } from "@/components/shell/PageHeader";
+import { readiness } from "@/lib/readiness";
+import { ReadinessMeter } from "@/components/readiness/ReadinessMeter";
 
 export const metadata = { title: "My scores · Kali Kannada" };
 
@@ -20,10 +22,13 @@ export default async function MyScores() {
   const best = graded.length ? Math.max(...graded.map(pct)) : null;
   const fullMarks = attempts.filter((a) => a.awarded !== null && a.awarded === a.max).length;
   const skills = skillRows(attempts).filter((s) => s.pct !== null);
+  const ready = readiness(attempts, sessions, child.exam);
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-4">
       <PageHeader title="My scores" sub={`Well done for practising, ${child.nickname}!`} />
+
+      <ReadinessMeter r={ready} audience="child" nickname={child.nickname} />
 
       <section className="grid grid-cols-3 gap-3">
         <Stat label="Latest" value={graded[0] ? `${pct(graded[0])}%` : "–"} />

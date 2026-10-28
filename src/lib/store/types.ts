@@ -1,7 +1,11 @@
 import type { QuestionType, Skill } from "@/content/schema";
 
 // The child's avatar is stored in the "theme" column (themes came first; see lib/avatars).
-export type Child = { id: string; parentId: string; nickname: string; theme: string; createdAt: string };
+export type Child = { id: string; parentId: string; nickname: string; theme: string; createdAt: string; exam?: ExamPlan | null };
+
+// The next exam, set by the parent in Parent view (stored in children.exam, migration 0004).
+// actualMark is the real result, entered afterwards; acknowledged means the parent has read the readiness note.
+export type ExamPlan = { date: string | null; lessonIds: string[]; actualMark?: number | null; acknowledged?: boolean };
 
 export type SessionStatus = "writing" | "reading" | "checking" | "graded";
 export type PracticeSession = {
@@ -99,7 +103,7 @@ export interface Store {
   listChildren(parentId: string): Promise<Child[]>;
   getChild(parentId: string, childId: string): Promise<Child | null>;
   createChild(parentId: string, nickname: string, avatar: string): Promise<Child>;
-  updateChild(parentId: string, childId: string, patch: Partial<Pick<Child, "nickname" | "theme">>): Promise<void>;
+  updateChild(parentId: string, childId: string, patch: Partial<Pick<Child, "nickname" | "theme" | "exam">>): Promise<void>;
   deleteChild(parentId: string, childId: string): Promise<void>;
 
   createSession(s: Omit<PracticeSession, "id" | "startedAt">): Promise<PracticeSession>;
