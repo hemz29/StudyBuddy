@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getLesson } from "@/content";
 import { EXAM_MARKS, levelLabel, type LevelId, type Readiness } from "@/lib/readiness";
-import { ReadinessDial } from "./ReadinessDial";
+import { LEVEL_COLORS, ReadinessDial } from "./ReadinessDial";
 import { ReadinessInfo } from "./ReadinessInfo";
 
 const CHEER: Record<LevelId, string> = {
@@ -36,8 +36,8 @@ export function ReadinessMeter({ r, audience, nickname }: { r: Readiness; audien
 
       <div className="mt-4 grid items-center gap-6 md:grid-cols-[18rem_1fr]">
         <div className="flex flex-col items-center">
-          <ReadinessDial pct={r.pct} active={r.enoughEvidence} />
-          <p className="-mt-1 text-lg font-bold">{r.enoughEvidence ? levelLabel(r.level) : "Not enough practice yet"}</p>
+          <ReadinessDial pct={r.pct} level={r.level} active={r.enoughEvidence} />
+          <p className="-mt-1 text-lg font-bold" style={r.enoughEvidence ? { color: LEVEL_COLORS[r.level].text } : undefined}>{r.enoughEvidence ? levelLabel(r.level) : "Not enough practice yet"}</p>
           {r.enoughEvidence && <p className="text-sm text-muted">Likely {r.low}–{r.high} out of {EXAM_MARKS}</p>}
         </div>
 

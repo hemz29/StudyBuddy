@@ -6,7 +6,7 @@ import { ChoiceCard } from "@/components/shell/PageHeader";
 import { KnText } from "@/components/Word";
 import { LineIcon } from "@/components/LineIcon";
 import { EXAM_MARKS, levelLabel, readiness } from "@/lib/readiness";
-import { ReadinessDial } from "@/components/readiness/ReadinessDial";
+import { LEVEL_COLORS, ReadinessDial } from "@/components/readiness/ReadinessDial";
 import { countdown } from "@/components/readiness/ReadinessMeter";
 
 export default async function LearnHome() {
@@ -58,8 +58,8 @@ export default async function LearnHome() {
         <Group title="My progress" single>
           <ChoiceCard href="/learn/scores" tone="sage" icon={<LineIcon name="trophy" size={20} />} title="Exam readiness" sub={countdown(ready) ?? "How ready you are, and your scores"}>
             <span className="flex flex-col items-center">
-              <ReadinessDial pct={ready.pct} active={ready.enoughEvidence} size="sm" />
-              <span className="text-sm font-bold">{ready.enoughEvidence ? levelLabel(ready.level) : "Finish a practice test to see it"}</span>
+              <ReadinessDial pct={ready.pct} level={ready.level} active={ready.enoughEvidence} size="sm" />
+              <span className="text-sm font-bold" style={ready.enoughEvidence ? { color: LEVEL_COLORS[ready.level].text } : undefined}>{ready.enoughEvidence ? levelLabel(ready.level) : "Finish a practice test to see it"}</span>
               {ready.enoughEvidence && <span className="text-xs text-muted">Likely {ready.low}–{ready.high} out of {EXAM_MARKS}</span>}
             </span>
             <span className="text-sm">{done} worksheet{done === 1 ? "" : "s"} finished{latestPct === null ? "" : ` · latest ${latestPct}%`}</span>
