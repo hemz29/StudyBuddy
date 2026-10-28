@@ -1,6 +1,6 @@
 import { getLesson, getQuestion, getWorksheet, LESSONS, SECTION_TEXT, TERM_PAPER } from "@/content";
 import type { QuestionType } from "@/content/schema";
-import type { ExamPlan, PracticeSession, QuestionAttempt } from "@/lib/store/types";
+import type { AttemptScore, ExamPlan, PracticeSession } from "@/lib/store/types";
 
 // Exam readiness: an estimate of the exam mark, worked out from saved answers – no AI involved.
 // The plain-language version of these rules is in components/ReadinessInfo.tsx; keep the two in step.
@@ -99,7 +99,7 @@ function practiceHref(type: QuestionType, lessonIds: string[]) {
   return "/learn/writing";
 }
 
-export function readiness(attempts: QuestionAttempt[], sessions: PracticeSession[], plan: ExamPlan | null | undefined, now = Date.now()): Readiness {
+export function readiness(attempts: AttemptScore[], sessions: PracticeSession[], plan: ExamPlan | null | undefined, now = Date.now()): Readiness {
   const exam: ExamPlan = { date: plan?.date ?? null, lessonIds: plan?.lessonIds?.length ? plan.lessonIds : allLessonIds(), actualMark: plan?.actualMark ?? null, acknowledged: plan?.acknowledged };
   const inExam = new Set(exam.lessonIds);
   const blueprint = examBlueprint(exam.lessonIds);

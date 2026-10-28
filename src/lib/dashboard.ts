@@ -1,6 +1,6 @@
 import { SKILLS, type QuestionType, type Skill } from "@/content/schema";
 import { getWorksheet, SECTION_TEXT } from "@/content";
-import type { PracticeSession, QuestionAttempt } from "@/lib/store/types";
+import type { AttemptScore, PracticeSession, QuestionAttempt } from "@/lib/store/types";
 
 // Everything on the parent dashboard is computed here from saved attempts – no AI involved.
 
@@ -17,9 +17,9 @@ export type SkillRow = {
 export type TrendPoint = { sessionId: string; date: string; title: string; awarded: number; max: number; pct: number; ownPct: number };
 
 const DAY = 24 * 60 * 60 * 1000;
-const scored = (a: QuestionAttempt) => a.awarded !== null && a.status !== "blank";
+const scored = (a: AttemptScore) => a.awarded !== null && a.status !== "blank";
 
-export function skillRows(attempts: QuestionAttempt[], now = Date.now()): SkillRow[] {
+export function skillRows(attempts: AttemptScore[], now = Date.now()): SkillRow[] {
   return (Object.keys(SKILLS) as Skill[]).map((skill) => {
     const mine = attempts.filter((a) => a.skill === skill && scored(a));
     const earned = mine.reduce((t, a) => t + (a.awarded ?? 0), 0);

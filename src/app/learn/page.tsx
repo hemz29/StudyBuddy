@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { getWorksheet } from "@/content";
 import { requireChild, userStore } from "@/lib/server/context";
+import type { ExamPlan, PracticeSession } from "@/lib/store/types";
 import { AvatarImage } from "@/components/AvatarImage";
 import { ChoiceCard } from "@/components/shell/PageHeader";
 import { KnText } from "@/components/Word";
@@ -12,8 +14,7 @@ import { countdown } from "@/components/readiness/ReadinessMeter";
 export default async function LearnHome() {
   const { parent, child } = await requireChild();
   const store = await userStore();
-  const [sessions, attempts] = await Promise.all([store.listSessions(parent.id, child.id), store.listChildAttempts(parent.id, child.id)]);
-  const ready = readiness(attempts, sessions, child.exam);
+  const sessions = await store.listSessions(parent.id, child.id);
   const open = sessions
     .filter((s) => s.kind === "worksheet" && s.status !== "graded" && !getWorksheet(s.worksheetId)?.retired)
     .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
@@ -56,17 +57,39 @@ export default async function LearnHome() {
           </Group>
         </div>
         <Group title="My progress" single>
-          <ChoiceCard href="/learn/scores" tone="sage" icon={<LineIcon name="trophy" size={20} />} title="Exam readiness" sub={countdown(ready) ?? "How ready you are, and your scores"}>
-            <span className="flex flex-col items-center">
-              <ReadinessDial pct={ready.pct} level={ready.level} active={ready.enoughEvidence} size="sm" />
-              <span className="text-sm font-bold" style={ready.enoughEvidence ? { color: LEVEL_COLORS[ready.level].text } : undefined}>{ready.enoughEvidence ? levelLabel(ready.level) : "Finish a practice test to see it"}</span>
-              {ready.enoughEvidence && <span className="text-xs text-muted">Likely {ready.low}–{ready.high} out of {EXAM_MARKS}</span>}
-            </span>
+          <ChoiceCard href="/learn/scores" tone="sage" icon={<LineIcon name="trophy" size={20} />} title="Exam readiness" sub={countdown(readiness([], [], child.exam)) ?? "How ready you are, and your scores"}>
+            {/* The rest of the page doesn't wait for the answers the meter needs: the dial fills in when they arrive. */}
+            <Suspense fallback={<TileDial />}>
+              <ReadinessTile parentId={parent.id} childId={child.id} sessions={sessions} exam={child.exam} />
+            </Suspense>
             <span className="text-sm">{done} worksheet{done === 1 ? "" : "s"} finished{latestPct === null ? "" : ` · latest ${latestPct}%`}</span>
           </ChoiceCard>
         </Group>
       </div>
     </div>
+  );
+}
+
+async function ReadinessTile({ parentId, childId, sessions, exam }: { parentId: string; childId: string; sessions: PracticeSession[]; exam?: ExamPlan | null }) {
+  const attempts = await (await userStore()).listAttemptScores(parentId, childId);
+  const ready = readiness(attempts, sessions, exam);
+  return (
+    <span className="flex flex-col items-center">
+      <ReadinessDial pct={ready.pct} level={ready.level} active={ready.enoughEvidence} size="sm" />
+      <span className="text-sm font-bold" style={ready.enoughEvidence ? { color: LEVEL_COLORS[ready.level].text } : undefined}>{ready.enoughEvidence ? levelLabel(ready.level) : "Finish a practice test to see it"}</span>
+      {ready.enoughEvidence && <span className="text-xs text-muted">Likely {ready.low}–{ready.high} out of {EXAM_MARKS}</span>}
+    </span>
+  );
+}
+
+// Same size as the filled tile, so nothing jumps when the dial arrives.
+function TileDial() {
+  return (
+    <span className="flex flex-col items-center" aria-busy>
+      <ReadinessDial pct={0} active={false} size="sm" />
+      <span className="text-sm text-muted">Working out…</span>
+      <span className="text-xs">&nbsp;</span>
+    </span>
   );
 }
 

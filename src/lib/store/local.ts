@@ -115,6 +115,12 @@ export const localStore: Store = {
     read((db) => db.attempts.filter((a) => a.sessionId === sessionId && a.parentId === parentId)),
   listChildAttempts: (parentId, childId) =>
     read((db) => db.attempts.filter((a) => a.childId === childId && a.parentId === parentId)),
+  listAttemptScores: (parentId, childId) =>
+    read((db) =>
+      db.attempts
+        .filter((a) => a.childId === childId && a.parentId === parentId)
+        .map(({ questionId, type, skill, sessionId, awarded, max, status, helpLevel, createdAt }) => ({ questionId, type, skill, sessionId, awarded, max, status, helpLevel, createdAt })),
+    ),
 
   createToken: (t) =>
     tx((db) => {

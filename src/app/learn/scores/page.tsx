@@ -14,7 +14,7 @@ const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 export default async function MyScores() {
   const { parent, child } = await requireChild();
   const store = await userStore();
-  const [sessions, attempts] = await Promise.all([store.listSessions(parent.id, child.id), store.listChildAttempts(parent.id, child.id)]);
+  const [sessions, attempts] = await Promise.all([store.listSessions(parent.id, child.id), store.listAttemptScores(parent.id, child.id)]);
   const graded = sessions
     .filter((s) => s.kind === "worksheet" && s.status === "graded" && s.max)
     .sort((a, b) => (b.completedAt ?? "").localeCompare(a.completedAt ?? ""));

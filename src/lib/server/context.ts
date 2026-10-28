@@ -83,11 +83,12 @@ export function serviceStore(): Store {
 
 const CHILD_COOKIE = "sb_child";
 
-export async function getActiveChild(parentId: string): Promise<Child | null> {
+// Cached per request, so the learn layout and the page share one lookup.
+export const getActiveChild = cache(async (parentId: string): Promise<Child | null> => {
   const id = (await cookies()).get(CHILD_COOKIE)?.value;
   if (!id) return null;
   return (await userStore()).getChild(parentId, id);
-}
+});
 
 export async function requireChild() {
   const parent = await requireParent();

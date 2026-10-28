@@ -74,6 +74,15 @@ export function supabaseStore(db: SupabaseClient): Store {
       rows(await db.from("question_attempts").select().eq("parent_id", parentId).eq("session_id", sessionId)),
     listChildAttempts: async (parentId, childId) =>
       rows(await db.from("question_attempts").select().eq("parent_id", parentId).eq("child_id", childId).order("created_at")),
+    listAttemptScores: async (parentId, childId) =>
+      rows(
+        await db
+          .from("question_attempts")
+          .select("question_id, type, skill, session_id, awarded, max, status, help_level, created_at")
+          .eq("parent_id", parentId)
+          .eq("child_id", childId)
+          .order("created_at"),
+      ),
 
     createToken: async (t) => {
       check(await db.from("upload_tokens").insert(toRow(t)));

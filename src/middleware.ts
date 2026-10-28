@@ -33,5 +33,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|worksheets/|snap/|api/snap/).*)"],
+  // Public files (images, icons, audio, the word list) never need a sign-in, so they skip this and come straight from the CDN.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|worksheets/|snap/|api/snap/|art/|brand/|icons/|audio/|.*\\.(?:png|webp|jpg|jpeg|svg|ico|mp3|json|txt)$).*)"],
 };

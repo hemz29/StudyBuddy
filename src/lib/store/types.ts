@@ -68,6 +68,8 @@ export type QuestionAttempt = {
   createdAt: string;
 };
 
+export type AttemptScore = Pick<QuestionAttempt, "questionId" | "type" | "skill" | "sessionId" | "awarded" | "max" | "status" | "helpLevel" | "createdAt">;
+
 export type AttemptFeedback = {
   en: string;
   points?: { point: string; met: boolean }[];
@@ -120,6 +122,8 @@ export interface Store {
   updateAttempt(parentId: string, attemptId: string, patch: Partial<QuestionAttempt>): Promise<void>;
   listSessionAttempts(parentId: string, sessionId: string): Promise<QuestionAttempt[]>;
   listChildAttempts(parentId: string, childId: string): Promise<QuestionAttempt[]>;
+  // Just the marks of every answer, without the text, feedback or handwriting: enough for scores and readiness.
+  listAttemptScores(parentId: string, childId: string): Promise<AttemptScore[]>;
 
   createToken(t: Omit<UploadToken, "usedAt">): Promise<void>;
   getToken(token: string): Promise<UploadToken | null>;
