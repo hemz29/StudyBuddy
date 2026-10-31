@@ -24,11 +24,16 @@ const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 const date = (iso?: string | null) => (iso ? new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) : "–");
 
 // The owner's view of the pilot: who joined, who practised, how long sessions took, what parents looked at.
-export default async function Admin({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+type Query = { view?: string; kids?: string; families?: string; sessions?: string };
+
+export default async function Admin({ searchParams }: { searchParams: Promise<Query> }) {
   const me = await requireParent();
   if (!isAdmin(me.email)) notFound();
   // Real users unless Demo data is chosen. Feedback only ever comes from real parents.
-  const demo = (await searchParams).view === "demo";
+  const query = await searchParams;
+  const demo = query.view === "demo";
+  // Long tables show 10 rows a page; each table keeps its own page in the address (?kids=2, ?families=3, ?sessions=1).
+  const pages = { kids: paged(query, "kids"), families: paged(query, "families"), sessions: paged(query, "sessions") };
   const [d, fbReal] = await Promise.all([loadAdminData(demo ? "demo" : "real"), loadFeedback()]);
   const fb = demo ? { ...fbReal, rows: [] as typeof fbReal.rows } : fbReal;
 
@@ -155,10 +160,10 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           </p>
         )}
 
-        <Card title="What each child is doing">
+        <Card title="What each child is doing" id="kids">
           <p className="mt-1 text-sm text-muted">One row per child, most recently active first. Signals point out who needs a nudge and where children get stuck.</p>
           <Table head={["Child", "Family", "Days active", "Time spent", "Last seen", "Lessons read", "Grammar cards", "Worksheets", "Hints", "Signals"]}>
-            {kids.map((k) => (
+            {pages.kids.slice(kids).map((k) => (
               <tr key={k.childId} className="border-t border-line align-top">
                 <td className="py-2 font-bold">{k.nickname}</td>
                 <td>{label(familyOf.get(k.parentId))}</td>
@@ -177,11 +182,12 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
               </tr>
             ))}
           </Table>
+          <Pager query={query} name="kids" total={kids.length} page={pages.kids.page} />
         </Card>
 
-        <Card title="Families">
+        <Card title="Families" id="families">
           <Table head={["Parent email", "Joined", "Last sign-in", "Children", "Worksheets (finished)", "Dashboard views", "Device use", "Last activity"]}>
-            {d.families.map((f) => {
+            {pages.families.slice(d.families).map((f) => {
               const kids = d.children.filter((c) => c.parentId === f.parentId);
               const ws = worksheets.filter((s) => s.parentId === f.parentId);
               const acts = d.activity.filter((a) => a.parentId === f.parentId);
@@ -200,11 +206,12 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
               );
             })}
           </Table>
+          <Pager query={query} name="families" total={d.families.length} page={pages.families.page} />
         </Card>
 
-        <Card title="Worksheet sessions">
+        <Card title="Worksheet sessions" id="sessions">
           <Table head={["Started", "Family", "Child", "Worksheet", "Status", "Score", "Time", "Hints (1 / 2)"]}>
-            {worksheets.map((s) => {
+            {pages.sessions.slice(worksheets).map((s) => {
               const ws = getWorksheet(s.worksheetId);
               const levels = Object.values(s.help ?? {});
               return (
@@ -221,6 +228,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
               );
             })}
           </Table>
+          <Pager query={query} name="sessions" total={worksheets.length} page={pages.sessions.page} />
         </Card>
 
       </main>
@@ -238,12 +246,47 @@ function Stat({ label, value, note }: { label: string; value: number | string; n
   );
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({ title, id, children }: { title: string; id?: string; children: React.ReactNode }) {
   return (
-    <section className="card bg-white p-5">
+    <section id={id} className="card scroll-mt-4 bg-white p-5">
       <h2 className="text-xl">{title}</h2>
       {children}
     </section>
+  );
+}
+
+const PAGE = 10;
+
+function paged(query: Query, name: "kids" | "families" | "sessions") {
+  const page = Math.max(1, Math.floor(Number(query[name]) || 1));
+  return { page, slice: <T,>(rows: T[]) => rows.slice((page - 1) * PAGE, page * PAGE) };
+}
+
+// "1 2 3 … 9 →" under a table. Other tables' pages and the Real/Demo choice stay as they are.
+function Pager({ query, name, total, page }: { query: Query; name: "kids" | "families" | "sessions"; total: number; page: number }) {
+  const count = Math.ceil(total / PAGE);
+  if (count <= 1) return null;
+  const href = (n: number) => {
+    const q = new URLSearchParams(Object.entries(query).filter(([, v]) => v) as [string, string][]);
+    if (n === 1) q.delete(name);
+    else q.set(name, String(n));
+    const s = q.toString();
+    return `/admin${s ? `?${s}` : ""}#${name}`;
+  };
+  const shown = [...new Set([1, page - 1, page, page + 1, count])].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
+  const cur = Math.min(page, count);
+  return (
+    <nav aria-label="Pages" className="mt-3 flex flex-wrap items-center gap-1 text-sm">
+      <span className="mr-2 text-muted">{(cur - 1) * PAGE + 1}–{Math.min(cur * PAGE, total)} of {total}</span>
+      {cur > 1 && <Link href={href(cur - 1)} className="top-btn !h-8">← Prev</Link>}
+      {shown.map((n, i) => (
+        <span key={n} className="flex items-center gap-1">
+          {i > 0 && n - shown[i - 1] > 1 && <span className="px-1 text-muted">…</span>}
+          <Link href={href(n)} aria-current={n === cur ? "page" : undefined} className={`top-btn !h-8 !px-3 ${n === cur ? "!border-black !bg-black !text-white" : ""}`}>{n}</Link>
+        </span>
+      ))}
+      {cur < count && <Link href={href(cur + 1)} className="top-btn !h-8">Next →</Link>}
+    </nav>
   );
 }
 
