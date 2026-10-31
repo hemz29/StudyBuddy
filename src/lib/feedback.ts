@@ -14,5 +14,10 @@ export function nps(scores: number[]) {
   return Math.round(pct((n) => n >= 9) - pct((n) => n <= 6));
 }
 
+// Who's behind the NPS: fans (9–10), neutral (7–8) and unhappy (0–6).
+export function npsBreakdown(scores: number[]) {
+  return { fans: scores.filter((n) => n >= 9).length, neutral: scores.filter((n) => n >= 7 && n <= 8).length, unhappy: scores.filter((n) => n <= 6).length };
+}
+
 export const countBy = (rows: FeedbackRow[], key: "intent" | "replace", options: readonly string[]) =>
   options.map((o) => ({ what: o, n: rows.filter((r) => [r.answers[key]].flat().includes(o)).length }));

@@ -10,7 +10,7 @@ import { DemoMenu } from "@/components/DemoMenu";
 import { activityMix, busyTimes, childSummaries, devices, funnel, median, repeatParents, visits, weekly } from "@/lib/adminStats";
 import { Bars, GrowthChart } from "@/components/admin/AdminCharts";
 import { loadFeedback } from "@/lib/server/feedback";
-import { INTENT, REPLACE, countBy, nps } from "@/lib/feedback";
+import { INTENT, REPLACE, countBy, nps, npsBreakdown } from "@/lib/feedback";
 
 // "💻 75% · 📱 20% · tablet 5% (40 visits)" from the device noted on each visit.
 function deviceSplit(acts: { device: string | null }[]) {
@@ -65,6 +65,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<Qu
     return m;
   }, {})).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([id, n]) => ({ what: getLesson(id)?.title.en ?? id, n }));
   const score = nps(fb.rows.map((r) => r.answers.nps));
+  const split = npsBreakdown(fb.rows.map((r) => r.answers.nps));
   const willUse = fb.rows.filter((r) => r.answers.intent === "Definitely" || r.answers.intent === "Probably").length;
   const weeks = weekly(d.families, d.children, d.sessions, vs);
   const busy = busyTimes(vs);
@@ -73,11 +74,11 @@ export default async function Admin({ searchParams }: { searchParams: Promise<Qu
 
   return (
     <div className="app-bg min-h-screen">
-      <main className={`mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 ${demo ? "demo-view" : ""}`}>
+      <main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
         <Logo />
         <DemoMenu back={demo ? "/admin?view=demo" : "/admin"} />
         <div className="flex flex-wrap items-center gap-4">
-          <h1 className="text-3xl">Pilot admin {demo && <span className="ml-2 rounded-full bg-[var(--brand-yellow)] px-3 py-1 align-middle text-sm font-bold">DEMO DATA</span>}</h1>
+          <h1 className="text-3xl">Pilot admin</h1>
           {/* Real and demo statistics are never mixed. */}
           <div className="ml-auto flex rounded-full border border-line bg-white p-1 text-sm font-semibold" role="group" aria-label="Which statistics">
             <Link href="/admin" aria-current={!demo} className={`rounded-full px-4 py-1.5 ${!demo ? "bg-black text-white" : "text-muted hover:text-ink"}`}>Real users</Link>
@@ -102,7 +103,12 @@ export default async function Admin({ searchParams }: { searchParams: Promise<Qu
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <Stat label="Replies" value={fb.rows.length} />
                 <Stat label="Will use it for the next test" value={`${Math.round((willUse / fb.rows.length) * 100)}%`} note={`${willUse} said definitely or probably`} />
-                <Stat label="NPS" value={score ?? "–"} note="% 9–10 minus % 0–6" />
+                <Stat
+                  label="NPS"
+                  value={score ?? "–"}
+                  note={`${split.fans} fan${split.fans === 1 ? "" : "s"} · ${split.neutral} neutral · ${split.unhappy} unhappy`}
+                  hint="NPS = % of fans (scored 9–10) minus % unhappy (scored 0–6). Neutral replies (7–8) don't count either way."
+                />
                 <Stat label="Average recommend" value={(fb.rows.reduce((t, r) => t + r.answers.nps, 0) / fb.rows.length).toFixed(1)} note="out of 10" />
               </div>
               <div className="grid gap-3 md:grid-cols-2">
@@ -236,12 +242,13 @@ export default async function Admin({ searchParams }: { searchParams: Promise<Qu
   );
 }
 
-function Stat({ label, value, note }: { label: string; value: number | string; note?: string }) {
+function Stat({ label, value, note, hint }: { label: string; value: number | string; note?: string; hint?: string }) {
   return (
-    <div className="card p-3">
+    <div className="card p-3" title={hint}>
       <p className="text-xs font-bold text-muted">{label}</p>
       <p className="mt-0.5 text-2xl font-light">{value}</p>
       {note && <p className="text-xs text-muted">{note}</p>}
+      {hint && <span className="sr-only">{hint}</span>}
     </div>
   );
 }
