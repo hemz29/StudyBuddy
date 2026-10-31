@@ -21,11 +21,14 @@ export function DemoMenuPanel({ role, running, back }: { role: string; running: 
     </form>
   );
   return (
-    <details className="no-print relative">
-      <summary className={`flex cursor-pointer list-none items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold ${running ? "bg-[var(--brand-yellow)] text-black" : "border border-line bg-white text-ink"}`}>
-        {running ? `Demo · ${role}` : "Demo as"} <span aria-hidden>▾</span>
+    <details className="no-print fixed bottom-5 left-5 z-30" open={Boolean(note) || undefined}>
+      <summary
+        title="Owner tools: switch demo role"
+        className={`flex cursor-pointer list-none items-center gap-2 rounded-full px-4 py-2 text-xs font-bold tracking-[0.12em] shadow-lg transition hover:scale-105 ${running ? "bg-[var(--brand-yellow)] text-black" : "bg-black text-[var(--brand-yellow)]"}`}
+      >
+        DEMO{running && <span className="font-semibold tracking-normal">· {role}</span>} <span aria-hidden>▴</span>
       </summary>
-      <div className="absolute right-0 z-40 mt-2 w-72 rounded-2xl border border-line bg-white p-2 text-ink shadow-xl">
+      <div className="absolute bottom-12 left-0 w-72 rounded-2xl border border-line bg-white p-2 text-ink shadow-xl">
         {note && <p className="mb-1 rounded-xl bg-accent-soft px-3 py-2 text-xs">{note}</p>}
         {choice("guest", "Guest (fresh)", "A brand-new guest, as a first-time family sees it")}
         {choice("parent", "Demo parent", "Arjun's family, with 3 weeks of practice")}

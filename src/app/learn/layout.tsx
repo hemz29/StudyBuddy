@@ -21,13 +21,13 @@ export default async function LearnLayout({ children }: { children: React.ReactN
     <div className="app-bg min-h-screen">
       <ActivityPing />
       <LocalTracker childId={child.id} />
+      <DemoMenu back="/learn" />
       {/* The same header as the home page: logo on the left, the menu across the top, the learner and account on the right. */}
       <header className="no-print border-b border-line bg-bg/95 backdrop-blur lg:sticky lg:top-0 lg:z-30">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           <Logo />
           <div className="order-last w-full lg:order-none lg:w-auto lg:flex-1"><SideNav /></div>
           <div className="ml-auto flex items-center gap-1">
-            <DemoMenu back="/learn" />
             <Link href="/profiles" title="Switch learner" className="flex items-center gap-2 rounded-full border border-line bg-white py-1 pl-1 pr-3 text-sm font-medium hover:border-black">
               <AvatarImage avatar={child.theme} size={30} /> {child.nickname}
             </Link>

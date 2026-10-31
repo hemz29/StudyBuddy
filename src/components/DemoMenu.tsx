@@ -7,8 +7,8 @@ import { DEMO_PARENT_EMAIL } from "@/lib/demoData";
 import { SUPABASE_SERVICE_KEY } from "@/lib/supabaseEnv";
 import { DemoMenuPanel } from "./DemoMenuPanel";
 
-// "Demo as ▾" for the admin, in the header of the learner pages, Parent view, profiles and the admin page.
-// While a demo runs it shows which role this tab is in ("Demo · Guest") so there's never any doubt.
+// The admin's floating DEMO switch (bottom-left, away from the page's own buttons), on the learner pages, Parent view,
+// profiles and the admin page. While a demo runs it shows which role this tab is in ("DEMO · Guest").
 export async function DemoMenu({ back }: { back: string }) {
   const parent = await getParent();
   const ticket = readTicket((await cookies()).get(DEMO_COOKIE)?.value, SUPABASE_SERVICE_KEY);

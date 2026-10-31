@@ -69,10 +69,8 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   return (
     <div className="app-bg min-h-screen">
       <main className={`mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 ${demo ? "demo-view" : ""}`}>
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="mr-auto"><Logo /></span>
-          <DemoMenu back={demo ? "/admin?view=demo" : "/admin"} />
-        </div>
+        <Logo />
+        <DemoMenu back={demo ? "/admin?view=demo" : "/admin"} />
         <div className="flex flex-wrap items-center gap-4">
           <h1 className="text-3xl">Pilot admin {demo && <span className="ml-2 rounded-full bg-[var(--brand-yellow)] px-3 py-1 align-middle text-sm font-bold">DEMO DATA</span>}</h1>
           {/* Real and demo statistics are never mixed. */}

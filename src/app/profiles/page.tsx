@@ -47,10 +47,10 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
         <div className="flex flex-wrap items-center gap-3">
           <span className="mr-auto"><Logo /></span>
           <Link href="/parent" className="btn btn-ghost"><LineIcon name="family" size={18} />Parent view</Link>
-          <DemoMenu back="/profiles" />
           <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
         </div>
         {isDemo && <div className="mt-4"><DemoBanner /></div>}
+        <DemoMenu back="/profiles" />
         <h1 className="mt-8 text-4xl">Who is practising today?</h1>
 
         {children.length > 0 && (

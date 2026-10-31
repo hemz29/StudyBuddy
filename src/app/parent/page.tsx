@@ -107,8 +107,6 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       {parent.isGuest && <SaveProgressStrip name={child.nickname} dismissible={false} />}
       <div className="flex flex-wrap items-center gap-3">
         <span className="mr-auto"><Logo /></span>
-        <Link href="/feedback" className="btn btn-ghost"><LineIcon name="chat" size={20} /> Give feedback</Link>
-        <DemoMenu back="/parent" />
         <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
         {children.length > 1 &&
           children.map((c) => (
@@ -277,6 +275,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
         </form>
       </section>
     </main>
+      <DemoMenu back="/parent" />
       <Link href="/feedback" aria-label="Give feedback" title="Give feedback" className="fixed right-5 bottom-5 z-20 grid h-14 w-14 place-items-center rounded-full bg-black text-[var(--brand-yellow)] shadow-lg transition hover:scale-105">
         <LineIcon name="chat" size={26} />
       </Link>
