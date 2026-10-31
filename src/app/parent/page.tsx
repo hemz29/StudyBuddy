@@ -17,6 +17,7 @@ import { isAdmin } from "@/lib/server/admin";
 import { writingTime } from "@/lib/time";
 import { ActivityPing } from "@/components/ActivityPing";
 import { SignOutButton } from "@/components/SignOutButton";
+import { DemoMenu } from "@/components/DemoMenu";
 import { LineIcon } from "@/components/LineIcon";
 import { SaveProgressStrip } from "@/components/SaveProgressStrip";
 
@@ -107,6 +108,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       <div className="flex flex-wrap items-center gap-3">
         <span className="mr-auto"><Logo /></span>
         <Link href="/feedback" className="btn btn-ghost"><LineIcon name="chat" size={20} /> Give feedback</Link>
+        <DemoMenu back="/parent" />
         <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
         {children.length > 1 &&
           children.map((c) => (

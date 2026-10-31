@@ -16,7 +16,7 @@ function friendly(message: string, email: string) {
 }
 
 // Google or an email link, for both creating an account and signing in (Supabase treats them the same).
-export async function SignInCard({ mode, sent, error, email = "" }: { mode: "signin" | "signup"; sent?: string; error?: string; email?: string }) {
+export async function SignInCard({ mode, sent, error, email = "", fromGuest = false }: { mode: "signin" | "signup"; sent?: string; error?: string; email?: string; fromGuest?: boolean }) {
   const problem = error ? friendly(error, email || "your email") : null;
   const google = await googleEnabled();
   return (
@@ -37,6 +37,7 @@ export async function SignInCard({ mode, sent, error, email = "" }: { mode: "sig
             <Link href="/" className="text-sm text-muted underline">← Back</Link>
           </div>
           <HashError />
+          {fromGuest && <p className="text-sm text-muted">You&apos;ve left guest mode. Practice done as a guest on this device doesn&apos;t carry over.</p>}
           {google && (
             <>
               <form action={googleSignIn}>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/SignOutButton";
+import { DemoMenu } from "@/components/DemoMenu";
 import { isDemo, requireParent, setActiveChild, userStore } from "@/lib/server/context";
 import { AVATARS } from "@/lib/avatars";
 import { AvatarImage } from "@/components/AvatarImage";
@@ -46,15 +47,11 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
         <div className="flex flex-wrap items-center gap-3">
           <span className="mr-auto"><Logo /></span>
           <Link href="/parent" className="btn btn-ghost"><LineIcon name="family" size={18} />Parent view</Link>
+          <DemoMenu back="/profiles" />
           <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
         </div>
         {isDemo && <div className="mt-4"><DemoBanner /></div>}
         <h1 className="mt-8 text-4xl">Who is practising today?</h1>
-        {parent.isGuest && (
-          <p className="mt-2 text-sm text-muted">
-            Practising as a guest. <Link href="/save#switch" className="underline">Sign in with a different account</Link>
-          </p>
-        )}
 
         {children.length > 0 && (
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">

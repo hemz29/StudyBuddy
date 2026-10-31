@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabaseEnv";
+import { GUEST_SINCE_COOKIE, guestExpired } from "@/lib/guestPass";
 
 // Keeps the Supabase login session fresh. Does nothing in demo mode.
 export async function middleware(request: NextRequest) {
@@ -28,7 +29,18 @@ export async function middleware(request: NextRequest) {
     },
   });
   // Refreshes the sign-in when needed; getClaims() verifies the token locally where it can, which is faster than getUser().
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+
+  // The 7-day guest pass: the clock starts the first time a guest is seen in this browser; once it has run out,
+  // the guest goes to the route that clears their unsaved data, signs them out and shows /trial-ended.
+  const path = request.nextUrl.pathname;
+  if (data?.claims?.is_anonymous) {
+    const since = request.cookies.get(GUEST_SINCE_COOKIE)?.value;
+    if (!since) response.cookies.set(GUEST_SINCE_COOKIE, new Date().toISOString(), { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+    else if (guestExpired(since) && path !== "/api/guest-expired" && path !== "/trial-ended" && !path.startsWith("/api/")) {
+      return NextResponse.redirect(new URL("/api/guest-expired", request.url));
+    }
+  }
   return response;
 }
 

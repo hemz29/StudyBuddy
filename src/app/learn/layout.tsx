@@ -10,6 +10,7 @@ import { ActivityPing } from "@/components/ActivityPing";
 import { LocalTracker } from "@/components/LocalTracker";
 import { SaveProgressStrip } from "@/components/SaveProgressStrip";
 import { SignOutButton } from "@/components/SignOutButton";
+import { DemoMenu } from "@/components/DemoMenu";
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
   const { parent, child } = await requireChild();
@@ -26,6 +27,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
           <Logo />
           <div className="order-last w-full lg:order-none lg:w-auto lg:flex-1"><SideNav /></div>
           <div className="ml-auto flex items-center gap-1">
+            <DemoMenu back="/learn" />
             <Link href="/profiles" title="Switch learner" className="flex items-center gap-2 rounded-full border border-line bg-white py-1 pl-1 pr-3 text-sm font-medium hover:border-black">
               <AvatarImage avatar={child.theme} size={30} /> {child.nickname}
             </Link>

@@ -12,6 +12,7 @@ type Db = {
   tokens: UploadToken[];
   ai: (AiUsageEvent & { parentId: string; at: string })[];
   activity: (ActivityEvent & { parentId: string; createdAt: string })[];
+  demoParents?: string[]; // dummy families for demos (see lib/server/demo.ts), shown only in the admin page's Demo view
 };
 
 const DIR = process.env.LOCAL_DATA_DIR ?? path.join(process.cwd(), ".data");
@@ -153,3 +154,23 @@ export const localStore: Store = {
 
 // Everything in the demo store, for the admin page.
 export const localDump = () => load();
+
+// Demo data in the local file: the same dummy families as on Supabase, marked so the admin page can keep them apart.
+export async function localResetDemo(families: { parentId: string; child: Child; sessions: PracticeSession[]; attempts: QuestionAttempt[]; activity: (ActivityEvent & { createdAt: string })[]; ai: (AiUsageEvent & { at: string })[] }[]) {
+  await tx((db) => {
+    const old = new Set(db.demoParents ?? []);
+    db.children = db.children.filter((c) => !old.has(c.parentId));
+    db.sessions = db.sessions.filter((s) => !old.has(s.parentId));
+    db.attempts = db.attempts.filter((a) => !old.has(a.parentId));
+    db.activity = db.activity.filter((a) => !old.has(a.parentId));
+    db.ai = db.ai.filter((a) => !old.has(a.parentId));
+    for (const f of families) {
+      db.children.push(f.child);
+      db.sessions.push(...f.sessions);
+      db.attempts.push(...f.attempts);
+      db.activity.push(...f.activity.map((a) => ({ ...a, parentId: f.parentId })));
+      db.ai.push(...f.ai.map((a) => ({ ...a, parentId: f.parentId })));
+    }
+    db.demoParents = families.map((f) => f.parentId);
+  });
+}

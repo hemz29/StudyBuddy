@@ -212,3 +212,25 @@ h2,
 @media (prefers-reduced-motion: reduce) {
   .badge-pop { animation: none; }
 }
+
+/* The admin page's Demo view: every card is striped and labelled, so dummy numbers can't pass for real ones. */
+.demo-stripes,
+.demo-view .card {
+  background-image: repeating-linear-gradient(-45deg, rgba(251, 206, 26, 0.16) 0 12px, transparent 12px 24px);
+}
+.demo-view .card {
+  position: relative;
+}
+.demo-view .card::after {
+  content: "DEMO";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border-radius: 999px;
+  background: var(--brand-yellow);
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #000;
+}

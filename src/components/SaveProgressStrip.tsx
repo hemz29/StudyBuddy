@@ -14,11 +14,10 @@ export function SaveProgressStrip({ name, dismissible = true }: { name?: string;
       <Link href="/save" className="flex flex-1 items-center gap-3">
         <span className="flex-1">
           <b className="font-semibold text-[var(--brand-yellow)]">Save {name ? `${name}'s` : "your"} progress</b>
-          <span className="block text-gray-300">Add your email so you can come back on any device.</span>
+          <span className="block text-gray-300">Guest practice is kept for 7 days. Add your email to keep it and come back on any device.</span>
         </span>
         <span aria-hidden>→</span>
       </Link>
-      <Link href="/save#switch" className="hidden shrink-0 text-xs text-gray-300 underline hover:text-white sm:block">Use a different account</Link>
       {dismissible && (
         <button
           aria-label="Not now"

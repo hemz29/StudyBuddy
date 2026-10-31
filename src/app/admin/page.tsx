@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLesson, getWorksheet } from "@/content";
 import { SKILLS, type Skill } from "@/content/schema";
@@ -5,6 +6,7 @@ import { requireParent } from "@/lib/server/context";
 import { isAdmin, loadAdminData, type Family } from "@/lib/server/admin";
 import { writingTime } from "@/lib/time";
 import { Logo } from "@/components/shell/Logo";
+import { DemoMenu } from "@/components/DemoMenu";
 import { activityMix, busyTimes, childSummaries, devices, funnel, median, repeatParents, visits, weekly } from "@/lib/adminStats";
 import { Bars, GrowthChart } from "@/components/admin/AdminCharts";
 import { loadFeedback } from "@/lib/server/feedback";
@@ -22,10 +24,13 @@ const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 const date = (iso?: string | null) => (iso ? new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) : "–");
 
 // The owner's view of the pilot: who joined, who practised, how long sessions took, what parents looked at.
-export default async function Admin() {
+export default async function Admin({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const me = await requireParent();
   if (!isAdmin(me.email)) notFound();
-  const [d, fb] = await Promise.all([loadAdminData(), loadFeedback()]);
+  // Real users unless Demo data is chosen. Feedback only ever comes from real parents.
+  const demo = (await searchParams).view === "demo";
+  const [d, fbReal] = await Promise.all([loadAdminData(demo ? "demo" : "real"), loadFeedback()]);
+  const fb = demo ? { ...fbReal, rows: [] as typeof fbReal.rows } : fbReal;
 
   const familyOf = new Map(d.families.map((f) => [f.parentId, f]));
   const childOf = new Map(d.children.map((c) => [c.id, c]));
@@ -63,12 +68,29 @@ export default async function Admin() {
 
   return (
     <div className="app-bg min-h-screen">
-      <main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6">
-        <Logo />
-        <h1 className="text-3xl">Pilot admin</h1>
+      <main className={`mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 ${demo ? "demo-view" : ""}`}>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="mr-auto"><Logo /></span>
+          <DemoMenu back={demo ? "/admin?view=demo" : "/admin"} />
+        </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <h1 className="text-3xl">Pilot admin {demo && <span className="ml-2 rounded-full bg-[var(--brand-yellow)] px-3 py-1 align-middle text-sm font-bold">DEMO DATA</span>}</h1>
+          {/* Real and demo statistics are never mixed. */}
+          <div className="ml-auto flex rounded-full border border-line bg-white p-1 text-sm font-semibold" role="group" aria-label="Which statistics">
+            <Link href="/admin" aria-current={!demo} className={`rounded-full px-4 py-1.5 ${!demo ? "bg-black text-white" : "text-muted hover:text-ink"}`}>Real users</Link>
+            <Link href="/admin?view=demo" aria-current={demo} className={`rounded-full px-4 py-1.5 ${demo ? "bg-[var(--brand-yellow)] text-black" : "text-muted hover:text-ink"}`}>Demo data</Link>
+          </div>
+        </div>
+        {demo && (
+          <p className="demo-stripes rounded-2xl border-2 border-black p-4 text-center font-bold">
+            DUMMY DATA, for demonstration only. Not real users. <Link href="/admin" className="underline">Back to real statistics</Link>
+          </p>
+        )}
 
         <Card title="Feedback">
-          {fb.missing ? (
+          {demo ? (
+            <p className="mt-2 text-muted">Feedback only ever comes from real parents. See it under <Link href="/admin" className="underline">Real users</Link>.</p>
+          ) : fb.missing ? (
             <p className="mt-2 rounded-2xl bg-warn-soft p-4 text-warn">Answers can&apos;t be saved yet: run <code>supabase/migrations/0003_feedback.sql</code> in the Supabase SQL Editor.</p>
           ) : !fb.rows.length ? (
             <p className="mt-2 text-muted">No answers yet. Share <b>/feedback?n=Name</b> with parents.</p>

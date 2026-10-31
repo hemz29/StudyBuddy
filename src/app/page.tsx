@@ -5,6 +5,7 @@ import { getActiveChild, getParent } from "@/lib/server/context";
 import { startFree } from "@/lib/server/startFree";
 import { SignInCard } from "@/components/signin/SignInCard";
 import { LogoMark } from "@/components/shell/Logo";
+import { GoogleOneTap } from "@/components/signin/GoogleOneTap";
 
 export const dynamic = "force-dynamic";
 
@@ -31,18 +32,19 @@ function StartButton({ className = "" }: { className?: string }) {
 }
 
 // The public home page. Signed-in families (guests included) go straight to their practice.
-export default async function Home({ searchParams }: { searchParams: Promise<{ sent?: string; error?: string; email?: string; mode?: string }> }) {
+export default async function Home({ searchParams }: { searchParams: Promise<{ sent?: string; error?: string; email?: string; mode?: string; from?: string }> }) {
   const parent = await getParent();
   if (parent) {
     const child = await getActiveChild(parent.id);
     redirect(child ? "/learn" : "/profiles");
   }
-  const { sent, error, email, mode: m } = await searchParams;
+  const { sent, error, email, mode: m, from } = await searchParams;
   // Three ways in: try without an account, create one, or sign in. The last two open the same Google / email card.
   const mode = m === "signin" || m === "signup" ? m : sent || error ? "signup" : null;
 
   return (
     <div className="min-h-screen bg-bg text-ink">
+      {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && <GoogleOneTap clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID} />}
       <header className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-4">
         <LogoMark size={36} />
         <span className="flex flex-1 items-center gap-2 text-lg font-medium">Kali Kannada <Beta /></span>
@@ -64,7 +66,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
             <div className="mt-2">
               {mode ? (
                 <div className="max-w-md">
-                  <SignInCard mode={mode} sent={sent} error={error} email={email} />
+                  <SignInCard mode={mode} sent={sent} error={error} email={email} fromGuest={from === "guest"} />
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">

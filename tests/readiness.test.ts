@@ -111,3 +111,18 @@ describe("exam readiness", () => {
     for (const g of r.gains) expect(g.href).toMatch(/^\/learn\//);
   });
 });
+
+describe("demo family", () => {
+  it("Arjun's seeded history lands at Nearly ready with gains to point at", async () => {
+    const { arjun, buildFamily } = await import("@/lib/demoData");
+    const now = Date.parse("2026-11-20T10:00:00Z");
+    const spec = arjun(now);
+    const f = buildFamily(spec, now);
+    const r = readiness(f.attempts.map((a) => ({ ...a, sessionId: a.sessionKey })), f.sessions.map((s) => ({ ...s, id: s.key, parentId: "p", childId: "c" })), spec.exam, now);
+    expect(r.enoughEvidence).toBe(true);
+    expect(r.level).toBe("nearly");
+    expect(r.gains.length).toBeGreaterThan(0);
+    // The same seed always gives the same demo.
+    expect(buildFamily(spec, now)).toEqual(f);
+  });
+});
