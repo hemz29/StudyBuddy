@@ -46,8 +46,10 @@ export default async function Profiles({ searchParams }: { searchParams: Promise
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="flex flex-wrap items-center gap-3">
           <span className="mr-auto"><Logo /></span>
-          <Link href="/parent" className="btn btn-ghost"><LineIcon name="family" size={18} />Parent view</Link>
-          <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
+          <span className="flex flex-wrap items-center gap-2">
+            <Link href="/parent" className="top-btn"><LineIcon name="family" size={16} />Parent view</Link>
+            <SignOutButton isGuest={parent.isGuest} />
+          </span>
         </div>
         {isDemo && <div className="mt-4"><DemoBanner /></div>}
         <DemoMenu back="/profiles" />

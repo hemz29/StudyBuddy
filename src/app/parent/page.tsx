@@ -107,12 +107,14 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       {parent.isGuest && <SaveProgressStrip name={child.nickname} dismissible={false} />}
       <div className="flex flex-wrap items-center gap-3">
         <span className="mr-auto"><Logo /></span>
-        <SignOutButton isGuest={parent.isGuest} className="btn btn-ghost" />
-        {children.length > 1 &&
-          children.map((c) => (
-            <Link key={c.id} href={`/parent?child=${c.id}`} className={`chip h-9 px-4 ${c.id === child.id ? "bg-accent text-accent-ink" : "bg-white/80"}`}>{c.nickname}</Link>
-          ))}
-        {isAdmin(parent.email) && <Link href="/admin" className="btn btn-ghost">Admin</Link>}
+        <span className="flex flex-wrap items-center gap-2">
+          {children.length > 1 &&
+            children.map((c) => (
+              <Link key={c.id} href={`/parent?child=${c.id}`} className={`top-btn ${c.id === child.id ? "!border-black !bg-black !text-white" : ""}`}>{c.nickname}</Link>
+            ))}
+          {isAdmin(parent.email) && <Link href="/admin" className="top-btn">Admin</Link>}
+          <SignOutButton isGuest={parent.isGuest} />
+        </span>
       </div>
       <header className="flex flex-wrap items-center gap-5 rounded-[var(--radius)] bg-black p-6 text-white sm:p-8">
         <AvatarImage avatar={child.theme} size={72} className="shrink-0 rounded-full bg-white" />
