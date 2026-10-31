@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { requireParent, supabaseServer } from "@/lib/server/context";
+import { requireParent, supabaseServer, userStore } from "@/lib/server/context";
+import { leaveGuest } from "@/lib/server/signOut";
 import { googleEnabled } from "@/lib/server/google";
 import { GoogleLogo } from "@/components/GoogleLogo";
 import { LogoMark } from "@/components/shell/Logo";
@@ -31,6 +32,8 @@ export default async function Save({ searchParams }: { searchParams: Promise<{ s
   if (!parent.isGuest) redirect("/parent");
   const { sent, error } = await searchParams;
   const google = await googleEnabled();
+  const names = (await (await userStore()).listChildren(parent.id)).map((c) => c.nickname);
+  const who = names.length ? names.join(" and ") : "the guest profile";
 
   return (
     <main className="app-bg grid min-h-screen place-items-center px-4 py-10">
@@ -60,6 +63,22 @@ export default async function Save({ searchParams }: { searchParams: Promise<{ s
           </>
         )}
         <Link href="/learn" className="text-center text-sm text-muted underline">Not now, keep practising</Link>
+
+        {/* For a parent who already has an account and started as a guest by mistake (or on a shared device). */}
+        <section id="switch" className="scroll-mt-6 border-t border-line pt-4">
+          <h2 className="text-lg font-bold">Already have an account?</h2>
+          <p className="mt-1 text-sm text-muted">Sign in with your email or Google account instead.</p>
+          <p className="mt-2 rounded-xl bg-warn-soft p-3 text-sm text-warn">
+            <b>{who}</b> on this device {names.length > 1 ? "were" : "was"} started as a guest. After you leave, {names.length > 1 ? "their" : "this"} progress can&apos;t be opened again, unless you save it above first.
+          </p>
+          <form action={leaveGuest} className="mt-3 flex flex-col gap-3">
+            <label className="flex items-start gap-2 text-sm">
+              <input type="checkbox" name="understood" required className="mt-0.5 h-4 w-4 accent-black" />
+              I understand {who}&apos;s guest progress will be lost.
+            </label>
+            <button className="btn btn-ghost">Leave guest mode and sign in</button>
+          </form>
+        </section>
       </div>
     </main>
   );

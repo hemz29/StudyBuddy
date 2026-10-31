@@ -18,6 +18,7 @@ export function SaveProgressStrip({ name, dismissible = true }: { name?: string;
         </span>
         <span aria-hidden>→</span>
       </Link>
+      <Link href="/save#switch" className="hidden shrink-0 text-xs text-gray-300 underline hover:text-white sm:block">Use a different account</Link>
       {dismissible && (
         <button
           aria-label="Not now"
