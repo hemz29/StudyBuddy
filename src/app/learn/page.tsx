@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 import Link from "next/link";
 import { getWorksheet } from "@/content";
 import { requireChild, userStore } from "@/lib/server/context";
@@ -10,6 +10,7 @@ import { LineIcon } from "@/components/LineIcon";
 import { EXAM_MARKS, levelLabel, readiness } from "@/lib/readiness";
 import { LEVEL_COLORS, ReadinessDial } from "@/components/readiness/ReadinessDial";
 import { countdown } from "@/components/readiness/ReadinessMeter";
+import { ReadinessSetup } from "@/components/readiness/ReadinessSetup";
 
 export default async function LearnHome() {
   const { parent, child } = await requireChild();
@@ -57,21 +58,39 @@ export default async function LearnHome() {
           </Group>
         </div>
         <Group title="My progress" single>
-          <ChoiceCard href="/learn/scores" tone="sage" icon={<LineIcon name="trophy" size={20} />} title="Exam readiness" sub={countdown(readiness([], [], child.exam)) ?? "How ready you are, and your scores"}>
-            {/* The rest of the page doesn't wait for the answers the meter needs: the dial fills in when they arrive. */}
-            <Suspense fallback={<TileDial />}>
-              <ReadinessTile parentId={parent.id} childId={child.id} sessions={sessions} exam={child.exam} />
+          {/* Built like a ChoiceCard, but with the setup steps as their own links below the main one. */}
+          <div className="card flex flex-col gap-3 p-4 sm:p-5">
+            <Link href="/learn/scores" className="group flex flex-col gap-2">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-[#f2f2f2] text-xl text-black"><LineIcon name="trophy" size={20} /></span>
+              <span className="serif text-lg font-semibold text-ink">Exam readiness</span>
+              <span className="text-sm text-muted">{countdown(readiness([], [], child.exam)) ?? "How ready you are, and your scores"}</span>
+              {/* The rest of the page doesn't wait for the answers the meter needs: the dial fills in when they arrive. */}
+              <Suspense fallback={<TileDial />}>
+                <ReadinessTile parentId={parent.id} childId={child.id} sessions={sessions} exam={child.exam} />
+              </Suspense>
+              <span className="text-sm">{done} worksheet{done === 1 ? "" : "s"} finished{latestPct === null ? "" : ` · latest ${latestPct}%`}</span>
+            </Link>
+            <Suspense fallback={null}>
+              <ReadinessTileSetup parentId={parent.id} childId={child.id} sessions={sessions} exam={child.exam} />
             </Suspense>
-            <span className="text-sm">{done} worksheet{done === 1 ? "" : "s"} finished{latestPct === null ? "" : ` · latest ${latestPct}%`}</span>
-          </ChoiceCard>
+            <Link href="/learn/scores" aria-label="Open My scores" className="mt-auto text-lg font-bold text-black transition hover:translate-x-1">→</Link>
+          </div>
         </Group>
       </div>
     </div>
   );
 }
 
-async function ReadinessTile({ parentId, childId, sessions, exam }: { parentId: string; childId: string; sessions: PracticeSession[]; exam?: ExamPlan | null }) {
-  const attempts = await (await userStore()).listAttemptScores(parentId, childId);
+// One answers query per page, shared by the dial and the setup steps.
+const attemptScores = cache(async (parentId: string, childId: string) => (await userStore()).listAttemptScores(parentId, childId));
+type TileProps = { parentId: string; childId: string; sessions: PracticeSession[]; exam?: ExamPlan | null };
+
+async function ReadinessTileSetup({ parentId, childId, sessions, exam }: TileProps) {
+  return <ReadinessSetup r={readiness(await attemptScores(parentId, childId), sessions, exam)} />;
+}
+
+async function ReadinessTile({ parentId, childId, sessions, exam }: TileProps) {
+  const attempts = await attemptScores(parentId, childId);
   const ready = readiness(attempts, sessions, exam);
   return (
     <span className="flex flex-col items-center">

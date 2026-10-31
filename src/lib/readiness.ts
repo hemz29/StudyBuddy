@@ -50,6 +50,7 @@ export type TypeReadiness = {
 
 export type Readiness = {
   exam: ExamPlan;
+  chaptersChosen: boolean; // the parent picked the chapters (otherwise every chapter counts)
   daysToGo: number | null;
   enoughEvidence: boolean;
   evidenceShare: number; // share of the paper's marks backed by written answers
@@ -175,6 +176,7 @@ export function readiness(attempts: AttemptScore[], sessions: PracticeSession[],
 
   return {
     exam,
+    chaptersChosen: Boolean(plan?.lessonIds?.length),
     daysToGo,
     enoughEvidence: evidenceShare >= MIN_EVIDENCE,
     evidenceShare,

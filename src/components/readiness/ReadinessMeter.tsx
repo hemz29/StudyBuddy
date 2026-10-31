@@ -3,6 +3,7 @@ import { getLesson } from "@/content";
 import { EXAM_MARKS, levelLabel, type LevelId, type Readiness } from "@/lib/readiness";
 import { LEVEL_COLORS, ReadinessDial } from "./ReadinessDial";
 import { ReadinessInfo } from "./ReadinessInfo";
+import { ReadinessSetup } from "./ReadinessSetup";
 
 const CHEER: Record<LevelId, string> = {
   starting: "Every bit of practice helps. Keep going!",
@@ -42,11 +43,14 @@ export function ReadinessMeter({ r, audience, nickname }: { r: Readiness; audien
         </div>
 
         <div className="flex flex-col gap-3">
+          {child && <ReadinessSetup r={r} />}
           {!r.enoughEvidence ? (
+            child ? null : (
             <p className="rounded-2xl bg-accent-soft p-4">
               {child ? "Finish one practice test to see how ready you are." : `${nickname} needs a few more written answers before the meter can make a fair estimate. Usually one full practice test is enough.`}{" "}
               <Link href="/learn/tests" className="font-bold underline">{child ? "Start a practice test →" : "Practice tests →"}</Link>
             </p>
+            )
           ) : (
             <p className="text-base">{child ? CHEER[r.level] : `${nickname} is likely to score ${r.low}–${r.high} out of ${EXAM_MARKS} today.`}</p>
           )}
@@ -57,7 +61,7 @@ export function ReadinessMeter({ r, audience, nickname }: { r: Readiness; audien
             </p>
           )}
 
-          {r.gains.length > 0 && (
+          {r.enoughEvidence && r.gains.length > 0 && (
             <div>
               <h3 className="text-sm font-bold">{child ? "Practise these to win the most marks" : "Where the most marks are to win"}</h3>
               <ul className="mt-1 flex flex-col gap-1 text-sm">
