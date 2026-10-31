@@ -10,7 +10,7 @@ import { LineIcon } from "@/components/LineIcon";
 import { EXAM_MARKS, levelLabel, readiness } from "@/lib/readiness";
 import { LEVEL_COLORS, ReadinessDial } from "@/components/readiness/ReadinessDial";
 import { countdown } from "@/components/readiness/ReadinessMeter";
-import { ReadinessSetup } from "@/components/readiness/ReadinessSetup";
+import { ReadinessSetupLine } from "@/components/readiness/ReadinessSetup";
 
 export default async function LearnHome() {
   const { parent, child } = await requireChild();
@@ -86,7 +86,7 @@ const attemptScores = cache(async (parentId: string, childId: string) => (await 
 type TileProps = { parentId: string; childId: string; sessions: PracticeSession[]; exam?: ExamPlan | null };
 
 async function ReadinessTileSetup({ parentId, childId, sessions, exam }: TileProps) {
-  return <ReadinessSetup r={readiness(await attemptScores(parentId, childId), sessions, exam)} />;
+  return <ReadinessSetupLine r={readiness(await attemptScores(parentId, childId), sessions, exam)} />;
 }
 
 async function ReadinessTile({ parentId, childId, sessions, exam }: TileProps) {
@@ -95,7 +95,7 @@ async function ReadinessTile({ parentId, childId, sessions, exam }: TileProps) {
   return (
     <span className="flex flex-col items-center">
       <ReadinessDial pct={ready.pct} level={ready.level} active={ready.enoughEvidence} size="sm" />
-      <span className="text-sm font-bold" style={ready.enoughEvidence ? { color: LEVEL_COLORS[ready.level].text } : undefined}>{ready.enoughEvidence ? levelLabel(ready.level) : "Finish a practice test to see it"}</span>
+      <span className="text-sm font-bold" style={ready.enoughEvidence ? { color: LEVEL_COLORS[ready.level].text } : undefined}>{ready.enoughEvidence ? levelLabel(ready.level) : "Not enough to show yet"}</span>
       {ready.enoughEvidence && <span className="text-xs text-muted">Likely {ready.low}–{ready.high} out of {EXAM_MARKS}</span>}
     </span>
   );
